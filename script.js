@@ -1068,6 +1068,19 @@
     });
   });
 
+  // Open sidebar automatically when in portrait mode on small screens
+  function handleOrientation() {
+    if (window.matchMedia('(orientation: portrait)').matches && window.innerWidth <= 700) {
+      sidebarEl.classList.add('open');
+      if (sidebarOverlayEl) sidebarOverlayEl.classList.add('visible');
+    } else {
+      sidebarEl.classList.remove('open');
+      if (sidebarOverlayEl) sidebarOverlayEl.classList.remove('visible');
+    }
+  }
+  handleOrientation();
+  window.addEventListener('orientationchange', handleOrientation);
+
   // ========== Service Worker Registration ==========
   // Use a relative path when registering the service worker so that it works on GitHub Pages or when the app is served from a subdirectory.
   if ('serviceWorker' in navigator) {
