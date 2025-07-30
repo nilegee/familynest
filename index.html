@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Dashboard - Ghassan's Style</title>
+  <!-- Import custom font for the logo. Using Pacifico adds a handwritten feel to the title -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <!-- Include Font Awesome icons for consistent iconography -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p+5LB0ZwpUeX2o4YjIfUThDsHLYvhzl8+/3F9IqdnJXGxXJbQi9vzSkzAS6nmzXIg2V1vZhcZ01Aflh5fuo8yw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- User Selection Modal -->
+  <div id="userSelectModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1" class="modal-hidden">
+    <div class="modal-content" role="document">
+      <h2 id="modalTitle">Select Your User</h2>
+      <select id="userSelect" aria-label="Select User">
+        <option value="" disabled selected>Choose your name</option>
+        <option value="Ghassan">Ghassan</option>
+        <option value="Mariem">Mariem</option>
+        <option value="Yazid">Yazid</option>
+        <option value="Yahya">Yahya</option>
+      </select>
+      <button id="confirmUserBtn" class="btn-primary">Confirm</button>
+    </div>
+  </div>
+
+  <nav class="sidebar" aria-label="Main navigation">
+    <!-- Enhance the dashboard title with an emoji to give it a more playful feel -->
+    <div class="logo">Family Nest 🪺</div>
+    <input type="search" id="sidebarSearch" placeholder="Search menu" aria-label="Search navigation menu" autocomplete="off"/>
+    <ul role="menubar" aria-orientation="vertical" id="sidebarMenu">
+      <li role="menuitem" tabindex="0" class="active" aria-current="page">Wall</li>
+      <li role="menuitem" tabindex="-1">Q&A</li>
+      <li role="menuitem" tabindex="-1">Calendar</li>
+      <li role="menuitem" tabindex="-1">Chores</li>
+      <li role="menuitem" tabindex="-1">Ghassan</li>
+      <li role="menuitem" tabindex="-1">Mariem</li>
+      <li role="menuitem" tabindex="-1">Yazid</li>
+      <li role="menuitem" tabindex="-1">Yahya</li>
+    </ul>
+    <button id="changeUserBtn" class="btn-secondary" aria-label="Change User">Switch User</button>
+  </nav>
+
+  <!-- Overlay to darken content when the sidebar is open on small screens -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <main class="content" role="main" tabindex="0">
+    <header class="topbar" role="region" aria-label="User greeting and controls">
+      <!-- Hamburger menu for mobile -- add button to toggle sidebar on small screens -->
+      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu" type="button">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div>
+        <div class="greeting">Welcome, <span id="currentUserDisplay">Guest</span></div>
+        <div class="date" id="currentDateDisplay" aria-live="polite" aria-atomic="true">Loading date...</div>
+      </div>
+      <div class="right-controls">
+        <input type="search" id="contentSearch" class="search-input" placeholder="Search content" aria-label="Search content" autocomplete="off"/>
+        <button class="bell-btn" aria-label="Notifications" id="notificationBtn" aria-live="polite" aria-atomic="true" aria-relevant="additions">
+          <i class="fa-solid fa-bell"></i>
+          <span id="notificationBadge" class="notification-badge" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Wall Section -->
+    <section id="wall" aria-label="Wall Section">
+      <h1>Wall</h1>
+      <textarea id="newWallPost" placeholder="Write something..." rows="3" aria-label="New wall post" ></textarea>
+      <br/>
+      <button class="add-btn" id="addWallPostBtn">Post</button>
+      <ul class="wall-posts" aria-live="polite" aria-atomic="true" aria-relevant="additions" id="wallPostsList"></ul>
+    </section>
+
+    <!-- Q&A Section -->
+    <section id="qa" aria-label="Q&A Section" hidden>
+      <h1>Q&A</h1>
+      <ul class="qa-list" aria-live="polite" aria-atomic="true" id="qaList"></ul>
+      <input type="text" id="newQuestion" placeholder="Ask a question..." aria-label="New question input" autocomplete="off"/>
+      <button class="add-btn" id="askBtn">Ask</button>
+
+      <div id="adminAnswerSection" hidden aria-live="polite" aria-atomic="true">
+        <h2>Answer a Question</h2>
+        <select id="questionSelect" aria-label="Select question to answer"></select>
+        <textarea id="answerInput" rows="3" placeholder="Type answer here..." aria-label="Answer input"></textarea>
+        <button id="saveAnswerBtn" class="add-btn">Save Answer</button>
+      </div>
+
+      <div id="pinnedMessage" class="pinned-message" aria-live="polite" aria-atomic="true">
+        Mariem is the love of my life and followed by Yazid and Yahya. You are my kids and you are my whole world, the best time I spend is with all of you.
+      </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section id="calendar" aria-label="Calendar Section" hidden>
+      <h1>Calendar</h1>
+
+      <table id="calendarTable" aria-label="August 2025 Calendar" role="grid" aria-readonly="true" aria-describedby="calendarLegend">
+        <thead>
+          <tr>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Sun</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Mon</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Tue</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Wed</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Thu</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Fri</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Sat</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+
+      <div id="calendarLegend" class="calendar-legend">
+        <strong>Legend:</strong>
+        <span><span class="legend-color" style="background:#9c27b0;"></span>Birthday 🎂</span>
+        <span><span class="legend-color" style="background:#2196f3;"></span>Trip 🏨</span>
+        <span><span class="legend-color" style="background:#4caf50;"></span>Other 📅</span>
+      </div>
+
+      <h2>Upcoming Events</h2>
+      <ul class="events-list" aria-live="polite" aria-atomic="true" id="eventList"></ul>
+
+      <label for="eventStartDate">Start Date:</label><br/>
+      <input type="date" id="eventStartDate" aria-label="Event start date" />
+      <br/>
+      <label for="eventEndDate">End Date (optional):</label><br/>
+      <input type="date" id="eventEndDate" aria-label="Event end date" />
+      <br/>
+      <label for="eventDesc">Event Description:</label><br/>
+      <input type="text" id="eventDesc" placeholder="Description" aria-label="Event description" autocomplete="off" />
+      <br/>
+      <button class="add-btn" id="addEventBtn">Add Event</button>
+    </section>
+
+    <!-- Chores Section -->
+    <section id="chores" aria-label="Chores Section" hidden>
+      <h1>Chores</h1>
+      <ul id="choresList" class="chores-list" aria-live="polite" aria-atomic="true"></ul>
+      <!-- Admin-only chore creation form -->
+      <div id="choreAdminPanel" hidden>
+        <h2>Add Chore</h2>
+        <label for="choreDesc">Description:</label><br/>
+        <input type="text" id="choreDesc" placeholder="e.g., Water the plants" aria-label="Chore description" autocomplete="off" />
+        <br/>
+        <label for="choreAssignedTo">Assign To:</label><br/>
+        <select id="choreAssignedTo" aria-label="Assign chore">
+          <option value="All">All</option>
+          <option value="Ghassan">Ghassan</option>
+          <option value="Mariem">Mariem</option>
+          <option value="Yazid">Yazid</option>
+          <option value="Yahya">Yahya</option>
+        </select>
+        <br/>
+        <label for="choreDue">Due Date:</label><br/>
+        <input type="date" id="choreDue" aria-label="Chore due date" />
+        <br/>
+        <button class="add-btn" id="addChoreBtn">Add Chore</button>
+      </div>
+    </section>
+
+    <!-- Profile Detail Section -->
+    <section id="profileDetail" aria-label="Profile Detail Section" hidden>
+      <h1 id="profileName" style="display:flex; align-items:center; gap:10px;">
+        Profile
+        <img id="profileAvatar" alt="" class="profile-avatar" />
+      </h1>
+      <div id="profileContainer" class="profile-container"></div>
+      <button id="addFamilyMemberBtn" class="btn-secondary">Add Family Member</button>
+      <button id="removeFamilyMemberBtn" class="btn-secondary">Remove Family Member</button>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

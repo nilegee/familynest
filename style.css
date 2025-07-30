@@ -1,0 +1,789 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+/*
+  Define a soft pastel colour palette for the family dashboard. These CSS variables
+  make it easy to tweak the look and feel consistently across the app. The
+  primary colour is a gentle lilac, secondary is a mint green and the accent
+  colour is a soft sky blue. Backgrounds are off‑white to reduce eye strain.
+*/
+:root {
+  --color-primary: #b39ddb;   /* lilac */
+  --color-secondary: #81c784; /* mint */
+  --color-accent: #90caf9;    /* soft blue */
+  --color-background: #f7f7fa; /* off‑white */
+  --color-card: #ffffff;
+  --color-text: #333333;
+  --color-border: #e0e0e0;
+}
+
+* {
+  box-sizing: border-box;
+}
+body, html {
+  margin: 0; padding: 0; height: 100%;
+  font-family: 'Poppins', sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  max-width: 100vw;
+}
+nav.sidebar {
+  width: 260px;
+  background: var(--color-card);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  box-shadow: 1px 0 6px rgb(0 0 0 / 0.05);
+  user-select: none;
+  position: relative;
+}
+nav.sidebar .logo {
+  /* Use a playful handwritten font for the logo. The Pacifico font is defined in index.html */
+  font-family: 'Pacifico', cursive;
+  font-weight: 400;
+  font-size: 1.6rem;
+  color: #6b42f5;
+  margin-bottom: 1.5rem;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+nav.sidebar input[type="search"] {
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  width: 100%;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+nav.sidebar input[type="search"]:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 6px rgba(144,202,249,0.6);
+}
+nav.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+nav.sidebar li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+nav.sidebar li:hover {
+  background: var(--color-primary);
+  color: white;
+}
+nav.sidebar li.active {
+  background: var(--color-secondary);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(129,199,132,0.5);
+}
+nav.sidebar button#changeUserBtn {
+  margin-top: 1rem;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+nav.sidebar button#changeUserBtn:hover {
+  background: #6b42f5;
+  color: white;
+}
+
+/* Responsive adjustments: shrink sidebar on narrow screens and allow content to fill the remaining width */
+@media (max-width: 700px) {
+  nav.sidebar {
+    width: 200px;
+  }
+  main.content {
+    max-width: calc(100vw - 200px);
+    padding: 1.5rem;
+  }
+  nav.sidebar .logo {
+    font-size: 1.4rem;
+  }
+}
+
+main.content {
+  flex-grow: 1;
+  background: white;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: calc(100vw - 260px);
+  user-select: none;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.topbar .greeting {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #222;
+  flex-grow: 1;
+  min-width: 200px;
+}
+.topbar .date {
+  font-size: 0.85rem;
+  color: #999;
+}
+.topbar .right-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  min-width: 220px;
+}
+.topbar .search-input {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  outline: none;
+  width: 100%;
+  max-width: 220px;
+  transition: border-color 0.3s ease;
+}
+.topbar .search-input:focus {
+  border-color: #7b5bfc;
+  box-shadow: 0 0 6px #a991ffcc;
+}
+.topbar button.bell-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  color: #666;
+  transition: color 0.3s ease;
+  flex-shrink: 0;
+}
+.topbar button.bell-btn:hover {
+  color: #6b42f5;
+}
+.topbar button.bell-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #f44336;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 50%;
+  padding: 2px 6px;
+  display: none;
+  user-select: none;
+}
+
+h1, h2, h3 {
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+  color: #222;
+  user-select: none;
+}
+
+ul.wall-posts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 900px;
+  user-select: none;
+}
+ul.wall-posts li {
+  /* Use a card background colour and subtle shadow for posts. The border adds
+     gentle separation from the background. */
+  background: var(--color-card);
+  border-radius: 15px;
+  border: 1px solid var(--color-border);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  position: relative;
+  word-wrap: break-word;
+}
+ul.wall-posts li strong {
+  color: #6b42f5;
+  user-select: text;
+}
+.wall-post-date {
+  font-size: 0.8rem;
+  color: #666;
+  margin-left: 6px;
+  font-weight: 400;
+  user-select: none;
+}
+.wall-post-text {
+  margin-top: 0.3rem;
+  user-select: text;
+  white-space: pre-wrap;
+}
+.wall-post-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+.wall-post-actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.wall-post-actions button:hover {
+  transform: scale(1.2);
+}
+.wall-post-edit-area {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.wall-post-edit-area textarea {
+  flex-grow: 1;
+  resize: vertical;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+}
+
+ul.qa-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+  max-width: 900px;
+}
+ul.qa-list li {
+  /* Match Q&A items with card style and shadow */
+  background: var(--color-card);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  padding: 1rem 1.3rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  font-weight: 600;
+  position: relative;
+}
+.qa-question {
+  font-weight: 700;
+  color: #6b42f5;
+  user-select: text;
+}
+.qa-answer {
+  margin-top: 0.4rem;
+  font-weight: 400;
+  font-style: italic;
+  user-select: text;
+}
+.qa-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+.qa-actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+.qa-actions button:hover {
+  transform: scale(1.2);
+}
+
+#adminAnswerSection {
+  max-width: 900px;
+  margin-top: 1rem;
+  /* Light pastel panel for admin answer area */
+  background: rgba(179, 157, 219, 0.2);
+  padding: 1rem;
+  border-left: 5px solid var(--color-primary);
+  border-radius: 8px;
+}
+
+#adminAnswerSection select,
+#adminAnswerSection textarea {
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  resize: vertical;
+}
+
+#adminAnswerSection button {
+  padding: 0.5rem 1.5rem;
+  font-weight: 700;
+  background-color: #6b42f5;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#adminAnswerSection button:hover {
+  background-color: #7b5bfc;
+}
+
+.pinned-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(179, 157, 219, 0.2);
+  border-left: 5px solid var(--color-primary);
+  font-style: italic;
+  max-width: 900px;
+  user-select: none;
+}
+
+section#calendar {
+  max-width: 900px;
+}
+
+ul.events-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+}
+
+ul.events-list li {
+  /* Apply card styling to events */
+  background: var(--color-card);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  padding: 1rem 1.3rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+ul.events-list li button {
+  background: none;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Chore list styling: similar to events */
+ul.chores-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 900px;
+}
+ul.chores-list li {
+  background: #faf8ff;
+  border-radius: 12px;
+  padding: 1rem 1.3rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgb(160 126 255 / 0.3);
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+ul.chores-list li.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+ul.chores-list li button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+/* Additional chore styling */
+.chore-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.chore-item .chore-desc {
+  font-weight: 600;
+}
+.chore-item small {
+  margin-left: 0.4rem;
+  color: #777;
+  font-size: 0.85rem;
+}
+.chore-assigned {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* Points display in profile */
+.points-display {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Badge section styling */
+.badge-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9f5ff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.badge-container h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #6b42f5;
+}
+.badge-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.badge-list .badge-item {
+  background: #6b42f5;
+  color: white;
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.badge-award {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.badge-award select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+.badge-award button {
+  background: #6b42f5;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Similarity info styling */
+.similarity-info {
+  margin-top: 1rem;
+  background: #fffbec;
+  border: 1px solid #fff4c2;
+  border-radius: 12px;
+  padding: 1rem;
+}
+.similarity-info h3 {
+  margin-bottom: 0.5rem;
+  color: #d08a00;
+  font-size: 1.1rem;
+}
+.similarity-info ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  padding-left: 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.calendar-legend {
+  margin: 1rem 0 1.5rem 0;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  user-select: none;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  border-radius: 4px;
+  margin-right: 0.3rem;
+}
+
+input[type="text"], input[type="date"], textarea {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  width: 100%;
+  max-width: 350px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  user-select: text;
+  font-family: 'Poppins', sans-serif;
+}
+
+input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+  border-color: #7b5bfc;
+  box-shadow: 0 0 6px #a991ffcc;
+}
+
+button.add-btn {
+  margin-top: 1rem;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 40px;
+  padding: 0.6rem 2rem;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+button.add-btn:hover {
+  background: var(--color-secondary);
+}
+
+button.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 30px;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+button.btn-primary:hover {
+  background-color: var(--color-secondary);
+}
+
+button.btn-secondary {
+  background-color: var(--color-card);
+  color: var(--color-text);
+  font-weight: 600;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+button.btn-secondary:hover {
+  background-color: #6b42f5;
+  color: white;
+}
+
+.profile-container {
+  max-width: 900px;
+  margin-top: 1rem;
+}
+
+.profile-field {
+  margin-bottom: 0.8rem;
+}
+
+.profile-field label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.25rem;
+  user-select: text;
+}
+
+.profile-field input[type="text"],
+.profile-field textarea,
+.profile-field input[type="color"] {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  resize: vertical;
+  user-select: text;
+  font-family: 'Poppins', sans-serif;
+}
+
+.profile-avatar {
+  /* Increase avatar size to make profiles more visually engaging */
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+  user-select: none;
+}
+
+/* Engineering animation for Yazid and Yahya */
+.engineer-animation-container {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.engineer-animation-container svg {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+@keyframes drive {
+  0% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  100% { transform: translateX(-10px); }
+}
+.engineer-animation-container .engineer-car {
+  animation: drive 4s linear infinite;
+}
+
+/* Additional animation for engineer plane */
+@keyframes fly {
+  0% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  100% { transform: translateX(-10px); }
+}
+.engineer-animation-container .engineer-plane {
+  animation: fly 6s linear infinite;
+}
+
+/* Hamburger menu button: hidden on desktop, visible on small screens */
+.hamburger-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text);
+  cursor: pointer;
+  display: none;
+  padding: 0.4rem;
+}
+.hamburger-btn:hover {
+  color: var(--color-primary);
+}
+
+/* Overlay behind the sidebar when open on small screens */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 998;
+  display: none;
+}
+
+/* Responsive behaviour for small screens */
+@media (max-width: 700px) {
+  .hamburger-btn {
+    display: inline-block;
+  }
+  nav.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    width: 220px;
+  }
+  nav.sidebar.open {
+    transform: translateX(0);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+  }
+  .sidebar-overlay.visible {
+    display: block;
+  }
+  /* When sidebar is collapsed, allow content to take full width */
+  main.content {
+    max-width: 100vw;
+    padding: 1.2rem;
+  }
+}
+
+/* Modal styles */
+#userSelectModal.modal-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#userSelectModal {
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+#userSelectModal .modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  user-select: none;
+}
