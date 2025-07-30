@@ -38,8 +38,6 @@
   const profileContainer = document.getElementById('profileContainer');
   const profileNameHeading = document.getElementById('profileName');
   const profileAvatar = document.getElementById('profileAvatar');
-  const addFamilyMemberBtn = document.getElementById('addFamilyMemberBtn');
-  const removeFamilyMemberBtn = document.getElementById('removeFamilyMemberBtn');
 
   const currentDateDisplay = document.getElementById('currentDateDisplay');
 
@@ -111,6 +109,25 @@
     if (months < 12) return `${months} month${months > 1 ? 's' : ''} ago`;
     const years = Math.floor(months / 12);
     return `${years} year${years > 1 ? 's' : ''} ago`;
+  }
+
+  function calculateAge(dateStr) {
+    const birth = new Date(dateStr);
+    if (isNaN(birth)) return '';
+    const today = new Date();
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+    let days = today.getDate() - birth.getDate();
+    if (days < 0) {
+      months--;
+      const prevMonthDays = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      days += prevMonthDays;
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    return `${years}y ${months}m ${days}d`;
   }
 
   function generateId() {
@@ -817,8 +834,6 @@
     const user = localStorage.getItem(currentUserKey);
     const isAdmin = adminUsers.includes(user);
     document.getElementById('choreAdminPanel').hidden = !isAdmin;
-    document.getElementById('addFamilyMemberBtn').hidden = !isAdmin;
-    document.getElementById('removeFamilyMemberBtn').hidden = !isAdmin;
     adminAnswerSection.hidden = !isAdmin || !qaList.some(item => !item.a);
   }
 
@@ -915,8 +930,9 @@
       profileAvatar.style.display = 'none';
     }
     profileContainer.innerHTML = '';
+    const age = calculateAge(profile.birthdate);
     const entries = [
-      { label: 'Birthdate', value: profile.birthdate },
+      { label: 'Birthdate', value: profile.birthdate, age },
       { label: 'Favourite Colour', value: profile.favoriteColor },
       { label: 'Favourite Food', value: profile.favoriteFood },
       { label: 'Disliked Food', value: profile.dislikedFood },
@@ -930,92 +946,90 @@
     entries.forEach(item => {
       const div = document.createElement('div');
       div.className = 'profile-row';
-      div.innerHTML = `<strong>${item.label}:</strong> ${escapeHtml(item.value)}`;
+      const safe = escapeHtml(item.value);
+      div.innerHTML = `<strong>${item.label}:</strong> ${safe}${item.age ? ` <span class="age-text">(${item.age})</span>` : ''}`;
       profileContainer.appendChild(div);
     });
-    // Show badges earned by this user
-    const badgeDiv = document.createElement('div');
-    badgeDiv.className = 'profile-row';
+
     const userBadges = badges[name] || [];
-    badgeDiv.innerHTML = `<strong>Badges:</strong> ${userBadges.length ? userBadges.map(b => `${b.icon} ${b.name}`).join(', ') : 'None yet'}`;
-    profileContainer.appendChild(badgeDiv);
-    // Show points
+    const badgeContainer = document.createElement('div');
+    badgeContainer.className = 'badge-container';
+    badgeContainer.innerHTML = `<h3>Badges</h3>`;
+    const badgeList = document.createElement('ul');
+    badgeList.className = 'badge-list';
+    if (userBadges.length) {
+      userBadges.forEach(b => {
+        const li = document.createElement('li');
+        li.className = 'badge-item';
+        li.textContent = `${b.icon} ${b.name}`;
+        badgeList.appendChild(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      li.textContent = 'None yet';
+      badgeList.appendChild(li);
+    }
+    badgeContainer.appendChild(badgeList);
+
+    const currentUser = localStorage.getItem(currentUserKey);
+    if (adminUsers.includes(currentUser)) {
+      const awardDiv = document.createElement('div');
+      awardDiv.className = 'badge-award';
+      const select = document.createElement('select');
+      badgeTypes.forEach(b => {
+        const option = document.createElement('option');
+        option.value = b.id;
+        option.textContent = `${b.icon} ${b.name}`;
+        select.appendChild(option);
+      });
+      const btn = document.createElement('button');
+      btn.textContent = 'Give Badge';
+      btn.addEventListener('click', () => {
+        grantBadge(name, select.value);
+        renderSingleProfile(name);
+      });
+      awardDiv.appendChild(select);
+      awardDiv.appendChild(btn);
+      badgeContainer.appendChild(awardDiv);
+    }
+    profileContainer.appendChild(badgeContainer);
+
     const pointsDiv = document.createElement('div');
-    pointsDiv.className = 'profile-row';
-    pointsDiv.innerHTML = `<strong>Points:</strong> ${userPoints[name] || 0}`;
+    pointsDiv.className = 'points-display';
+    pointsDiv.textContent = `Points: ${userPoints[name] || 0}`;
+    if (adminUsers.includes(currentUser)) {
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn-secondary';
+      addBtn.textContent = '+1 Point';
+      addBtn.addEventListener('click', () => {
+        incrementPoints(name);
+        renderSingleProfile(name);
+      });
+      pointsDiv.appendChild(addBtn);
+    }
     profileContainer.appendChild(pointsDiv);
+
+    if (currentUser === name || adminUsers.includes(currentUser)) {
+      const uploadBtn = document.createElement('input');
+      uploadBtn.type = 'file';
+      uploadBtn.accept = 'image/*';
+      uploadBtn.className = 'avatar-upload-btn';
+      uploadBtn.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            profile.avatar = reader.result;
+            saveToStorage(profilesDataKey, profilesData);
+            renderSingleProfile(name);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      profileContainer.appendChild(uploadBtn);
+    }
   }
 
-  addFamilyMemberBtn.addEventListener('click', () => {
-    const name = prompt('Enter the name of the new family member:');
-    if (!name || profilesData[name]) {
-      showAlert('Invalid name or user already exists.');
-      return;
-    }
-    profilesData[name] = {
-      birthdate: '',
-      favoriteColor: '',
-      favoriteFood: '',
-      dislikedFood: '',
-      favoriteWeekendActivity: '',
-      favoriteGame: '',
-      favoriteMovie: '',
-      favoriteHero: '',
-      profession: { title: '', description: '' },
-      funFact: '',
-      avatar: ''
-    };
-    saveToStorage(profilesDataKey, profilesData);
-    // Append to menu
-    const li = document.createElement('li');
-    li.textContent = name;
-    li.setAttribute('role', 'menuitem');
-    li.setAttribute('tabindex', '-1');
-    tabs.push(li);
-    document.getElementById('sidebarMenu').appendChild(li);
-    li.addEventListener('click', () => {
-      setActiveTab(tabs.indexOf(li));
-    });
-    li.addEventListener('keydown', (e) => {
-      const idx = tabs.indexOf(li);
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const next = (idx + 1) % tabs.length;
-        tabs[next].focus();
-      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-        e.preventDefault();
-        const prev = (idx - 1 + tabs.length) % tabs.length;
-        tabs[prev].focus();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setActiveTab(idx);
-      }
-    });
-    incrementNotification();
-  });
-
-  removeFamilyMemberBtn.addEventListener('click', () => {
-    const name = prompt('Enter the name of the family member to remove:');
-    if (!name || !profilesData[name]) {
-      showAlert('Invalid name or user does not exist.');
-      return;
-    }
-    delete profilesData[name];
-    saveToStorage(profilesDataKey, profilesData);
-    // Remove from menu and tabs
-    const idx = tabs.findIndex(li => li.textContent.trim() === name);
-    if (idx !== -1) {
-      const li = tabs[idx];
-      li.parentElement.removeChild(li);
-      tabs.splice(idx, 1);
-      if (activeTabIndex >= tabs.length) {
-        setActiveTab(0);
-      } else {
-        setActiveTab(activeTabIndex);
-      }
-    }
-    incrementNotification();
-  });
 
   // ========== Initialization ==========
 
