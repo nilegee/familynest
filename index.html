@@ -4,14 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Family Dashboard - Ghassan's Style</title>
-<link rel="manifest" href="./manifest.json">
-…
-<script src="./script.js" defer></script>  <meta name="theme-color" content="#6b42f5">
   <!-- Import custom font for the logo. Using Pacifico adds a handwritten feel to the title -->
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <!-- Include Font Awesome icons for consistent iconography -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p+5LB0ZwpUeX2o4YjIfUThDsHLYvhzl8+/3F9IqdnJXGxXJbQi9vzSkzAS6nmzXIg2V1vZhcZ01Aflh5fuo8yw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="style.css" />
+  <!-- Link to web app manifest so the PWA install prompt appears. Use a relative path so it works when hosted in a subfolder (e.g. GitHub Pages). -->
+  <link rel="manifest" href="./manifest.json">
+  <!-- Set a base URL so that all relative resources (CSS/JS/icons) are resolved relative to the app root, not the domain root. -->
+  <base href="./">
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
@@ -176,6 +177,7 @@
     </section>
   </main>
 
-  <script src="script.js" defer></script>
+  <!-- Use a relative path for the script to ensure it loads correctly when deployed in a subdirectory -->
+  <script src="./script.js" defer></script>
 </body>
 </html>
