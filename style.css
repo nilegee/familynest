@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
 /*
   Define a soft pastel colour palette for the family dashboard. These CSS variables
@@ -21,7 +21,7 @@
 }
 body, html {
   margin: 0; padding: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   background: var(--color-background);
   color: var(--color-text);
   display: flex;
@@ -278,7 +278,7 @@ ul.wall-posts li strong {
   resize: vertical;
   border-radius: 8px;
   padding: 0.5rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 1rem;
 }
 
@@ -341,7 +341,7 @@ ul.qa-list li {
 #adminAnswerSection select,
 #adminAnswerSection textarea {
   width: 100%;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 1rem;
   margin-bottom: 0.5rem;
   border-radius: 8px;
@@ -572,7 +572,7 @@ input[type="text"], input[type="date"], textarea {
   outline: none;
   transition: border-color 0.3s ease;
   user-select: text;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
@@ -637,6 +637,26 @@ button.btn-secondary:hover {
   margin-top: 1rem;
 }
 
+.profile-row {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+}
+
+.age-text {
+  color: #777;
+  font-size: 0.85rem;
+  margin-left: 4px;
+}
+
+.avatar-upload-btn {
+  margin-top: 0.5rem;
+}
+
 .profile-field {
   margin-bottom: 0.8rem;
 }
@@ -659,7 +679,7 @@ button.btn-secondary:hover {
   font-size: 1rem;
   resize: vertical;
   user-select: text;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .profile-avatar {
