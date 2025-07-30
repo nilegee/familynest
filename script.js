@@ -44,7 +44,30 @@
   const notificationBtn = document.getElementById('notificationBtn');
   const notificationBadge = document.getElementById('notificationBadge');
 
-  // ========== Constants and Keys ==========
+  // --- Responsive Sidebar Hamburger Toggle ---
+const sidebar = document.querySelector('nav.sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+const hamburger = document.getElementById('hamburgerBtn');
+
+// On mobile: hamburger toggles sidebar and overlay
+if (hamburger && sidebar && overlay) {
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+  // Optional: close sidebar when a tab is clicked (for mobile UX)
+  sidebar.addEventListener('click', (e) => {
+    if (window.innerWidth <= 700 && e.target.tagName === 'LI') {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    }
+  });
+}
+// ========== Constants and Keys ==========
   const currentUserKey = 'familyCurrentUser';
   const wallPostsKey = 'familyWallPosts';
   const qaListKey = 'familyQAList';
