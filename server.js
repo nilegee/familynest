@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs/promises';
 import { google } from 'googleapis';
+import nodemailer from 'nodemailer';
 
 const PORT = process.env.PORT || 3000;
 const DRIVE_FILE_ID = process.env.DRIVE_FILE_ID;
@@ -11,6 +12,21 @@ if (!DRIVE_FILE_ID) {
 
 const app = express();
 app.use(express.json());
+
+// Optional email transport for reminders
+let mailTransport = null;
+if (process.env.SMTP_HOST) {
+  mailTransport = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    auth: process.env.SMTP_USER
+      ? {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      : undefined
+  });
+}
 
 // Google OAuth2 setup
 async function authorize() {
@@ -26,7 +42,8 @@ let data = {
   wallPosts: [],
   calendarEvents: [],
   chores: [],
-  profiles: {}
+  profiles: {},
+  reminders: []
 };
 
 async function loadData() {
@@ -49,6 +66,33 @@ async function saveData() {
   } catch (err) {
     console.error('Failed to save to Drive', err.message);
   }
+}
+
+function sendReminderEmail(reminder) {
+  if (!mailTransport || !reminder.email) return;
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const mail = {
+    from,
+    to: reminder.email,
+    subject: reminder.title || 'Reminder',
+    text: `It's time for: ${reminder.title}`
+  };
+  mailTransport.sendMail(mail).catch(err => {
+    console.error('Failed to send reminder email:', err.message);
+  });
+}
+
+function checkReminders() {
+  const now = Date.now();
+  let changed = false;
+  for (const rem of data.reminders) {
+    if (!rem.sent && new Date(rem.time).getTime() <= now) {
+      sendReminderEmail(rem);
+      rem.sent = true;
+      changed = true;
+    }
+  }
+  if (changed) saveData();
 }
 
 // REST endpoints
@@ -89,6 +133,28 @@ app.post('/api/profiles', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.get('/api/reminders', (_req, res) => {
+  res.json(data.reminders);
+});
+
+app.post('/api/reminders', (req, res) => {
+  const { time, title, email } = req.body;
+  if (!time) {
+    return res.status(400).json({ error: 'time required' });
+  }
+  const reminder = {
+    id: Date.now().toString(),
+    time,
+    title: title || 'Reminder',
+    email,
+    sent: false
+  };
+  data.reminders.push(reminder);
+  saveData();
+  res.json(reminder);
+});
+
 loadData().then(() => {
   app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+  setInterval(checkReminders, 60 * 1000);
 });
