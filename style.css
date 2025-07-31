@@ -307,6 +307,15 @@ ul.wall-posts li strong {
 .wall-post-actions button:hover {
   transform: scale(1.2);
 }
+.reply-list {
+  list-style: none;
+  padding-left: 1rem;
+  margin-top: 0.5rem;
+  border-left: 2px solid var(--color-border);
+}
+.reply-list li {
+  margin-top: 0.5rem;
+}
 .wall-post-edit-area {
   margin-top: 0.5rem;
   display: flex;

@@ -114,8 +114,26 @@
 
 
   const defaultWallPosts = [
-    { id: generateId(), member: "Ghassan", text: "Just finished organizing the garden!", date: "2025-07-30T09:00:00", reactions: { "👍": 1, "❤️": 2 }, edited: false, userReactions: {} },
-    { id: generateId(), member: "Yazid", text: "I won the game last night!", date: "2025-07-29T20:45:00", reactions: { "😂": 3 }, edited: false, userReactions: {} }
+    {
+      id: generateId(),
+      member: "Ghassan",
+      text: "Just finished organizing the garden!",
+      date: "2025-07-30T09:00:00",
+      reactions: { "👍": 1, "❤️": 2 },
+      edited: false,
+      userReactions: {},
+      replies: []
+    },
+    {
+      id: generateId(),
+      member: "Yazid",
+      text: "I won the game last night!",
+      date: "2025-07-29T20:45:00",
+      reactions: { "😂": 3 },
+      edited: false,
+      userReactions: {},
+      replies: []
+    }
   ];
 
   const defaultQAList = [
@@ -455,17 +473,26 @@
 
       const safeText = escapeHtml(post.text);
 
+      const replies = (post.replies || []).map(r => `
+          <li data-id="${r.id}">
+            <strong>${escapeHtml(r.member)}</strong>
+            <span class="wall-post-date" title="${formatDateLocal(r.date)}">(${timeAgo(r.date)})</span>
+            <div class="wall-post-text">${escapeHtml(r.text)}</div>
+          </li>`).join('');
+
       li.innerHTML = `
         <strong>${escapeHtml(post.member)}</strong>
         <span class="wall-post-date" title="${formatDateLocal(post.date)}">(${timeAgo(post.date)})${post.edited ? ' (edited)' : ''}</span>
         <div class="wall-post-text">${safeText}</div>
         <div class="wall-post-actions" aria-label="Post actions">
-          <button class="reaction-btn" aria-label="Thumbs up reaction" data-reaction="👍">👍 ${post.reactions['👍'] || 0}</button>
+          <button class="like-btn reaction-btn" aria-label="Like post" data-reaction="👍">Like ${post.reactions['👍'] || 0}</button>
+          <button class="reply-btn" aria-label="Reply to post">Reply</button>
           <button class="reaction-btn" aria-label="Heart reaction" data-reaction="❤️">❤️ ${post.reactions['❤️'] || 0}</button>
           <button class="reaction-btn" aria-label="Laugh reaction" data-reaction="😂">😂 ${post.reactions['😂'] || 0}</button>
           <button class="edit-btn" aria-label="Edit post"><i class="fa-solid fa-pen-to-square"></i></button>
           <button class="delete-btn" aria-label="Delete post"><i class="fa-solid fa-trash"></i></button>
         </div>
+        ${replies ? `<ul class="reply-list">${replies}</ul>` : ''}
       `;
 
       wallPostsList.appendChild(li);
@@ -504,6 +531,26 @@
         post.reactions[reaction] = (post.reactions[reaction] || 0) + 1;
       }
       post.userReactions[currentUser] = userReacts;
+      saveToStorage(wallPostsKey, wallPosts);
+      renderWallPosts(contentSearch.value);
+      incrementNotification();
+    } else if (e.target.classList.contains('reply-btn')) {
+      const currentUser = localStorage.getItem(currentUserKey);
+      if (!currentUser) {
+        showAlert('Please select your user first.');
+        showUserModal();
+        return;
+      }
+      const replyText = prompt('Enter your reply:');
+      if (!replyText) return;
+      const post = wallPosts[postIndex];
+      post.replies = post.replies || [];
+      post.replies.push({
+        id: generateId(),
+        member: currentUser,
+        text: replyText.trim(),
+        date: new Date().toISOString()
+      });
       saveToStorage(wallPostsKey, wallPosts);
       renderWallPosts(contentSearch.value);
       incrementNotification();
@@ -578,7 +625,8 @@
       date: new Date().toISOString(),
       reactions: {},
       edited: false,
-      userReactions: {}
+      userReactions: {},
+      replies: []
     });
     saveToStorage(wallPostsKey, wallPosts);
     newWallPostInput.value = '';
