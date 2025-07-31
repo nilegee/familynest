@@ -257,7 +257,7 @@ async function saveToSupabase(table, data) {
       favoriteMovie: value.favoriteMovie || null,
       favoriteHero: value.favoriteHero || null,
       professionTitle: (value.profession && value.profession.title) || null,
-professionDesc: (value.profession && value.profession.description) || null,
+professionDescription: (value.profession && value.profession.description) || null,
       funFact: value.funFact || null,
       avatar: value.avatar || null,
       dreamJob: value.dreamJob || null,
@@ -323,7 +323,7 @@ async function loadFromSupabase(table, defaultValue) {
         favoriteHero: row.favoriteHero,
         profession: {
           title: row.professionTitle,
-          description: row.professionDes
+          description: row.professionDescription  
         },
         funFact: row.funFact,
         avatar: row.avatar,
