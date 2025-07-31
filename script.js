@@ -78,6 +78,10 @@ const supabase = window.supabase
   ? window.supabase.createClient(supabaseUrl, supabaseKey)
   : createClient(supabaseUrl, supabaseKey);
   let supabaseEnabled = true;
+  const tableAliases = { 'Q&A Table': 'qa_table' };
+  function resolveTable(name) {
+    return tableAliases[name] || name;
+  }
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
   // Ghassan/Mariem without entering this PIN.
@@ -224,6 +228,7 @@ const supabase = window.supabase
   }
 
   function saveToLocal(table, data) {
+    table = resolveTable(table);
     try {
       localStorage.setItem(`fn_${table}`, JSON.stringify(data));
     } catch (e) {
@@ -232,6 +237,7 @@ const supabase = window.supabase
   }
 
   async function saveToSupabase(table, data) {
+    table = resolveTable(table);
     if (!supabaseEnabled) {
       saveToLocal(table, data);
       return;
@@ -253,6 +259,7 @@ const supabase = window.supabase
   }
 
   function loadFromLocal(table, defaultValue) {
+    table = resolveTable(table);
     try {
       const stored = localStorage.getItem(`fn_${table}`);
       if (stored) return JSON.parse(stored);
@@ -263,6 +270,7 @@ const supabase = window.supabase
   }
 
   async function loadFromSupabase(table, defaultValue) {
+    table = resolveTable(table);
     if (!supabaseEnabled) {
       return loadFromLocal(table, defaultValue);
     }
