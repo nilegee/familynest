@@ -1,55 +1,67 @@
-// A progressive web app (PWA) service worker for the Family Nest app.
-// This version adjusts the list of URLs to cache based on the service worker's
-// current location. When hosted in a subfolder (e.g. /familynest/ on GitHub Pages),
-// using absolute paths (like '/index.html') would break caching. Instead, we
-// derive the scope from self.location and prefix each asset with that path.
+// sw.js
 
-const CACHE_NAME = 'family-nest-cache-v2';
-
-// Determine the scope (the directory where the service worker lives). This ensures
-// cached URLs are correctly prefixed even when the app is hosted in a subfolder.
-const scope = self.location.pathname.replace(/[^\/]+$/, '');
-
-// Files we want to cache for offline access. All paths are relative to the scope.
-const urlsToCache = [
-  scope,
-  `${scope}index.html`,
-  `${scope}style.css`,
-  `${scope}script.js`,
-  `${scope}manifest.json`,
-  `${scope}icons/house-192.png`,
-  `${scope}icons/house-512.png`
+const CACHE_NAME = 'family-hub-v1';
+const URLS_TO_CACHE = [
+  '/',
+  '/index.html',
+  '/main.js', // Change to your actual entry file
+  '/styles.css',
+  '/icons/default-avatar.svg',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  // Add more static assets if needed
 ];
 
+// INSTALL: cache app shell
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
   );
+  self.skipWaiting();
 });
 
+// ACTIVATE: cleanup old caches
 self.addEventListener('activate', event => {
-  // Remove old caches on activation
   event.waitUntil(
-    caches.keys().then(cacheNames =>
-      Promise.all(
-        cacheNames.map(name => {
-          if (name !== CACHE_NAME) return caches.delete(name);
-        })
-      )
+    caches.keys().then(keys => 
+      Promise.all(keys.map(k => {
+        if (k !== CACHE_NAME) return caches.delete(k);
+      }))
     )
   );
+  self.clients.claim();
 });
 
+// FETCH: serve from cache, fallback to network
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
   );
 });
 
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'show-notification') {
-    self.registration.showNotification(event.data.title, {
-      body: event.data.body
-    });
-  }
+// NOTIFICATIONS: show notification when called by app
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(winClients => {
+      // Focus if open, else open
+      for (let client of winClients) {
+        if (client.url === '/' && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow('/');
+    })
+  );
+});
+
+// Listen for push events (OPTIONAL, only if you implement push API)
+self.addEventListener('push', event => {
+  let data = {};
+  try { data = event.data.json(); } catch (e) {}
+  const title = data.title || 'Notification';
+  const body = data.body || '';
+  event.waitUntil(
+    self.registration.showNotification(title, { body })
+  );
 });

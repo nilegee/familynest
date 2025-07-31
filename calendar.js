@@ -1,0 +1,120 @@
+// calendar.js
+
+import { saveToSupabase } from './storage.js';
+import { generateId, showAlert } from './util.js';
+
+let calendarEvents = [];
+let calendarBody;
+let eventListEl;
+let contentSearch;
+let eventStartDate;
+let eventEndDate;
+let eventDesc;
+let addEventBtn;
+
+export function setupCalendar({
+  calendarEventsRef,
+  calendarBodyRef,
+  eventListElRef,
+  contentSearchRef,
+  eventStartDateRef,
+  eventEndDateRef,
+  eventDescRef,
+  addEventBtnRef
+}) {
+  calendarEvents = calendarEventsRef;
+  calendarBody = calendarBodyRef;
+  eventListEl = eventListElRef;
+  contentSearch = contentSearchRef;
+  eventStartDate = eventStartDateRef;
+  eventEndDate = eventEndDateRef;
+  eventDesc = eventDescRef;
+  addEventBtn = addEventBtnRef;
+
+  addEventBtn.addEventListener('click', addCalendarEvent);
+  calendarBody.addEventListener('click', calendarTableClickHandler);
+
+  renderCalendarTable();
+  renderCalendarEventsList();
+}
+
+export function renderCalendarTable() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startDay = firstDay.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  calendarBody.innerHTML = '';
+  let day = 1;
+  for (let r = 0; r < 6; r++) {
+    const row = document.createElement('tr');
+    for (let c = 0; c < 7; c++) {
+      const cell = document.createElement('td');
+      cell.style.padding = '6px';
+      cell.style.border = '1px solid #ddd';
+      cell.style.textAlign = 'center';
+      if (r === 0 && c < startDay) {
+        cell.textContent = '';
+      } else if (day > daysInMonth) {
+        cell.textContent = '';
+      } else {
+        cell.textContent = day;
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        cell.setAttribute('data-date', dateStr);
+        day++;
+      }
+      row.appendChild(cell);
+    }
+    calendarBody.appendChild(row);
+  }
+}
+
+export function renderCalendarEventsList(filterDesc = '') {
+  eventListEl.innerHTML = '';
+  const events = Array.isArray(calendarEvents) ? calendarEvents : [];
+  let filtered = events;
+  if (filterDesc) {
+    const f = filterDesc.toLowerCase();
+    filtered = events.filter(ev => ev.desc.toLowerCase().includes(f));
+  }
+  filtered.forEach(ev => {
+    const li = document.createElement('li');
+    li.setAttribute('data-id', ev.id);
+    li.setAttribute('tabindex', '0');
+    li.textContent = `${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''}: ${ev.desc}`;
+    eventListEl.appendChild(li);
+  });
+}
+
+function addCalendarEvent() {
+  const start = eventStartDate.value;
+  const end = eventEndDate.value;
+  const desc = eventDesc.value.trim();
+  if (!start || !desc) {
+    showAlert('Start date and description are required.');
+    return;
+  }
+  if (end && new Date(end) < new Date(start)) {
+    showAlert('End date cannot be before start date.');
+    return;
+  }
+  calendarEvents.push({ id: generateId(), start, end: end || start, desc });
+  saveToSupabase('calendar_events', calendarEvents);
+  eventStartDate.value = '';
+  eventEndDate.value = '';
+  eventDesc.value = '';
+  renderCalendarEventsList(contentSearch.value);
+  renderCalendarTable();
+}
+
+function calendarTableClickHandler(e) {
+  const cell = e.target.closest('td[data-date]');
+  if (!cell) return;
+  const date = cell.getAttribute('data-date');
+  const filtered = calendarEvents.filter(ev => ev.start <= date && ev.end >= date);
+  if (filtered.length) {
+    const msg = filtered.map(ev => `${ev.desc} (${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''})`).join('\n');
+    alert(msg);
+  }
+}
