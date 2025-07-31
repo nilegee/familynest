@@ -895,3 +895,43 @@ button.btn-secondary:hover {
   justify-content: center;
   font-size: 0.8rem;
 }
+
+/* Bottom navigation for small screens */
+nav.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-card);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  z-index: 997;
+}
+nav.bottom-nav button {
+  flex: 1;
+  padding: 0.6rem 0;
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+nav.bottom-nav button.active {
+  color: var(--color-primary);
+}
+
+@media (max-width: 600px) {
+  nav.sidebar {
+    display: none;
+  }
+  .hamburger-btn {
+    display: none;
+  }
+  nav.bottom-nav {
+    display: flex;
+  }
+  main.content {
+    padding-bottom: 4rem;
+    max-width: 100vw;
+  }
+}

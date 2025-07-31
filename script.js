@@ -8,8 +8,10 @@
   const currentUserDisplay = document.getElementById('currentUserDisplay');
   const changeUserBtn = document.getElementById('changeUserBtn');
 
-  const tabs = Array.from(document.querySelectorAll('nav.sidebar li'));
+  const sidebarTabs = Array.from(document.querySelectorAll('nav.sidebar li'));
+  const bottomTabs = Array.from(document.querySelectorAll('nav.bottom-nav button'));
   const sections = Array.from(document.querySelectorAll('main.content > section'));
+  const tabCount = sidebarTabs.length;
 
   const sidebarSearch = document.getElementById('sidebarSearch');
   const contentSearch = document.getElementById('contentSearch');
@@ -388,15 +390,18 @@
 
   function setActiveTab(index) {
     activeTabIndex = index;
-    tabs.forEach((tab, i) => {
+    sidebarTabs.forEach((tab, i) => {
       const isActive = i === index;
       tab.classList.toggle('active', isActive);
       tab.setAttribute('tabindex', isActive ? '0' : '-1');
       if (sections[i]) sections[i].hidden = !isActive;
     });
+    bottomTabs.forEach((tab, i) => {
+      tab.classList.toggle('active', i === index);
+    });
     updateSearchFilters();
     // Render profile if it's a profile tab
-    const name = tabs[index].textContent.trim();
+    const name = sidebarTabs[index].textContent.trim();
     if (['Ghassan', 'Mariem', 'Yazid', 'Yahya'].includes(name)) {
       renderSingleProfile(name);
       profileDetailSection.hidden = false;
@@ -406,23 +411,28 @@
   }
   setActiveTab(0);
 
-  tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => setActiveTab(i));
-    tab.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const next = (i + 1) % tabs.length;
-        tabs[next].focus();
-      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-        e.preventDefault();
-        const prev = (i - 1 + tabs.length) % tabs.length;
-        tabs[prev].focus();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setActiveTab(i);
-      }
+  function setupTabListeners(list) {
+    list.forEach((tab, i) => {
+      tab.addEventListener('click', () => setActiveTab(i));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          const next = (i + 1) % tabCount;
+          list[next].focus();
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const prev = (i - 1 + tabCount) % tabCount;
+          list[prev].focus();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setActiveTab(i);
+        }
+      });
     });
-  });
+  }
+
+  setupTabListeners(sidebarTabs);
+  setupTabListeners(bottomTabs);
 
   // ========== Wall Posts ==========
 
@@ -956,7 +966,7 @@
 
   function updateSearchFilters() {
     const filter = contentSearch.value.trim().toLowerCase();
-    const activeTab = tabs[activeTabIndex].textContent.trim();
+    const activeTab = sidebarTabs[activeTabIndex].textContent.trim();
     switch (activeTab) {
       case 'Wall':
         renderWallPosts(filter);
@@ -984,7 +994,7 @@
 
   sidebarSearch.addEventListener('input', () => {
     const query = sidebarSearch.value.trim().toLowerCase();
-    tabs.forEach(li => {
+    sidebarTabs.forEach(li => {
       li.style.display = li.textContent.toLowerCase().includes(query) ? '' : 'none';
     });
   });
@@ -1229,7 +1239,7 @@
     });
   }
   // Close sidebar when a menu item is selected on small screens
-  tabs.forEach(li => {
+  sidebarTabs.forEach(li => {
     li.addEventListener('click', () => {
       if (window.innerWidth <= 700 && sidebarEl) {
         if (!window.matchMedia('(orientation: portrait)').matches) {
