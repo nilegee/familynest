@@ -368,7 +368,7 @@ async function loadFromSupabase(table, defaultValue) {
     saveToSupabase('qa_table', qaList);
   }
 
-  async function loadAllData() {
+loadAllData().then(allData => init(allData));
     wallPosts = await loadFromSupabase('wall_posts', defaultWallPosts);
     wallPosts.forEach(p => { if (!p.userReactions) p.userReactions = {}; });
     qaList = await loadFromSupabase('qa_table', defaultQAList);
@@ -1398,8 +1398,15 @@ function renderAdminQuestionOptions() {
 
   // ========== Initialization ==========
 
-  function init() {
-    checkUserSelection();
+function init(allData) {
+  wallPosts = allData.wallPosts;
+  qaList = allData.qaList;
+  calendarEvents = allData.calendarEvents;
+  profilesData = allData.profilesData;
+  chores = allData.chores;
+  userPoints = allData.userPoints;
+  badges = allData.badges;
+  completedChores = allData.completedChores;    checkUserSelection();
     // Ensure the default tab (index 0) is activated only after all data is loaded.
     // Without this, setActiveTab would run before wallPosts is initialized, leading to errors.
     setActiveTab(0);
