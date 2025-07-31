@@ -34,6 +34,8 @@
   const eventDesc = document.getElementById('eventDesc');
   const addEventBtn = document.getElementById('addEventBtn');
 
+  const showDailyOnlyCheckbox = document.getElementById('showDailyOnly');
+
   const profileDetailSection = document.getElementById('profileDetail');
   const profileContainer = document.getElementById('profileContainer');
   const profileNameHeading = document.getElementById('profileName');
@@ -293,7 +295,11 @@
   });
 
   // ========== New Data for Chores, Points and Badges ==========
-  let chores = loadFromStorage(choresKey, []);
+  let chores = loadFromStorage(choresKey, [
+    { id: generateId(), desc: 'Pray 5 times', assignedTo: 'All', due: '', daily: true },
+    { id: generateId(), desc: 'Make your bed', assignedTo: 'All', due: '', daily: true },
+    { id: generateId(), desc: 'Read stories', assignedTo: 'Yahya', due: '', daily: false }
+  ]);
   let userPoints = loadFromStorage(userPointsKey, {
     Ghassan: 0,
     Mariem: 0,
@@ -795,21 +801,25 @@
 
   // ========== Chores ==========
 
-  function renderChores(filterText = '') {
+  function renderChores(filterText = '', dailyOnly = false) {
     const list = document.getElementById('choresList');
     list.innerHTML = '';
     let filtered = chores;
+    if (dailyOnly) {
+      filtered = filtered.filter(item => item.daily);
+    }
     if (filterText) {
       const f = filterText.toLowerCase();
-      filtered = chores.filter(item => item.desc.toLowerCase().includes(f) || (item.assignedTo && item.assignedTo.toLowerCase().includes(f)));
+      filtered = filtered.filter(item => item.desc.toLowerCase().includes(f) || (item.assignedTo && item.assignedTo.toLowerCase().includes(f)));
     }
     filtered.forEach(item => {
       const li = document.createElement('li');
       li.setAttribute('data-id', item.id);
+      const dueHtml = item.daily ? '' : `<span class="chore-due">${item.due}</span>`;
       li.innerHTML = `
-        <span class="chore-desc">${escapeHtml(item.desc)}</span>
+        <span class="chore-desc">${escapeHtml(item.desc)}${item.daily ? '<span class="daily-label">Daily</span>' : ''}</span>
         <span class="chore-assignee">${item.assignedTo}</span>
-        <span class="chore-due">${item.due}</span>
+        ${dueHtml}
       `;
       list.appendChild(li);
     });
@@ -843,12 +853,13 @@
     const desc = document.getElementById('choreDesc').value.trim();
     const assignedTo = document.getElementById('choreAssignedTo').value;
     const due = document.getElementById('choreDue').value;
-    if (!desc || !due) {
-      showAlert('Please enter a description and due date.');
+    const daily = document.getElementById('choreDaily').checked;
+    if (!desc || (!daily && !due)) {
+      showAlert('Please enter a description' + (daily ? '' : ' and due date') + '.');
       return;
     }
     const id = generateId();
-    chores.push({ id, desc, assignedTo, due });
+    chores.push({ id, desc, assignedTo, due: daily ? '' : due, daily });
     saveToStorage(choresKey, chores);
     renderChores(contentSearch.value);
     // Award points and badges for assigning chores
@@ -896,7 +907,7 @@
         renderCalendarEventsList(filter);
         break;
       case 'Chores':
-        renderChores(filter);
+        renderChores(filter, showDailyOnlyCheckbox.checked);
         break;
       case 'Ghassan':
       case 'Mariem':
@@ -916,6 +927,11 @@
 
   contentSearch.addEventListener('input', () => {
     updateSearchFilters();
+  });
+
+  showDailyOnlyCheckbox.addEventListener('change', () => {
+    const filter = contentSearch.value.trim().toLowerCase();
+    renderChores(filter, showDailyOnlyCheckbox.checked);
   });
 
   // ========== Profile Logic ==========
@@ -1041,7 +1057,7 @@
     renderCalendarEventsList();
     updateGreeting();
     updateAdminVisibility();
-    renderChores();
+    renderChores('', showDailyOnlyCheckbox.checked);
   }
 
   // Update the greeting line to include the current date and time for the user
