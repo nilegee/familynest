@@ -14,7 +14,9 @@
   <!-- Set a base URL so that all relative resources (CSS/JS/icons) are resolved relative to the app root, not the domain root. -->
   <base href="./">
   <link rel="stylesheet" href="./style.css" >
+  <!-- Supabase SDK, must load before app code -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Your config file (Supabase keys, etc) -->
   <script src="./config.js"></script>
 </head>
 <body data-user="">
@@ -35,7 +37,6 @@
   </div>
 
   <nav class="sidebar" aria-label="Main navigation">
-    <!-- Enhance the dashboard title with an emoji to give it a more playful feel -->
     <div class="logo">Family Nest 🪺</div>
     <input type="search" id="sidebarSearch" placeholder="Search menu" aria-label="Search navigation menu" autocomplete="off">
     <ul role="menubar" aria-orientation="vertical" id="sidebarMenu">
@@ -52,12 +53,10 @@
     <button id="changeUserBtn" class="btn-secondary" aria-label="Change User">Switch User</button>
   </nav>
 
-  <!-- Overlay to darken content when the sidebar is open on small screens -->
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
   <main class="content" role="main" tabindex="0">
     <header class="topbar" role="region" aria-label="User greeting and controls">
-      <!-- Hamburger menu for mobile -- add button to toggle sidebar on small screens -->
       <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
       <div>
         <div class="greeting">Welcome, <span id="currentUserDisplay">Guest</span></div>
@@ -245,7 +244,7 @@
     <button>Yahya</button>
   </nav>
 
-  <!-- Use a relative path for the script to ensure it loads correctly when deployed in a subdirectory -->
-  <script src="./script.js" defer></script>
+  <!-- Modular JS loader -->
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
