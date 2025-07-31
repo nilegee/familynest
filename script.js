@@ -308,13 +308,13 @@ const supabase = window.supabase
         qaList.push({ id: generateId(), q: item.q, a: item.a });
       }
     });
-    saveToSupabase('Q&A Table', qaList);
+    saveToSupabase('qa_table', qaList);
   }
 
   async function loadAllData() {
     wallPosts = await loadFromSupabase('wall_posts', defaultWallPosts);
     wallPosts.forEach(p => { if (!p.userReactions) p.userReactions = {}; });
-    qaList = await loadFromSupabase('Q&A Table', defaultQAList);
+    qaList = await loadFromSupabase('qa_table', defaultQAList);
     injectDefaultQA();
     calendarEvents = await loadFromSupabase('calendar_events', defaultCalendarEvents);
     profilesData = await loadFromSupabase('profiles', defaultProfilesData);
@@ -702,7 +702,7 @@ const supabase = window.supabase
     }
     const id = generateId();
     qaList.unshift({ id, q, a: '' });
-    saveToSupabase('Q&A Table', qaList);
+    saveToSupabase('qa_table', qaList);
     newQuestionInput.value = '';
     renderQA(contentSearch.value);
     incrementNotification();
@@ -718,7 +718,7 @@ const supabase = window.supabase
     if (e.target.classList.contains('delete-q-btn')) {
       if (confirm('Delete this question?')) {
         qaList.splice(index, 1);
-        saveToSupabase('Q&A Table', qaList);
+        saveToSupabase('qa_table', qaList);
         renderQA(contentSearch.value);
       }
     } else if (e.target.classList.contains('edit-q-btn')) {
@@ -751,7 +751,7 @@ const supabase = window.supabase
       }
       qaItem.q = newQ;
       qaItem.a = newA;
-      saveToSupabase('Q&A Table', qaList);
+      saveToSupabase('qa_table', qaList);
       renderQA(contentSearch.value);
     });
     cancelBtn.addEventListener('click', () => {
@@ -782,7 +782,7 @@ function renderAdminQuestionOptions() {
     }
     const qaItem = qaList.find(item => item.id === selected);
     qaItem.a = answer;
-    saveToSupabase('Q&A Table', qaList);
+    saveToSupabase('qa_table', qaList);
     answerInput.value = '';
     renderQA(contentSearch.value);
   });
