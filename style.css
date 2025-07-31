@@ -14,7 +14,17 @@
   --color-card: #ffffff;
   --color-text: #333333;
   --color-border: #e0e0e0;
+  --accent-ghassan: #6b42f5;
+  --accent-mariem: #009688;
+  --accent-yazid: #2196f3;
+  --accent-yahya: #4caf50;
+  --accent-color: var(--accent-ghassan);
 }
+
+body[data-user="Ghassan"] { --accent-color: var(--accent-ghassan); }
+body[data-user="Mariem"]  { --accent-color: var(--accent-mariem); }
+body[data-user="Yazid"]   { --accent-color: var(--accent-yazid); }
+body[data-user="Yahya"]   { --accent-color: var(--accent-yahya); }
 
 [data-theme="dark"] {
   --color-background: #1e1e20;
@@ -52,7 +62,7 @@ nav.sidebar .logo {
   font-family: 'Pacifico', cursive;
   font-weight: 400;
   font-size: 1.6rem;
-  color: #6b42f5;
+  color: var(--accent-color);
   margin-bottom: 1.5rem;
   user-select: none;
   display: flex;
@@ -93,14 +103,14 @@ nav.sidebar li {
   user-select: none;
 }
 nav.sidebar li:hover {
-  background: var(--color-primary);
+  background: var(--accent-color);
   color: white;
 }
 nav.sidebar li.active {
-  background: var(--color-secondary);
+  background: var(--accent-color);
   color: white;
   font-weight: 700;
-  box-shadow: 0 0 12px rgba(129,199,132,0.5);
+  box-shadow: 0 0 12px rgba(0,0,0,0.2);
 }
 nav.sidebar button#changeUserBtn {
   margin-top: 1rem;
@@ -114,7 +124,7 @@ nav.sidebar button#changeUserBtn {
   user-select: none;
 }
 nav.sidebar button#changeUserBtn:hover {
-  background: #6b42f5;
+  background: var(--accent-color);
   color: white;
 }
 
@@ -181,8 +191,8 @@ main.content {
   transition: border-color 0.3s ease;
 }
 .topbar .search-input:focus {
-  border-color: #7b5bfc;
-  box-shadow: 0 0 6px #a991ffcc;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 6px var(--accent-color);
 }
 .topbar button.bell-btn {
   background: transparent;
@@ -195,7 +205,7 @@ main.content {
   flex-shrink: 0;
 }
 .topbar button.bell-btn:hover {
-  color: #6b42f5;
+  color: var(--accent-color);
 }
 .topbar button.bell-btn svg {
   width: 22px;
@@ -211,7 +221,7 @@ main.content {
   color: var(--color-text);
 }
 .theme-toggle:hover {
-  color: var(--color-primary);
+  color: var(--accent-color);
 }
 .notification-badge {
   position: absolute;
@@ -254,7 +264,7 @@ ul.wall-posts li {
   word-wrap: break-word;
 }
 ul.wall-posts li strong {
-  color: #6b42f5;
+  color: var(--accent-color);
   user-select: text;
 }
 .wall-post-date {
@@ -320,7 +330,7 @@ ul.qa-list li {
 }
 .qa-question {
   font-weight: 700;
-  color: #6b42f5;
+  color: var(--accent-color);
   user-select: text;
 }
 .qa-answer {
@@ -352,7 +362,7 @@ ul.qa-list li {
   /* Light pastel panel for admin answer area */
   background: rgba(179, 157, 219, 0.2);
   padding: 1rem;
-  border-left: 5px solid var(--color-primary);
+  border-left: 5px solid var(--accent-color);
   border-radius: 8px;
 }
 
@@ -371,7 +381,7 @@ ul.qa-list li {
 #adminAnswerSection button {
   padding: 0.5rem 1.5rem;
   font-weight: 700;
-  background-color: #6b42f5;
+  background-color: var(--accent-color);
   color: white;
   border: none;
   border-radius: 30px;
@@ -380,14 +390,14 @@ ul.qa-list li {
 }
 
 #adminAnswerSection button:hover {
-  background-color: #7b5bfc;
+  background-color: var(--accent-color);
 }
 
 .pinned-message {
   margin-top: 1rem;
   padding: 1rem;
   background: rgba(179, 157, 219, 0.2);
-  border-left: 5px solid var(--color-primary);
+  border-left: 5px solid var(--accent-color);
   font-style: italic;
   max-width: 900px;
   user-select: none;
@@ -507,7 +517,7 @@ ul.chores-list li button {
 .badge-container h3 {
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
-  color: #6b42f5;
+  color: var(--accent-color);
 }
 .badge-list {
   list-style: none;
@@ -518,7 +528,7 @@ ul.chores-list li button {
   gap: 0.5rem;
 }
 .badge-list .badge-item {
-  background: #6b42f5;
+  background: var(--accent-color);
   color: white;
   border-radius: 20px;
   padding: 0.2rem 0.6rem;
@@ -540,7 +550,7 @@ ul.chores-list li button {
   font-size: 0.9rem;
 }
 .badge-award button {
-  background: #6b42f5;
+  background: var(--accent-color);
   color: white;
   border: none;
   border-radius: 20px;
@@ -603,13 +613,13 @@ input[type="text"], input[type="date"], textarea {
 }
 
 input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
-  border-color: #7b5bfc;
-  box-shadow: 0 0 6px #a991ffcc;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 6px var(--accent-color);
 }
 
 button.add-btn {
   margin-top: 1rem;
-  background: var(--color-primary);
+  background: var(--accent-color);
   border: none;
   border-radius: 40px;
   padding: 0.6rem 2rem;
@@ -621,11 +631,11 @@ button.add-btn {
 }
 
 button.add-btn:hover {
-  background: var(--color-secondary);
+  background: var(--accent-color);
 }
 
 button.btn-primary {
-  background-color: var(--color-primary);
+  background-color: var(--accent-color);
   color: white;
   font-weight: 700;
   border: none;
@@ -638,7 +648,7 @@ button.btn-primary {
 }
 
 button.btn-primary:hover {
-  background-color: var(--color-secondary);
+  background-color: var(--accent-color);
 }
 
 button.btn-secondary {
@@ -655,7 +665,7 @@ button.btn-secondary {
 }
 
 button.btn-secondary:hover {
-  background-color: #6b42f5;
+  background-color: var(--accent-color);
   color: white;
 }
 
@@ -863,7 +873,7 @@ button.btn-secondary:hover {
   flex-wrap: wrap;
 }
 .scoreboard-badges span {
-  background: #6b42f5;
+  background: var(--accent-color);
   color: white;
   border-radius: 50%;
   width: 24px;
