@@ -1,6 +1,4 @@
 (async () => {
-  // A self‑invoking function to encapsulate all variables and avoid polluting the global scope. The code below is identical to the original script.js, with one key change: the service worker is registered using a relative path ('./sw.js') so that it registers correctly when the app is hosted in a subfolder (e.g., GitHub Pages).
-
   // ========== Cached DOM Elements ==========
   const userSelectModal = document.getElementById('userSelectModal');
   const userSelect = document.getElementById('userSelect');
@@ -68,27 +66,24 @@
   // ========== Constants and Keys ==========
   const currentUserKey = 'familyCurrentUser';
   const themeKey = 'familyTheme';
-// ====== Supabase Setup ======
-const supabaseUrl = window.SUPABASE_URL || "https://zlhamcofzyozfyzcgcdg.supabase.co";
-const supabaseKey = window.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo";
-if (!supabaseUrl || !supabaseKey) {
-  alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
-}
-const supabase = window.supabase
-  ? window.supabase.createClient(supabaseUrl, supabaseKey)
-  : createClient(supabaseUrl, supabaseKey);
+
+  // ====== Supabase Setup ======
+  const supabaseUrl = window.SUPABASE_URL || "https://zlhamcofzyozfyzcgcdg.supabase.co";
+  const supabaseKey = window.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo";
+  if (!supabaseUrl || !supabaseKey) {
+    alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
+  }
+  const supabase = window.supabase
+    ? window.supabase.createClient(supabaseUrl, supabaseKey)
+    : createClient(supabaseUrl, supabaseKey);
   let supabaseEnabled = true;
   const tableAliases = { 'Q&A Table': 'qa_table' };
   function resolveTable(name) {
     return tableAliases[name] || name;
   }
-  // Admin users and a simple PIN to restrict admin actions. In a real app
-  // you would implement proper authentication. Kids cannot log in as
-  // Ghassan/Mariem without entering this PIN.
   const adminUsers = ['Ghassan', 'Mariem'];
   const adminPin = '4321';
 
-  // Badge definitions. Each badge has an id, name, description and an emoji/icon.
   const badgeTypes = [
     { id: 'super-helper', name: 'Super Helper', desc: 'Completed many chores', icon: '🏅' },
     { id: 'kind-heart', name: 'Kind Heart', desc: 'Always kind and helpful', icon: '💖' },
@@ -236,51 +231,49 @@ const supabase = window.supabase
     }
   }
 
-async function saveToSupabase(table, data) {
-  table = resolveTable(table);
-  if (!supabaseEnabled) {
-    saveToLocal(table, data);
-    return;
-  }
-
-  let payload;
-  // --- Special case for profiles: flatten the object into an array of objects
-  if (table === 'profiles') {
-    payload = Object.entries(data).map(([name, value]) => ({
-      name,
-      birthdate: value.birthdate || null,
-      favoriteColor: value.favoriteColor || null,
-      favoriteFood: value.favoriteFood || null,
-      dislikedFood: value.dislikedFood || null,
-      favoriteWeekendActivity: value.favoriteWeekendActivity || null,
-      favoriteGame: value.favoriteGame || null,
-      favoriteMovie: value.favoriteMovie || null,
-      favoriteHero: value.favoriteHero || null,
-      professionTitle: (value.profession && value.profession.title) || null,
-professionDescription: (value.profession && value.profession.description) || null,
-      funFact: value.funFact || null,
-      avatar: value.avatar || null,
-      dreamJob: value.dreamJob || null,
-    }));
-  } else {
-    payload = Array.isArray(data)
-      ? data
-      : Object.entries(data).map(([name, value]) => ({ name, value }));
-  }
-
-  const { error } = await supabase.from(table).upsert(payload);
-  if (error) {
-    if (error.code === 'PGRST205') {
-      console.info(`Supabase table '${table}' not found - using localStorage.`);
-      supabaseEnabled = false;
+  async function saveToSupabase(table, data) {
+    table = resolveTable(table);
+    if (!supabaseEnabled) {
       saveToLocal(table, data);
       return;
     }
-    console.error('Supabase save error:', error);
-    showAlert('Could not save data.');
-  }
-}
 
+    let payload;
+    if (table === 'profiles') {
+      payload = Object.entries(data).map(([name, value]) => ({
+        name,
+        birthdate: value.birthdate || null,
+        favoriteColor: value.favoriteColor || null,
+        favoriteFood: value.favoriteFood || null,
+        dislikedFood: value.dislikedFood || null,
+        favoriteWeekendActivity: value.favoriteWeekendActivity || null,
+        favoriteGame: value.favoriteGame || null,
+        favoriteMovie: value.favoriteMovie || null,
+        favoriteHero: value.favoriteHero || null,
+        professionTitle: (value.profession && value.profession.title) || null,
+        professionDescription: (value.profession && value.profession.description) || null,
+        funFact: value.funFact || null,
+        avatar: value.avatar || null,
+        dreamJob: value.dreamJob || null,
+      }));
+    } else {
+      payload = Array.isArray(data)
+        ? data
+        : Object.entries(data).map(([name, value]) => ({ name, value }));
+    }
+
+    const { error } = await supabase.from(table).upsert(payload);
+    if (error) {
+      if (error.code === 'PGRST205') {
+        console.info(`Supabase table '${table}' not found - using localStorage.`);
+        supabaseEnabled = false;
+        saveToLocal(table, data);
+        return;
+      }
+      console.error('Supabase save error:', error);
+      showAlert('Could not save data.');
+    }
+  }
 
   function loadFromLocal(table, defaultValue) {
     table = resolveTable(table);
@@ -293,52 +286,51 @@ professionDescription: (value.profession && value.profession.description) || nul
     return defaultValue;
   }
 
-async function loadFromSupabase(table, defaultValue) {
-  table = resolveTable(table);
-  if (!supabaseEnabled) {
-    return loadFromLocal(table, defaultValue);
-  }
-  const { data, error } = await supabase.from(table).select('*');
-  if (error) {
-    if (error.code === 'PGRST205') {
-      console.info(`Supabase table '${table}' not found - switching to localStorage.`);
-      supabaseEnabled = false;
+  async function loadFromSupabase(table, defaultValue) {
+    table = resolveTable(table);
+    if (!supabaseEnabled) {
       return loadFromLocal(table, defaultValue);
     }
-    console.warn('Supabase load failed:', error);
-    return defaultValue;
-  }
-  // Special case for profiles
-  if (table === 'profiles') {
+    const { data, error } = await supabase.from(table).select('*');
+    if (error) {
+      if (error.code === 'PGRST205') {
+        console.info(`Supabase table '${table}' not found - switching to localStorage.`);
+        supabaseEnabled = false;
+        return loadFromLocal(table, defaultValue);
+      }
+      console.warn('Supabase load failed:', error);
+      return defaultValue;
+    }
+    if (table === 'profiles') {
+      const obj = {};
+      data.forEach(row => {
+        obj[row.name] = {
+          birthdate: row.birthdate,
+          favoriteColor: row.favoriteColor,
+          favoriteFood: row.favoriteFood,
+          dislikedFood: row.dislikedFood,
+          favoriteWeekendActivity: row.favoriteWeekendActivity,
+          favoriteGame: row.favoriteGame,
+          favoriteMovie: row.favoriteMovie,
+          favoriteHero: row.favoriteHero,
+          profession: {
+            title: row.professionTitle,
+            description: row.professionDescription
+          },
+          funFact: row.funFact,
+          avatar: row.avatar,
+          dreamJob: row.dreamJob
+        };
+      });
+      return Object.keys(obj).length ? obj : defaultValue;
+    }
+    if (Array.isArray(defaultValue)) return data || defaultValue;
     const obj = {};
     data.forEach(row => {
-      obj[row.name] = {
-        birthdate: row.birthdate,
-        favoriteColor: row.favoriteColor,
-        favoriteFood: row.favoriteFood,
-        dislikedFood: row.dislikedFood,
-        favoriteWeekendActivity: row.favoriteWeekendActivity,
-        favoriteGame: row.favoriteGame,
-        favoriteMovie: row.favoriteMovie,
-        favoriteHero: row.favoriteHero,
-        profession: {
-          title: row.professionTitle,
-          description: row.professionDescription  
-        },
-        funFact: row.funFact,
-        avatar: row.avatar,
-        dreamJob: row.dreamJob
-      };
+      if (row.name !== undefined && 'value' in row) obj[row.name] = row.value;
     });
     return Object.keys(obj).length ? obj : defaultValue;
   }
-  if (Array.isArray(defaultValue)) return data || defaultValue;
-  const obj = {};
-  data.forEach(row => {
-    if (row.name !== undefined && 'value' in row) obj[row.name] = row.value;
-  });
-  return Object.keys(obj).length ? obj : defaultValue;
-}
 
   // ========== Data Declarations ==========
   let wallPosts;
@@ -368,19 +360,22 @@ async function loadFromSupabase(table, defaultValue) {
     saveToSupabase('qa_table', qaList);
   }
 
-loadAllData().then(allData => init(allData));
-    wallPosts = await loadFromSupabase('wall_posts', defaultWallPosts);
+  // ========= LOADING ALL DATA (THE CORRECT WAY) ==========
+  async function loadAllData() {
+    let wallPosts = await loadFromSupabase('wall_posts', defaultWallPosts);
     wallPosts.forEach(p => { if (!p.userReactions) p.userReactions = {}; });
-    qaList = await loadFromSupabase('qa_table', defaultQAList);
+    let qaList = await loadFromSupabase('qa_table', defaultQAList);
     injectDefaultQA();
-    calendarEvents = await loadFromSupabase('calendar_events', defaultCalendarEvents);
-    profilesData = await loadFromSupabase('profiles', defaultProfilesData);
-    chores = await loadFromSupabase('chores', defaultChores);
+    let calendarEvents = await loadFromSupabase('calendar_events', defaultCalendarEvents);
+    let profilesData = await loadFromSupabase('profiles', defaultProfilesData);
+    let chores = await loadFromSupabase('chores', defaultChores);
     chores.forEach(c => { if (typeof c.completed !== "boolean") c.completed = false; });
-    userPoints = await loadFromSupabase('user_points', defaultUserPoints);
-    badges = await loadFromSupabase('badges', defaultBadges);
-    completedChores = await loadFromSupabase('completed_chores', defaultCompletedChores);
+    let userPoints = await loadFromSupabase('user_points', defaultUserPoints);
+    let badges = await loadFromSupabase('badges', defaultBadges);
+    let completedChores = await loadFromSupabase('completed_chores', defaultCompletedChores);
+    return { wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores };
   }
+
   // ========== User Selection ==========
   function showUserModal() {
     userSelectModal.classList.remove('modal-hidden');
@@ -520,8 +515,6 @@ loadAllData().then(allData => init(allData));
       profileDetailSection.hidden = true;
     }
   }
-  // The default active tab will be set after data has loaded in init().
-  // This avoids calling updateSearchFilters() before wallPosts and other data are initialized.
 
   function setupTabListeners(list) {
     list.forEach((tab, i) => {
@@ -545,6 +538,7 @@ loadAllData().then(allData => init(allData));
 
   setupTabListeners(sidebarTabs);
   setupTabListeners(bottomTabs);
+
   // ========== Wall Posts ==========
 
   function renderWallPosts(filterText = '') {
@@ -1399,17 +1393,16 @@ function renderSingleProfile(name) {
 
   // ========== Initialization ==========
 
-function init(allData) {
-  wallPosts = allData.wallPosts;
-  qaList = allData.qaList;
-  calendarEvents = allData.calendarEvents;
-  profilesData = allData.profilesData;
-  chores = allData.chores;
-  userPoints = allData.userPoints;
-  badges = allData.badges;
-  completedChores = allData.completedChores;    checkUserSelection();
-    // Ensure the default tab (index 0) is activated only after all data is loaded.
-    // Without this, setActiveTab would run before wallPosts is initialized, leading to errors.
+  function init(allData) {
+    wallPosts = allData.wallPosts;
+    qaList = allData.qaList;
+    calendarEvents = allData.calendarEvents;
+    profilesData = allData.profilesData;
+    chores = allData.chores;
+    userPoints = allData.userPoints;
+    badges = allData.badges;
+    completedChores = allData.completedChores;
+    checkUserSelection();
     setActiveTab(0);
     renderQA();
     renderCalendarTable();
@@ -1546,4 +1539,4 @@ function init(allData) {
   // Kick off the initial rendering and setup
   loadAllData().then(init);
 
-})();
+})(); // END OF FILE
