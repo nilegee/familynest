@@ -7,6 +7,7 @@ FamilyNest now stores all data in [Supabase](https://supabase.com). The front en
 1. Create a project at [app.supabase.com](https://app.supabase.com/).
 2. In **Project Settings → API** copy the **Project URL** and **anon public key**.
 3. Copy `config.example.js` to `config.js` and fill in your project URL and anon key.
+4. Ensure `index.html` includes `<script src="config.js"></script>` before `script.js` so your credentials are loaded.
 
 Once those values are set, the application will read and write wall posts, calendar events, chores and profile information directly from Supabase tables.
 
