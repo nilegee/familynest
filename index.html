@@ -142,6 +142,7 @@
     <!-- Chores Section -->
     <section id="chores" aria-label="Chores Section" hidden>
       <h1>Chores</h1>
+      <label><input type="checkbox" id="showDailyOnly" /> Show daily chores only</label>
       <ul id="choresList" class="chores-list" aria-live="polite" aria-atomic="true"></ul>
       <!-- Admin-only chore creation form -->
       <div id="choreAdminPanel" hidden>
@@ -160,6 +161,8 @@
         <br/>
         <label for="choreDue">Due Date:</label><br/>
         <input type="date" id="choreDue" aria-label="Chore due date" />
+        <br/>
+        <label><input type="checkbox" id="choreDaily" /> Daily chore</label>
         <br/>
         <button class="add-btn" id="addChoreBtn">Add Chore</button>
       </div>

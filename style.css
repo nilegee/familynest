@@ -462,6 +462,15 @@ ul.chores-list li button {
   font-size: 0.85rem;
 }
 
+.daily-label {
+  background: #ffecb3;
+  border-radius: 4px;
+  padding: 0 0.4rem;
+  margin-left: 0.4rem;
+  color: #c27600;
+  font-size: 0.75rem;
+}
+
 /* Points display in profile */
 .points-display {
   margin-top: 1rem;
