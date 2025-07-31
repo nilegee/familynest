@@ -40,6 +40,7 @@
       <li role="menuitem" tabindex="-1">Q&A</li>
       <li role="menuitem" tabindex="-1">Calendar</li>
       <li role="menuitem" tabindex="-1">Chores</li>
+      <li role="menuitem" tabindex="-1">Scoreboard</li>
       <li role="menuitem" tabindex="-1">Ghassan</li>
       <li role="menuitem" tabindex="-1">Mariem</li>
       <li role="menuitem" tabindex="-1">Yazid</li>
@@ -65,6 +66,7 @@
           <i class="fa-solid fa-bell"></i>
           <span id="notificationBadge" class="notification-badge" aria-hidden="true"></span>
         </button>
+        <button id="themeToggleBtn" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
       </div>
     </header>
 
@@ -164,6 +166,12 @@
         <br/>
         <button class="add-btn" id="addChoreBtn">Add Chore</button>
       </div>
+    </section>
+
+    <!-- Scoreboard Section -->
+    <section id="scoreboard" aria-label="Scoreboard Section" hidden>
+      <h1>Scoreboard</h1>
+      <ul id="scoreboardList" class="scoreboard-list"></ul>
     </section>
 
     <!-- Profile Detail Section -->
