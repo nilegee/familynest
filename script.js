@@ -236,27 +236,51 @@ const supabase = window.supabase
     }
   }
 
-  async function saveToSupabase(table, data) {
-    table = resolveTable(table);
-    if (!supabaseEnabled) {
+async function saveToSupabase(table, data) {
+  table = resolveTable(table);
+  if (!supabaseEnabled) {
+    saveToLocal(table, data);
+    return;
+  }
+
+  let payload;
+  // --- Special case for profiles: flatten the object into an array of objects
+  if (table === 'profiles') {
+    payload = Object.entries(data).map(([name, value]) => ({
+      name,
+      birthdate: value.birthdate || null,
+      favoriteColor: value.favoriteColor || null,
+      favoriteFood: value.favoriteFood || null,
+      dislikedFood: value.dislikedFood || null,
+      favoriteWeekendActivity: value.favoriteWeekendActivity || null,
+      favoriteGame: value.favoriteGame || null,
+      favoriteMovie: value.favoriteMovie || null,
+      favoriteHero: value.favoriteHero || null,
+      professionTitle: (value.profession && value.profession.title) || null,
+      professionDes: (value.profession && value.profession.description) || null,
+      funFact: value.funFact || null,
+      avatar: value.avatar || null,
+      dreamJob: value.dreamJob || null,
+    }));
+  } else {
+    payload = Array.isArray(data)
+      ? data
+      : Object.entries(data).map(([name, value]) => ({ name, value }));
+  }
+
+  const { error } = await supabase.from(table).upsert(payload);
+  if (error) {
+    if (error.code === 'PGRST205') {
+      console.info(`Supabase table '${table}' not found - using localStorage.`);
+      supabaseEnabled = false;
       saveToLocal(table, data);
       return;
     }
-    const payload = Array.isArray(data)
-      ? data
-      : Object.entries(data).map(([name, value]) => ({ name, value }));
-    const { error } = await supabase.from(table).upsert(payload);
-    if (error) {
-      if (error.code === 'PGRST205') {
-        console.info(`Supabase table '${table}' not found - using localStorage.`);
-        supabaseEnabled = false;
-        saveToLocal(table, data);
-        return;
-      }
-      console.error('Supabase save error:', error);
-      showAlert('Could not save data.');
-    }
+    console.error('Supabase save error:', error);
+    showAlert('Could not save data.');
   }
+}
+
 
   function loadFromLocal(table, defaultValue) {
     table = resolveTable(table);
