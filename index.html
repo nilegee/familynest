@@ -171,7 +171,53 @@
         Profile
         <img id="profileAvatar" alt="" class="profile-avatar" />
       </h1>
+      <button id="editProfileBtn" class="btn-secondary">Edit Profile</button>
+      <form id="profileEditForm" class="profile-edit-form" hidden>
+        <div class="profile-field">
+          <label for="editBirthdate">Birthdate</label>
+          <input type="date" id="editBirthdate" />
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteColor">Favourite Colour</label>
+          <input type="text" id="editFavoriteColor" />
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteFood">Favourite Food</label>
+          <input type="text" id="editFavoriteFood" />
+        </div>
+        <div class="profile-field">
+          <label for="editDislikedFood">Disliked Food</label>
+          <input type="text" id="editDislikedFood" />
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteWeekendActivity">Favourite Weekend Activity</label>
+          <input type="text" id="editFavoriteWeekendActivity" />
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteGame">Favourite Game</label>
+          <input type="text" id="editFavoriteGame" />
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteMovie">Favourite Movie</label>
+          <input type="text" id="editFavoriteMovie" />
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteHero">Favourite Hero</label>
+          <input type="text" id="editFavoriteHero" />
+        </div>
+        <div class="profile-field">
+          <label for="editProfessionTitle">Profession</label>
+          <input type="text" id="editProfessionTitle" />
+        </div>
+        <div class="profile-field">
+          <label for="editFunFact">Fun Fact</label>
+          <textarea id="editFunFact" rows="3"></textarea>
+        </div>
+        <button type="button" id="saveProfileBtn" class="btn-primary">Save</button>
+        <button type="button" id="cancelProfileBtn" class="btn-secondary">Cancel</button>
+      </form>
       <div id="profileContainer" class="profile-container"></div>
+      <div id="similarityInfo" class="similarity-info" hidden></div>
     </section>
   </main>
 
