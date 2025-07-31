@@ -69,12 +69,12 @@
   const currentUserKey = 'familyCurrentUser';
   const themeKey = 'familyTheme';
 // ====== Supabase Setup ======
-const supabaseUrl = 'https://zlhamcofyzozfyzcgcdg.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo'; // Get from Supabase > Project Settings > API > Project API keys
-const supabase = window.supabase
-  ? window.supabase.createClient(supabaseUrl, supabaseKey)
-  : createClient(supabaseUrl, supabaseKey); // Handles both CDN and npm module
-
+const supabaseUrl = 'YOUR_SUPABASE_URL';
+const supabaseKey = 'YOUR_SUPABASE_KEY';
+if (supabaseUrl === 'YOUR_SUPABASE_URL' || supabaseKey === 'YOUR_SUPABASE_KEY') {
+  alert('Please set supabaseUrl and supabaseKey in script.js');
+}
+const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : createClient(supabaseUrl, supabaseKey);
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
   // Ghassan/Mariem without entering this PIN.
