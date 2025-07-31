@@ -37,6 +37,11 @@
   const showDailyOnlyCheckbox = document.getElementById('showDailyOnly');
   const scoreboardList = document.getElementById('scoreboardList');
 
+  const adminTab = document.getElementById('adminTab');
+  const adminSectionEl = document.getElementById('adminSection');
+  const adminChoreList = document.getElementById('adminChoreList');
+  const adminEventList = document.getElementById('adminEventList');
+
   const profileDetailSection = document.getElementById('profileDetail');
   const profileContainer = document.getElementById('profileContainer');
   const profileNameHeading = document.getElementById('profileName');
@@ -121,11 +126,11 @@
   ];
 
   const defaultCalendarEvents = [
-    { id: generateId(), start: "2025-08-11", end: "2025-08-14", desc: "Hotel visit - Centara Mirage Beach Resort" },
-    { id: generateId(), start: "2025-08-31", end: "2025-08-31", desc: "Ghassan Birthday" },
-    { id: generateId(), start: "2025-10-23", end: "2025-10-23", desc: "Yahya Birthday" },
-    { id: generateId(), start: "2025-01-30", end: "2025-01-30", desc: "Mariem Birthday" },
-    { id: generateId(), start: "2025-03-28", end: "2025-03-28", desc: "Yazid Birthday" }
+    { id: generateId(), start: "2025-08-11", end: "2025-08-14", desc: "Hotel visit - Centara Mirage Beach Resort", assignedTo: "All" },
+    { id: generateId(), start: "2025-08-31", end: "2025-08-31", desc: "Ghassan Birthday", assignedTo: "All" },
+    { id: generateId(), start: "2025-10-23", end: "2025-10-23", desc: "Yahya Birthday", assignedTo: "All" },
+    { id: generateId(), start: "2025-01-30", end: "2025-01-30", desc: "Mariem Birthday", assignedTo: "All" },
+    { id: generateId(), start: "2025-03-28", end: "2025-03-28", desc: "Yazid Birthday", assignedTo: "All" }
   ];
 
   const defaultProfilesData = {
@@ -281,6 +286,7 @@
     qaList = await loadFromStorage(qaListKey, defaultQAList);
     injectDefaultQA();
     calendarEvents = await loadFromStorage(calendarEventsKey, defaultCalendarEvents);
+    calendarEvents.forEach(ev => { if (!ev.assignedTo) ev.assignedTo = 'All'; });
     profilesData = await loadFromStorage(profilesDataKey, defaultProfilesData);
     chores = await loadFromStorage(choresKey, defaultChores);
     userPoints = await loadFromStorage(userPointsKey, defaultUserPoints);
@@ -750,13 +756,14 @@
       showAlert('End date cannot be before start date.');
       return;
     }
-    calendarEvents.push({ id: generateId(), start, end: end || start, desc });
+    calendarEvents.push({ id: generateId(), start, end: end || start, desc, assignedTo: 'All' });
     saveToStorage(calendarEventsKey, calendarEvents);
     eventStartDate.value = '';
     eventEndDate.value = '';
     eventDesc.value = '';
     renderCalendarEventsList(contentSearch.value);
     renderCalendarTable();
+    renderAdminPanel();
     incrementNotification();
   });
 
@@ -870,6 +877,58 @@
     });
   }
 
+  function renderAdminPanel(filter = '') {
+    if (!adminSectionEl || adminSectionEl.hidden) return;
+    adminChoreList.innerHTML = '';
+    adminEventList.innerHTML = '';
+    let choreItems = chores;
+    let eventItems = calendarEvents;
+    if (filter) {
+      const f = filter.toLowerCase();
+      choreItems = choreItems.filter(c => c.desc.toLowerCase().includes(f));
+      eventItems = eventItems.filter(e => e.desc.toLowerCase().includes(f));
+    }
+    const members = ['All', 'Ghassan', 'Mariem', 'Yazid', 'Yahya'];
+    choreItems.forEach(ch => {
+      const li = document.createElement('li');
+      const select = document.createElement('select');
+      members.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        if (ch.assignedTo === m) opt.selected = true;
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', () => {
+        ch.assignedTo = select.value;
+        saveToStorage(choresKey, chores);
+        renderChores(contentSearch.value, showDailyOnlyCheckbox.checked);
+      });
+      li.textContent = ch.desc + ' ';
+      li.appendChild(select);
+      adminChoreList.appendChild(li);
+    });
+
+    eventItems.forEach(ev => {
+      const li = document.createElement('li');
+      const select = document.createElement('select');
+      members.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        if ((ev.assignedTo || 'All') === m) opt.selected = true;
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', () => {
+        ev.assignedTo = select.value;
+        saveToStorage(calendarEventsKey, calendarEvents);
+      });
+      li.textContent = `${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''}: ${ev.desc} `;
+      li.appendChild(select);
+      adminEventList.appendChild(li);
+    });
+  }
+
   editProfileBtn.addEventListener('click', () => {
     currentEditingProfile = profileNameHeading.dataset.name;
     renderSingleProfile(currentEditingProfile);
@@ -905,6 +964,13 @@
     const isAdmin = adminUsers.includes(user);
     document.getElementById('choreAdminPanel').hidden = !isAdmin;
     adminAnswerSection.hidden = !isAdmin || !qaList.some(item => !item.a);
+    if (adminTab) adminTab.hidden = !isAdmin;
+    if (!isAdmin && adminSectionEl) adminSectionEl.hidden = true;
+    if (isAdmin) renderAdminPanel();
+    if (!isAdmin && adminTab) {
+      const idx = tabs.indexOf(adminTab);
+      if (activeTabIndex === idx) setActiveTab(0);
+    }
   }
 
   // Add chore logic
@@ -922,6 +988,7 @@
     chores.push({ id, desc, assignedTo, due: daily ? '' : due, daily });
     saveToStorage(choresKey, chores);
     renderChores(contentSearch.value);
+    renderAdminPanel();
     // Award points and badges for assigning chores
     if (assignedTo !== 'All') {
       incrementPoints(assignedTo);
@@ -971,6 +1038,9 @@
         break;
       case 'Scoreboard':
         renderScoreboard();
+        break;
+      case 'Admin':
+        renderAdminPanel(filter);
         break;
       case 'Ghassan':
       case 'Mariem':
@@ -1179,6 +1249,7 @@
     Object.keys(profilesData).forEach(n => computeProfileSimilarities(n));
     updateGreeting();
     updateAdminVisibility();
+    renderAdminPanel();
     renderChores('', showDailyOnlyCheckbox.checked);
     renderScoreboard();
     loadTheme();
