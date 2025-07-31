@@ -20,10 +20,11 @@ FamilyNest expects the following tables to exist in your Supabase project:
 | Table            | Description                        | Example Columns                       |
 |------------------|------------------------------------|---------------------------------------|
 | `wall_posts`     | Posts on the family wall           | `id` (text), `member` (text), `text` (text), `date` (timestamp), `reactions` (json) |
-| `Q&A Table`      | Questions and answers              | `id` (text), `q` (text), `a` (text)   |
+| `qa_table`       | Questions and answers              | `id` (text), `q` (text), `a` (text)   |
 | `calendar_events`| Events for the family calendar     | `id` (text), `start` (date), `end` (date), `desc` (text) |
 | `profiles`       | Profile information for each user  | `name` (text), `value` (json)         |
 | `chores`         | Chores assigned to family members  | `id` (text), `desc` (text), `assignedTo` (text), `due` (date), `daily` (boolean), `completed` (boolean) |
+| `reminders`      | Reminders for family members       | `id` (text), `text` (text), `date` (timestamp) |
 | `user_points`    | Points for each family member       | `name` (text), `value` (integer)      |
 | `badges`         | Earned badges for members           | `name` (text), `value` (json)         |
 | `completed_chores`| Total chores completed            | `name` (text), `value` (integer)      |
