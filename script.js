@@ -302,7 +302,8 @@
       favoriteHero: 'Iron Man',
       profession: { title: 'Student in Year 6', description: 'Learning many things in school and loves sports.' },
       funFact: 'Fast runner in school races.',
-      avatar: ''
+      avatar: '',
+      dreamJob: 'Engineer 🛠️'
     },
     Yahya: {
       birthdate: '2017-10-23',
@@ -315,7 +316,8 @@
       favoriteHero: 'Batman',
       profession: { title: 'Student in Year 3', description: 'Enjoys school and learning new things every day.' },
       funFact: 'Can draw superheroes very well.',
-      avatar: ''
+      avatar: '',
+      dreamJob: 'Engineer 🛠️'
     }
   });
 
@@ -1020,7 +1022,13 @@
 
   function renderSingleProfile(name) {
     const profile = profilesData[name];
-    profileNameHeading.childNodes[0].nodeValue = name;
+    let headingText = name;
+    if (profile.dreamJob) {
+      const job = profile.dreamJob.replace('🛠️', '').trim();
+      const emoji = profile.dreamJob.includes('🛠️') ? '🛠️ ' : '';
+      headingText = `${emoji}${job} ${name}`;
+    }
+    profileNameHeading.childNodes[0].nodeValue = headingText;
     if (profile.avatar) {
       profileAvatar.src = profile.avatar;
       profileAvatar.style.display = 'inline-block';
@@ -1073,6 +1081,19 @@
       div.innerHTML = `<strong>${item.label}:</strong> ${safe}${item.age ? ` <span class="age-text">(${item.age})</span>` : ''}`;
       profileContainer.appendChild(div);
     });
+
+    if (profile.dreamJob && profile.dreamJob.toLowerCase().includes('engineer')) {
+      const iconDiv = document.createElement('div');
+      iconDiv.className = 'engineer-animation-container';
+      iconDiv.innerHTML = `
+        <svg viewBox="0 0 64 32" class="engineer-car" aria-hidden="true">
+          <rect x="8" y="12" width="48" height="10" fill="#6c757d" />
+          <rect x="18" y="6" width="20" height="8" fill="#adb5bd" />
+          <circle cx="24" cy="24" r="4" fill="#212529" />
+          <circle cx="40" cy="24" r="4" fill="#212529" />
+        </svg>`;
+      profileContainer.appendChild(iconDiv);
+    }
 
     const userBadges = badges[name] || [];
     const badgeContainer = document.createElement('div');
