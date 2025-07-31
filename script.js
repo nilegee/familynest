@@ -514,12 +514,13 @@ const supabase = window.supabase
 
       const safeText = escapeHtml(post.text);
 
-      const replies = (post.replies || []).map(r => `
-          <li data-id="${r.id}">
-            <strong>${escapeHtml(r.member)}</strong>
-            <span class="wall-post-date" title="${formatDateLocal(r.date)}">(${timeAgo(r.date)})</span>
-            <div class="wall-post-text">${escapeHtml(r.text)}</div>
-          </li>`).join('');
+const repliesArr = Array.isArray(post.replies) ? post.replies : [];
+const replies = repliesArr.map(r => `
+  <li data-id="${r.id}">
+    <strong>${escapeHtml(r.member)}</strong>
+    <span class="wall-post-date" title="${formatDateLocal(r.date)}">(${timeAgo(r.date)})</span>
+    <div class="wall-post-text">${escapeHtml(r.text)}</div>
+  </li>`).join('');
 
       li.innerHTML = `
         <strong>${escapeHtml(post.member)}</strong>
