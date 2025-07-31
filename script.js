@@ -1074,6 +1074,7 @@
     } else {
       profileAvatar.src = 'icons/default-avatar.svg';
     }
+    profileAvatar.alt = 'Avatar for ' + name;
     profileAvatar.style.display = 'inline-block';
     const currentUser = localStorage.getItem(currentUserKey);
     const canEdit = currentUser === name || adminUsers.includes(currentUser);
