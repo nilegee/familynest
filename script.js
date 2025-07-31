@@ -1046,20 +1046,22 @@ function renderAdminQuestionOptions() {
     profileSimilarities[name] = sims;
   }
 
-  function renderScoreboard() {
-    if (!scoreboardList) return;
-    scoreboardList.innerHTML = '';
-    Object.keys(userPoints).forEach(name => {
-      const badgeHtml = (badges[name] || [])
-        .map(b => `<span title="${escapeHtml(b.name)}">${b.icon}</span>`)
-        .join('');
-      const li = document.createElement('li');
-      li.innerHTML = `<span>${escapeHtml(name)}</span>` +
-        `<span>${userPoints[name] || 0} pts | ${completedChores[name] || 0} chores</span>` +
-        `<span class="scoreboard-badges">${badgeHtml}</span>`;
-      scoreboardList.appendChild(li);
-    });
-  }
+function renderScoreboard() {
+  if (!userPoints || typeof userPoints !== 'object') return; // <-- THE FIX
+  if (!badges || typeof badges !== 'object') return; // <-- Extra safety
+  if (!completedChores || typeof completedChores !== 'object') return; // <-- Extra safety
+  scoreboardList.innerHTML = '';
+  Object.keys(userPoints).forEach(name => {
+    const badgeHtml = (badges[name] || [])
+      .map(b => `<span title="${escapeHtml(b.name)}">${b.icon}</span>`)
+      .join('');
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${escapeHtml(name)}</span>` +
+      `<span>${userPoints[name] || 0} pts | ${completedChores[name] || 0} chores</span>` +
+      `<span class="scoreboard-badges">${badgeHtml}</span>`;
+    scoreboardList.appendChild(li);
+  });
+}
 
   editProfileBtn.addEventListener('click', () => {
     currentEditingProfile = profileNameHeading.dataset.name;
@@ -1144,6 +1146,7 @@ function renderAdminQuestionOptions() {
   // ========== Search Filtering ==========
 
   function updateSearchFilters() {
+      if (!sidebarTabs[activeTabIndex]) return; // Safety against null tabs
     const filter = contentSearch.value.trim().toLowerCase();
     const activeTab = sidebarTabs[activeTabIndex].textContent.trim();
     switch (activeTab) {
@@ -1189,21 +1192,19 @@ function renderAdminQuestionOptions() {
 
   // ========== Profile Logic ==========
 
-  function renderSingleProfile(name) {
-    if (!profilesData) {
-      profilesData = { ...defaultProfilesData };
-    }
-    if (!Array.isArray(chores)) chores = [];   // <--- ADD THIS LINE!
-    const profile = profilesData[name];
-    if (!profile) {
-      profileContainer.innerHTML = '<p>Profile not found.</p>';
-      profileNameHeading.dataset.name = name;
-      profileNameHeading.childNodes[0].nodeValue = name;
-      profileAvatar.src = 'icons/default-avatar.svg';
-      profileAvatar.alt = 'Avatar for ' + name;
-      profileAvatar.style.display = 'inline-block';
-      return;
-    }
+function renderSingleProfile(name) {
+  if (!profilesData || typeof profilesData !== 'object') return; // <-- THE FIX
+  if (!Array.isArray(chores)) chores = [];   // <--- Still keep this line!
+  const profile = profilesData[name];
+  if (!profile) {
+    profileContainer.innerHTML = '<p>Profile not found.</p>';
+    profileNameHeading.dataset.name = name;
+    profileNameHeading.childNodes[0].nodeValue = name;
+    profileAvatar.src = 'icons/default-avatar.svg';
+    profileAvatar.alt = 'Avatar for ' + name;
+    profileAvatar.style.display = 'inline-block';
+    return;
+  }
     let headingText = name;
     if (profile.dreamJob) {
       const job = profile.dreamJob.replace('🛠️', '').trim();
