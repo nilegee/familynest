@@ -241,11 +241,13 @@ const supabase = window.supabase
       : Object.entries(data).map(([name, value]) => ({ name, value }));
     const { error } = await supabase.from(table).upsert(payload);
     if (error) {
-      console.error('Supabase save error:', error);
       if (error.code === 'PGRST205') {
+        console.info(`Supabase table '${table}' not found - using localStorage.`);
         supabaseEnabled = false;
         saveToLocal(table, data);
+        return;
       }
+      console.error('Supabase save error:', error);
       showAlert('Could not save data.');
     }
   }
@@ -266,11 +268,12 @@ const supabase = window.supabase
     }
     const { data, error } = await supabase.from(table).select('*');
     if (error) {
-      console.warn('Supabase load failed:', error);
       if (error.code === 'PGRST205') {
+        console.info(`Supabase table '${table}' not found - switching to localStorage.`);
         supabaseEnabled = false;
         return loadFromLocal(table, defaultValue);
       }
+      console.warn('Supabase load failed:', error);
       return defaultValue;
     }
     if (Array.isArray(defaultValue)) return data || defaultValue;
