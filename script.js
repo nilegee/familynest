@@ -1045,6 +1045,16 @@
       editFavoriteHero.value = profile.favoriteHero || '';
       editProfessionTitle.value = profile.profession.title || '';
       editFunFact.value = profile.funFact || '';
+      profileEditForm.querySelectorAll('label').forEach(label => {
+        let icon = label.querySelector('.edit-icon');
+        if (!icon) {
+          icon = document.createElement('span');
+          icon.className = 'edit-icon';
+          icon.textContent = '✏️';
+          label.appendChild(icon);
+        }
+        icon.hidden = false;
+      });
       return;
     }
 
@@ -1052,6 +1062,7 @@
     editProfileBtn.hidden = !canEdit;
     profileContainer.style.display = '';
     profileContainer.innerHTML = '';
+    profileEditForm.querySelectorAll('.edit-icon').forEach(i => i.hidden = true);
 
     const age = calculateAge(profile.birthdate);
     const entries = [
@@ -1073,6 +1084,21 @@
       div.innerHTML = `<strong>${item.label}:</strong> ${safe}${item.age ? ` <span class="age-text">(${item.age})</span>` : ''}`;
       profileContainer.appendChild(div);
     });
+
+    // ----- Chore statistics -----
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0,0,0,0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7);
+    const assigned = chores.filter(c => c.assignedTo === name || c.assignedTo === 'All');
+    const dueThisWeek = assigned.filter(c => !c.daily && c.due && new Date(c.due) >= startOfWeek && new Date(c.due) < endOfWeek).length;
+    const dailyCount = assigned.filter(c => c.daily).length;
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'profile-summary';
+    summaryDiv.textContent = `Chores assigned: ${assigned.length} (Daily: ${dailyCount}, Due this week: ${dueThisWeek})`;
+    profileContainer.appendChild(summaryDiv);
 
     if (profile.dreamJob && profile.dreamJob.toLowerCase().includes('engineer')) {
       const iconDiv = document.createElement('div');

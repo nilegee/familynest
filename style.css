@@ -518,6 +518,18 @@ ul.chores-list li button {
   font-weight: 600;
 }
 
+.profile-summary {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.edit-icon {
+  margin-left: 0.3rem;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
 /* Badge section styling */
 .badge-container {
   margin-top: 1rem;
