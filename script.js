@@ -67,17 +67,7 @@
 
   // ========== Constants and Keys ==========
   const currentUserKey = 'familyCurrentUser';
-  const wallPostsKey = 'familyWallPosts';
-  const qaListKey = 'familyQAList';
-  const calendarEventsKey = 'familyCalendarEvents';
-  const profilesDataKey = 'familyProfilesData';
-
-  // Keys for new features
-  const choresKey = 'familyChores';
-  const userPointsKey = 'familyUserPoints';
-  const badgesKey = 'familyBadges';
   const themeKey = 'familyTheme';
-  const completedChoresKey = "familyCompletedChores";
 // ====== Supabase Setup ======
 const supabaseUrl = 'https://zlhamcofyzozfyzcgcdg.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo'; // Get from Supabase > Project Settings > API > Project API keys
@@ -87,13 +77,6 @@ const supabase = window.supabase
 
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
-  const API_BASE = "http://localhost:3000/api";
-  const endpointMap = {
-    [wallPostsKey]: "/wallPosts",
-    [calendarEventsKey]: "/calendarEvents",
-    [choresKey]: "/chores",
-    [profilesDataKey]: "/profiles"
-  };
   // Ghassan/Mariem without entering this PIN.
   const adminUsers = ['Ghassan', 'Mariem'];
   const adminPin = '4321';
@@ -237,43 +220,29 @@ const supabase = window.supabase
     alert(message);
   }
 
-  async function saveToStorage(key, data) {
-    const endpoint = API_BASE + endpointMap[key];
-    try {
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-    } catch (e) {
-      console.warn('Server save failed:', e);
-    }
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-    } catch (e) {
-      console.error('Storage error:', e);
-      showAlert('Could not save data. Storage might be full or restricted.');
+  async function saveToSupabase(table, data) {
+    const payload = Array.isArray(data)
+      ? data
+      : Object.entries(data).map(([name, value]) => ({ name, value }));
+    const { error } = await supabase.from(table).upsert(payload);
+    if (error) {
+      console.error('Supabase save error:', error);
+      showAlert('Could not save data.');
     }
   }
 
-  async function loadFromStorage(key, defaultValue) {
-    const endpoint = API_BASE + endpointMap[key];
-    try {
-      const res = await fetch(endpoint);
-      if (!res.ok) throw new Error('Bad response');
-      const data = await res.json();
-      localStorage.setItem(key, JSON.stringify(data));
-      return data;
-    } catch (e) {
-      console.warn('Server load failed:', e);
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return defaultValue;
-        return JSON.parse(raw);
-      } catch {
-        return defaultValue;
-      }
+  async function loadFromSupabase(table, defaultValue) {
+    const { data, error } = await supabase.from(table).select('*');
+    if (error) {
+      console.warn('Supabase load failed:', error);
+      return defaultValue;
     }
+    if (Array.isArray(defaultValue)) return data || defaultValue;
+    const obj = {};
+    data.forEach(row => {
+      if (row.name !== undefined && 'value' in row) obj[row.name] = row.value;
+    });
+    return Object.keys(obj).length ? obj : defaultValue;
   }
   // ========== Data Declarations ==========
   let wallPosts;
@@ -300,21 +269,21 @@ const supabase = window.supabase
         qaList.push({ id: generateId(), q: item.q, a: item.a });
       }
     });
-    saveToStorage(qaListKey, qaList);
+    saveToSupabase('qa_list', qaList);
   }
 
   async function loadAllData() {
-    wallPosts = await loadFromStorage(wallPostsKey, defaultWallPosts);
+    wallPosts = await loadFromSupabase('wall_posts', defaultWallPosts);
     wallPosts.forEach(p => { if (!p.userReactions) p.userReactions = {}; });
-    qaList = await loadFromStorage(qaListKey, defaultQAList);
+    qaList = await loadFromSupabase('qa_list', defaultQAList);
     injectDefaultQA();
-    calendarEvents = await loadFromStorage(calendarEventsKey, defaultCalendarEvents);
-    profilesData = await loadFromStorage(profilesDataKey, defaultProfilesData);
-    chores = await loadFromStorage(choresKey, defaultChores);
+    calendarEvents = await loadFromSupabase('calendar_events', defaultCalendarEvents);
+    profilesData = await loadFromSupabase('profiles', defaultProfilesData);
+    chores = await loadFromSupabase('chores', defaultChores);
     chores.forEach(c => { if (typeof c.completed !== "boolean") c.completed = false; });
-    userPoints = await loadFromStorage(userPointsKey, defaultUserPoints);
-    badges = await loadFromStorage(badgesKey, defaultBadges);
-    completedChores = await loadFromStorage(completedChoresKey, defaultCompletedChores);
+    userPoints = await loadFromSupabase('user_points', defaultUserPoints);
+    badges = await loadFromSupabase('badges', defaultBadges);
+    completedChores = await loadFromSupabase('completed_chores', defaultCompletedChores);
   }
   // ========== User Selection ==========
   function showUserModal() {
@@ -556,7 +525,7 @@ const supabase = window.supabase
         post.reactions[reaction] = (post.reactions[reaction] || 0) + 1;
       }
       post.userReactions[currentUser] = userReacts;
-      saveToStorage(wallPostsKey, wallPosts);
+      saveToSupabase('wall_posts', wallPosts);
       renderWallPosts(contentSearch.value);
       incrementNotification();
     } else if (e.target.classList.contains('reply-btn')) {
@@ -576,7 +545,7 @@ const supabase = window.supabase
         text: replyText.trim(),
         date: new Date().toISOString()
       });
-      saveToStorage(wallPostsKey, wallPosts);
+      saveToSupabase('wall_posts', wallPosts);
       renderWallPosts(contentSearch.value);
       incrementNotification();
     } else if (e.target.classList.contains('edit-btn')) {
@@ -584,7 +553,7 @@ const supabase = window.supabase
     } else if (e.target.classList.contains('delete-btn')) {
       if (confirm('Delete this post?')) {
         wallPosts.splice(postIndex, 1);
-        saveToStorage(wallPostsKey, wallPosts);
+        saveToSupabase('wall_posts', wallPosts);
         renderWallPosts(contentSearch.value);
       }
     }
@@ -620,7 +589,7 @@ const supabase = window.supabase
       post.text = newText;
       post.edited = true;
       post.date = new Date().toISOString();
-      saveToStorage(wallPostsKey, wallPosts);
+      saveToSupabase('wall_posts', wallPosts);
       renderWallPosts(contentSearch.value);
     });
 
@@ -653,7 +622,7 @@ const supabase = window.supabase
       userReactions: {},
       replies: []
     });
-    saveToStorage(wallPostsKey, wallPosts);
+    saveToSupabase('wall_posts', wallPosts);
     newWallPostInput.value = '';
     renderWallPosts(contentSearch.value);
     incrementNotification();
@@ -694,7 +663,7 @@ const supabase = window.supabase
     }
     const id = generateId();
     qaList.unshift({ id, q, a: '' });
-    saveToStorage(qaListKey, qaList);
+    saveToSupabase('qa_list', qaList);
     newQuestionInput.value = '';
     renderQA(contentSearch.value);
     incrementNotification();
@@ -710,7 +679,7 @@ const supabase = window.supabase
     if (e.target.classList.contains('delete-q-btn')) {
       if (confirm('Delete this question?')) {
         qaList.splice(index, 1);
-        saveToStorage(qaListKey, qaList);
+        saveToSupabase('qa_list', qaList);
         renderQA(contentSearch.value);
       }
     } else if (e.target.classList.contains('edit-q-btn')) {
@@ -743,7 +712,7 @@ const supabase = window.supabase
       }
       qaItem.q = newQ;
       qaItem.a = newA;
-      saveToStorage(qaListKey, qaList);
+      saveToSupabase('qa_list', qaList);
       renderQA(contentSearch.value);
     });
     cancelBtn.addEventListener('click', () => {
@@ -773,7 +742,7 @@ const supabase = window.supabase
     }
     const qaItem = qaList.find(item => item.id === selected);
     qaItem.a = answer;
-    saveToStorage(qaListKey, qaList);
+    saveToSupabase('qa_list', qaList);
     answerInput.value = '';
     renderQA(contentSearch.value);
   });
@@ -842,7 +811,7 @@ const supabase = window.supabase
       return;
     }
     calendarEvents.push({ id: generateId(), start, end: end || start, desc });
-    saveToStorage(calendarEventsKey, calendarEvents);
+    saveToSupabase('calendar_events', calendarEvents);
     eventStartDate.value = '';
     eventEndDate.value = '';
     eventDesc.value = '';
@@ -891,12 +860,12 @@ const supabase = window.supabase
       checkbox.addEventListener('change', () => {
         item.completed = checkbox.checked;
         li.classList.toggle('completed', item.completed);
-        saveToStorage(choresKey, chores);
+        saveToSupabase('chores', chores);
         if (item.assignedTo && item.assignedTo !== 'All') {
           const delta = checkbox.checked ? 1 : -1;
           completedChores[item.assignedTo] = (completedChores[item.assignedTo] || 0) + delta;
           if (completedChores[item.assignedTo] < 0) completedChores[item.assignedTo] = 0;
-          saveToStorage(completedChoresKey, completedChores);
+          saveToSupabase('completed_chores', completedChores);
           renderScoreboard();
         }
       });
@@ -926,7 +895,7 @@ const supabase = window.supabase
 
   function incrementPoints(user, amount = 1) {
     userPoints[user] = (userPoints[user] || 0) + amount;
-    saveToStorage(userPointsKey, userPoints);
+    saveToSupabase('user_points', userPoints);
     renderScoreboard();
   }
 
@@ -936,7 +905,7 @@ const supabase = window.supabase
     badges[user] = badges[user] || [];
     if (!badges[user].some(b => b.id === badgeId)) {
       badges[user].push(badge);
-      saveToStorage(badgesKey, badges);
+      saveToSupabase('badges', badges);
       renderScoreboard();
     }
   }
@@ -1011,7 +980,7 @@ const supabase = window.supabase
     p.favoriteHero = editFavoriteHero.value.trim();
     p.profession.title = editProfessionTitle.value.trim();
     p.funFact = editFunFact.value.trim();
-    saveToStorage(profilesDataKey, profilesData);
+    saveToSupabase('profiles', profilesData);
     computeProfileSimilarities(currentEditingProfile);
     const name = currentEditingProfile;
     currentEditingProfile = null;
@@ -1043,7 +1012,7 @@ const supabase = window.supabase
     }
     const id = generateId();
     chores.push({ id, desc, assignedTo, due: daily ? '' : due, daily, completed: false });
-    saveToStorage(choresKey, chores);
+    saveToSupabase('chores', chores);
     renderChores(contentSearch.value);
     // Award points and badges for assigning chores
     if (assignedTo !== 'All') {
@@ -1292,7 +1261,7 @@ const supabase = window.supabase
           const reader = new FileReader();
           reader.onload = () => {
             profile.avatar = reader.result;
-            saveToStorage(profilesDataKey, profilesData);
+            saveToSupabase('profiles', profilesData);
             renderSingleProfile(name);
           };
           reader.readAsDataURL(file);
