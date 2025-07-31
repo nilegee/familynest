@@ -516,6 +516,7 @@ const supabase = window.supabase
 
 const repliesArr = Array.isArray(post.replies) ? post.replies : [];
 const replies = repliesArr.map(r => `
+
   <li data-id="${r.id}">
     <strong>${escapeHtml(r.member)}</strong>
     <span class="wall-post-date" title="${formatDateLocal(r.date)}">(${timeAgo(r.date)})</span>
