@@ -26,7 +26,8 @@ let data = {
   wallPosts: [],
   calendarEvents: [],
   chores: [],
-  profiles: {}
+  profiles: {},
+  messages: []
 };
 
 async function loadData() {
@@ -85,6 +86,15 @@ app.get('/api/profiles', (_req, res) => {
 });
 app.post('/api/profiles', (req, res) => {
   data.profiles = req.body;
+  saveData();
+  res.json({ status: 'ok' });
+});
+
+app.get('/api/messages', (_req, res) => {
+  res.json(data.messages);
+});
+app.post('/api/messages', (req, res) => {
+  data.messages = req.body;
   saveData();
   res.json({ status: 'ok' });
 });

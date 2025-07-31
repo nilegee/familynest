@@ -19,13 +19,8 @@
   const newWallPostInput = document.getElementById('newWallPost');
 
   const qaListEl = document.getElementById('qaList');
-  const askBtn = document.getElementById('askBtn');
-  const newQuestionInput = document.getElementById('newQuestion');
-
-  const adminAnswerSection = document.getElementById('adminAnswerSection');
-  const questionSelect = document.getElementById('questionSelect');
-  const answerInput = document.getElementById('answerInput');
-  const saveAnswerBtn = document.getElementById('saveAnswerBtn');
+  const sendMsgBtn = document.getElementById('sendMsgBtn');
+  const newMessageInput = document.getElementById('newMessage');
 
   const calendarBody = document.getElementById('calendarBody');
   const eventListEl = document.getElementById('eventList');
@@ -66,7 +61,7 @@
   // ========== Constants and Keys ==========
   const currentUserKey = 'familyCurrentUser';
   const wallPostsKey = 'familyWallPosts';
-  const qaListKey = 'familyQAList';
+  const messagesKey = 'familyMessages';
   const calendarEventsKey = 'familyCalendarEvents';
   const profilesDataKey = 'familyProfilesData';
 
@@ -83,7 +78,8 @@
     [wallPostsKey]: "/wallPosts",
     [calendarEventsKey]: "/calendarEvents",
     [choresKey]: "/chores",
-    [profilesDataKey]: "/profiles"
+    [profilesDataKey]: "/profiles",
+    [messagesKey]: "/messages"
   };
   // Ghassan/Mariem without entering this PIN.
   const adminUsers = ['Ghassan', 'Mariem'];
@@ -115,10 +111,7 @@
     { id: generateId(), member: "Yazid", text: "I won the game last night!", date: "2025-07-29T20:45:00", reactions: { "😂": 3 }, edited: false, userReactions: {} }
   ];
 
-  const defaultQAList = [
-    { id: generateId(), q: "What's for dinner?", a: "We’re having Koshari!" },
-    { id: generateId(), q: "When is the next family trip?", a: "Next month, inshallah." }
-  ];
+  const defaultMessages = [];
 
   const defaultCalendarEvents = [
     { id: generateId(), start: "2025-08-11", end: "2025-08-14", desc: "Hotel visit - Centara Mirage Beach Resort" },
@@ -251,7 +244,7 @@
 
   // ========== Data Declarations ==========
   let wallPosts;
-  let qaList;
+  let messages;
   let calendarEvents;
   let profilesData;
   let chores;
@@ -259,27 +252,10 @@
   let badges;
   // In-memory similarities and editing state
 
-  function injectDefaultQA() {
-    const defaults = [
-      { q: 'I have a friend in class wearing a cross or praying to an elephant or praying to Jesus', a: 'People follow different religions. In Islam we believe in one God and we pray only to Him, but we respect others’ choices. The Qur’an teaches that Jesus said we should worship God alone.' },
-      { q: 'Is Jesus God?', a: 'Muslims see Jesus (peace be upon him) as one of God’s greatest messengers. He called people to worship God alone and never claimed to be divine.' },
-      { q: 'Why do people die?', a: 'Life in this world is temporary; death is the door to the next life. The Qur’an says every soul will taste death and that this life is but a test. Death lets us return to Allah and be rewarded for our good deeds.' },
-      { q: 'Will Papa die? If Papa dies how will I see him?', a: 'Everyone, even prophets, passes away. Islam teaches that the soul continues; if we live righteously, we hope to reunite in Paradise. Good deeds and prayers for loved ones keep us connected.' },
-      { q: 'Are we going to meet in Jannah?', a: 'That’s the goal! Paradise is for those who believe and do good. Families who love and help each other for Allah’s sake can be reunited there, so keep praying and doing good.' }
-    ];
-    defaults.forEach(item => {
-      if (!qaList.some(q => q.q === item.q)) {
-        qaList.push({ id: generateId(), q: item.q, a: item.a });
-      }
-    });
-    saveToStorage(qaListKey, qaList);
-  }
-
   async function loadAllData() {
     wallPosts = await loadFromStorage(wallPostsKey, defaultWallPosts);
     wallPosts.forEach(p => { if (!p.userReactions) p.userReactions = {}; });
-    qaList = await loadFromStorage(qaListKey, defaultQAList);
-    injectDefaultQA();
+    messages = await loadFromStorage(messagesKey, defaultMessages);
     calendarEvents = await loadFromStorage(calendarEventsKey, defaultCalendarEvents);
     profilesData = await loadFromStorage(profilesDataKey, defaultProfilesData);
     chores = await loadFromStorage(choresKey, defaultChores);
@@ -570,122 +546,43 @@
     incrementNotification();
   });
 
-  // ========== Q&A Section ==========
+  // ========== Q&A Chat ==========
 
   function renderQA(filterText = '') {
     qaListEl.innerHTML = '';
-    let filtered = qaList;
+    let filtered = messages;
     if (filterText) {
       const f = filterText.toLowerCase();
-      filtered = qaList.filter(item => item.q.toLowerCase().includes(f) || (item.a && item.a.toLowerCase().includes(f)));
+      filtered = messages.filter(m => m.text.toLowerCase().includes(f) || m.author.toLowerCase().includes(f));
     }
-    filtered.forEach(item => {
+    filtered.forEach(msg => {
       const li = document.createElement('li');
-      li.setAttribute('data-id', item.id);
-      li.setAttribute('tabindex', '0');
       li.innerHTML = `
-        <div class="qa-question">Q: ${escapeHtml(item.q)}</div>
-        <div class="qa-answer">${item.a ? `A: ${escapeHtml(item.a)}` : '<i>Waiting for answer...</i>'}</div>
-        <div class="qa-actions">
-          <button class="edit-q-btn" aria-label="Edit question"><i class="fa-solid fa-pen-to-square"></i></button>
-          <button class="delete-q-btn" aria-label="Delete question"><i class="fa-solid fa-trash"></i></button>
-        </div>
+        <div class="chat-header">${escapeHtml(msg.author)}<span class="chat-time">${new Date(msg.date).toLocaleString()}</span></div>
+        <div class="chat-text">${escapeHtml(msg.text)}</div>
       `;
       qaListEl.appendChild(li);
     });
-    renderAdminQuestionOptions();
   }
 
-  askBtn.addEventListener('click', () => {
-    const q = newQuestionInput.value.trim();
-    if (!q) {
-      showAlert('Please enter your question.');
+  sendMsgBtn.addEventListener('click', () => {
+    const text = newMessageInput.value.trim();
+    if (!text) {
+      showAlert('Please enter a message.');
       return;
     }
-    const id = generateId();
-    qaList.unshift({ id, q, a: '' });
-    saveToStorage(qaListKey, qaList);
-    newQuestionInput.value = '';
+    const currentUser = localStorage.getItem(currentUserKey);
+    if (!currentUser) {
+      showAlert('Please select your user first.');
+      showUserModal();
+      return;
+    }
+    const msg = { id: generateId(), author: currentUser, text, date: new Date().toISOString() };
+    messages.push(msg);
+    saveToStorage(messagesKey, messages);
+    newMessageInput.value = '';
     renderQA(contentSearch.value);
     incrementNotification();
-  });
-
-  qaListEl.addEventListener('click', (e) => {
-    const li = e.target.closest('li');
-    if (!li) return;
-    const id = li.getAttribute('data-id');
-    const index = qaList.findIndex(item => item.id === id);
-    if (index === -1) return;
-
-    if (e.target.classList.contains('delete-q-btn')) {
-      if (confirm('Delete this question?')) {
-        qaList.splice(index, 1);
-        saveToStorage(qaListKey, qaList);
-        renderQA(contentSearch.value);
-      }
-    } else if (e.target.classList.contains('edit-q-btn')) {
-      enterQAEditMode(id);
-    }
-  });
-
-  function enterQAEditMode(id) {
-    const li = qaListEl.querySelector(`li[data-id="${id}"]`);
-    if (!li) return;
-    const qaItem = qaList.find(item => item.id === id);
-    li.innerHTML = `
-      <textarea class="qa-edit-question" aria-label="Edit question">${qaItem.q}</textarea>
-      <textarea class="qa-edit-answer" aria-label="Edit answer">${qaItem.a || ''}</textarea>
-      <div class="qa-edit-actions">
-        <button class="save-qa-btn">Save</button>
-        <button class="cancel-qa-btn">Cancel</button>
-      </div>
-    `;
-    const qEdit = li.querySelector('.qa-edit-question');
-    const aEdit = li.querySelector('.qa-edit-answer');
-    const saveBtn = li.querySelector('.save-qa-btn');
-    const cancelBtn = li.querySelector('.cancel-qa-btn');
-    saveBtn.addEventListener('click', () => {
-      const newQ = qEdit.value.trim();
-      const newA = aEdit.value.trim();
-      if (!newQ) {
-        showAlert('Question cannot be empty.');
-        return;
-      }
-      qaItem.q = newQ;
-      qaItem.a = newA;
-      saveToStorage(qaListKey, qaList);
-      renderQA(contentSearch.value);
-    });
-    cancelBtn.addEventListener('click', () => {
-      renderQA(contentSearch.value);
-    });
-    qEdit.focus();
-  }
-
-  function renderAdminQuestionOptions() {
-    // Populate the dropdown with unanswered questions for admin to answer
-    questionSelect.innerHTML = '';
-    qaList.filter(item => !item.a).forEach(item => {
-      const option = document.createElement('option');
-      option.value = item.id;
-      option.textContent = item.q;
-      questionSelect.appendChild(option);
-    });
-    adminAnswerSection.hidden = questionSelect.options.length === 0;
-  }
-
-  saveAnswerBtn.addEventListener('click', () => {
-    const selected = questionSelect.value;
-    const answer = answerInput.value.trim();
-    if (!selected || !answer) {
-      showAlert('Select a question and type an answer.');
-      return;
-    }
-    const qaItem = qaList.find(item => item.id === selected);
-    qaItem.a = answer;
-    saveToStorage(qaListKey, qaList);
-    answerInput.value = '';
-    renderQA(contentSearch.value);
   });
 
   // ========== Calendar ==========
@@ -904,7 +801,6 @@
     const user = localStorage.getItem(currentUserKey);
     const isAdmin = adminUsers.includes(user);
     document.getElementById('choreAdminPanel').hidden = !isAdmin;
-    adminAnswerSection.hidden = !isAdmin || !qaList.some(item => !item.a);
   }
 
   // Add chore logic
