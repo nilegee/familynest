@@ -1,7 +1,7 @@
 // profile.js
 
 import { escapeHtml, calculateAge, saveToSupabase, generateId } from './util.js';
-import { badges, badgeTypes, userPoints, grantBadge, incrementPoints, completedChores } from './chores.js';
+import { badges, badgeTypes, userPoints, grantBadge, incrementPoints, completedChores } from './data.js';
 
 export let profilesData = {};
 export let currentEditingProfile = null;
