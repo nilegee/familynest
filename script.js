@@ -257,7 +257,7 @@ async function saveToSupabase(table, data) {
       favoriteMovie: value.favoriteMovie || null,
       favoriteHero: value.favoriteHero || null,
       professionTitle: (value.profession && value.profession.title) || null,
-      professionDes: (value.profession && value.profession.description) || null,
+professionDesc: (value.profession && value.profession.description) || null,
       funFact: value.funFact || null,
       avatar: value.avatar || null,
       dreamJob: value.dreamJob || null,
