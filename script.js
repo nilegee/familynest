@@ -112,7 +112,6 @@
     funFact: 'Fun Fact'
   };
 
-
   const defaultWallPosts = [
     {
       id: generateId(),
@@ -164,8 +163,8 @@
   const defaultUserPoints = { Ghassan: 0, Mariem: 0, Yazid: 0, Yahya: 0 };
   const defaultBadges = { Ghassan: [], Mariem: [], Yazid: [], Yahya: [] };
   const defaultCompletedChores = { Ghassan: 0, Mariem: 0, Yazid: 0, Yahya: 0 };
-  // ========== Utility Functions ==========
 
+  // ========== Utility Functions ==========
   function escapeHtml(text) {
     if (!text) return '';
     return text.replace(/[&<>"']/g, m => ({
@@ -270,7 +269,6 @@
       }
     }
   }
-
   // ========== Data Declarations ==========
   let wallPosts;
   let qaList;
@@ -280,7 +278,8 @@
   let userPoints;
   let badges;
   let completedChores;
-  // In-memory similarities and editing state
+  let profileSimilarities = {};
+  let currentEditingProfile = null;
 
   function injectDefaultQA() {
     const defaults = [
@@ -311,11 +310,7 @@
     badges = await loadFromStorage(badgesKey, defaultBadges);
     completedChores = await loadFromStorage(completedChoresKey, defaultCompletedChores);
   }
-  let profileSimilarities = {};
-  let currentEditingProfile = null;
-
   // ========== User Selection ==========
-
   function showUserModal() {
     userSelectModal.classList.remove('modal-hidden');
     userSelect.focus();
@@ -367,7 +362,6 @@
   });
 
   // ========== Keyboard focus trap (accessibility) ==========
-
   let focusTrapElement = null;
   let lastFocusedElement = null;
 
@@ -407,7 +401,7 @@
     }
   }
 
-  // ========== Tab & Section Navigation ==========
+  // ========== Tab & Section Navigation (THE FIXED PART) ==========
 
   let activeTabIndex = 0;
 
@@ -417,22 +411,46 @@
       const isActive = i === index;
       tab.classList.toggle('active', isActive);
       tab.setAttribute('tabindex', isActive ? '0' : '-1');
-      if (sections[i]) sections[i].hidden = !isActive;
     });
     bottomTabs.forEach((tab, i) => {
       tab.classList.toggle('active', i === index);
     });
+    sections.forEach(sec => sec.hidden = true);
+    const tabName = sidebarTabs[index].textContent.trim();
+    switch (tabName) {
+      case 'Wall':
+        document.getElementById('wall').hidden = false;
+        break;
+      case 'Q&A':
+        document.getElementById('qa').hidden = false;
+        break;
+      case 'Calendar':
+        document.getElementById('calendar').hidden = false;
+        break;
+      case 'Chores':
+        document.getElementById('chores').hidden = false;
+        break;
+      case 'Scoreboard':
+        document.getElementById('scoreboard').hidden = false;
+        break;
+      case 'Ghassan':
+      case 'Mariem':
+      case 'Yazid':
+      case 'Yahya':
+        document.getElementById('profileDetail').hidden = false;
+        renderSingleProfile(tabName);
+        break;
+    }
     updateSearchFilters();
-    // Render profile if it's a profile tab
-    const name = sidebarTabs[index].textContent.trim();
-    if (['Ghassan', 'Mariem', 'Yazid', 'Yahya'].includes(name)) {
-      renderSingleProfile(name);
+    if (['Ghassan', 'Mariem', 'Yazid', 'Yahya'].includes(tabName)) {
+      renderSingleProfile(tabName);
       profileDetailSection.hidden = false;
     } else {
       profileDetailSection.hidden = true;
     }
   }
-  setActiveTab(0);
+  // The default active tab will be set after data has loaded in init().
+  // This avoids calling updateSearchFilters() before wallPosts and other data are initialized.
 
   function setupTabListeners(list) {
     list.forEach((tab, i) => {
@@ -456,15 +474,16 @@
 
   setupTabListeners(sidebarTabs);
   setupTabListeners(bottomTabs);
-
   // ========== Wall Posts ==========
 
   function renderWallPosts(filterText = '') {
     wallPostsList.innerHTML = '';
-    let filteredPosts = wallPosts;
+    // Use a safe fallback if wallPosts hasn't been loaded yet
+    const posts = Array.isArray(wallPosts) ? wallPosts : [];
+    let filteredPosts = posts;
     if (filterText) {
       const f = filterText.toLowerCase();
-      filteredPosts = wallPosts.filter(p => p.text.toLowerCase().includes(f) || p.member.toLowerCase().includes(f));
+      filteredPosts = posts.filter(p => p.text.toLowerCase().includes(f) || p.member.toLowerCase().includes(f));
     }
     filteredPosts.forEach(post => {
       const li = document.createElement('li');
@@ -638,10 +657,12 @@
 
   function renderQA(filterText = '') {
     qaListEl.innerHTML = '';
-    let filtered = qaList;
+    // Use a safe fallback if qaList hasn't been loaded yet
+    const list = Array.isArray(qaList) ? qaList : [];
+    let filtered = list;
     if (filterText) {
       const f = filterText.toLowerCase();
-      filtered = qaList.filter(item => item.q.toLowerCase().includes(f) || (item.a && item.a.toLowerCase().includes(f)));
+      filtered = list.filter(item => item.q.toLowerCase().includes(f) || (item.a && item.a.toLowerCase().includes(f)));
     }
     filtered.forEach(item => {
       const li = document.createElement('li');
@@ -659,7 +680,6 @@
     });
     renderAdminQuestionOptions();
   }
-
   askBtn.addEventListener('click', () => {
     const q = newQuestionInput.value.trim();
     if (!q) {
@@ -751,7 +771,6 @@
     answerInput.value = '';
     renderQA(contentSearch.value);
   });
-
   // ========== Calendar ==========
 
   function renderCalendarTable() {
@@ -788,10 +807,12 @@
 
   function renderCalendarEventsList(filterDesc = '') {
     eventListEl.innerHTML = '';
-    let filtered = calendarEvents;
+    // Use safe fallback if calendarEvents hasn't been loaded yet
+    const events = Array.isArray(calendarEvents) ? calendarEvents : [];
+    let filtered = events;
     if (filterDesc) {
       const f = filterDesc.toLowerCase();
-      filtered = calendarEvents.filter(ev => ev.desc.toLowerCase().includes(f));
+      filtered = events.filter(ev => ev.desc.toLowerCase().includes(f));
     }
     filtered.forEach(ev => {
       const li = document.createElement('li');
@@ -838,13 +859,13 @@
       }
     });
   }
-
   // ========== Chores ==========
 
   function renderChores(filterText = '', dailyOnly = false) {
     const list = document.getElementById('choresList');
     list.innerHTML = '';
-    let filtered = chores;
+    // Use safe fallback if chores hasn't been loaded yet
+    let filtered = Array.isArray(chores) ? chores : [];
     if (dailyOnly) {
       filtered = filtered.filter(item => item.daily);
     }
@@ -1027,7 +1048,6 @@
     }
     incrementNotification();
   });
-
   // ========== Notifications ==========
 
   function incrementNotification() {
@@ -1289,12 +1309,13 @@
     }
   }
 
-
   // ========== Initialization ==========
 
   function init() {
     checkUserSelection();
-    renderWallPosts();
+    // Ensure the default tab (index 0) is activated only after all data is loaded.
+    // Without this, setActiveTab would run before wallPosts is initialized, leading to errors.
+    setActiveTab(0);
     renderQA();
     renderCalendarTable();
     renderCalendarEventsList();
@@ -1305,7 +1326,6 @@
     renderScoreboard();
     loadTheme();
   }
-
   // Update the greeting line to include the current date and time for the user
   function updateGreeting() {
     const user = localStorage.getItem(currentUserKey) || 'Guest';
@@ -1353,8 +1373,13 @@
   sidebarTabs.forEach(li => {
     li.addEventListener('click', () => {
       if (window.innerWidth <= 700 && sidebarEl) {
-        sidebarEl.classList.remove('open');
-        if (sidebarOverlayEl) sidebarOverlayEl.classList.remove('visible');
+        if (!window.matchMedia('(orientation: portrait)').matches) {
+          sidebarEl.classList.remove('open');
+          if (sidebarOverlayEl) sidebarOverlayEl.classList.remove('visible');
+        } else {
+          sidebarEl.classList.add('open');
+          if (sidebarOverlayEl) sidebarOverlayEl.classList.add('visible');
+        }
       }
     });
   });
@@ -1373,7 +1398,6 @@
   window.addEventListener('orientationchange', handleOrientation);
 
   // ========== Service Worker Registration ==========
-  // Use a relative path when registering the service worker so that it works on GitHub Pages or when the app is served from a subdirectory.
   let swReg;
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
