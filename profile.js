@@ -1,12 +1,42 @@
 // profile.js
 
-import { escapeHtml, calculateAge } from './util.js';
-import { saveToSupabase } from './storage.js';
-import { badges, badgeTypes, userPoints, grantBadge, incrementPoints, completedChores } from './data.js';
+import { escapeHtml, calculateAge, saveToSupabase, generateId } from './util.js';
 
-export let profilesData = {};
+// These will be set via setProfileData etc.
+let profilesData = {};
+let badgeTypes = [];
+let badges = {};
+let userPoints = {};
+let completedChores = {};
 export let currentEditingProfile = null;
 export let profileSimilarities = {};
+
+// Optionally let main.js call this to inject/replace shared state.
+export function setProfileData(data, badgeData = {}, badgeTypeData = [], userPts = {}, completed = {}) {
+  profilesData = data;
+  badges = badgeData;
+  badgeTypes = badgeTypeData;
+  userPoints = userPts;
+  completedChores = completed;
+}
+
+// Grant badge and increment points should ideally be imported, but can be local here for now:
+function grantBadge(user, badgeId) {
+  const badge = badgeTypes.find(b => b.id === badgeId);
+  if (!badge) return;
+  badges[user] = badges[user] || [];
+  if (!badges[user].some(b => b.id === badgeId)) {
+    badges[user].push(badge);
+    saveToSupabase('badges', badges);
+    // You may want to refresh scoreboard here!
+  }
+}
+
+function incrementPoints(user, amount = 1) {
+  userPoints[user] = (userPoints[user] || 0) + amount;
+  saveToSupabase('user_points', userPoints);
+  // You may want to refresh scoreboard here!
+}
 
 const adminUsers = ['Ghassan', 'Mariem'];
 const profileFieldLabels = {
@@ -23,17 +53,7 @@ const profileFieldLabels = {
 
 export function computeProfileSimilarities(name) {
   const profile = profilesData[name];
-  const fields = {
-    favoriteColor: 'Favourite Colour',
-    favoriteFood: 'Favourite Food',
-    dislikedFood: 'Disliked Food',
-    favoriteWeekendActivity: 'Favourite Weekend Activity',
-    favoriteGame: 'Favourite Game',
-    favoriteMovie: 'Favourite Movie',
-    favoriteHero: 'Favourite Hero',
-    professionTitle: 'Profession',
-    funFact: 'Fun Fact'
-  };
+  const fields = profileFieldLabels;
   const sims = {};
   for (const otherName in profilesData) {
     if (otherName === name) continue;
@@ -147,7 +167,7 @@ export function renderSingleProfile(name) {
     profileContainer.appendChild(div);
   });
 
-  // ----- Chore statistics -----
+  // Chore statistics
   const chores = window.chores || [];
   const now = new Date();
   const startOfWeek = new Date(now);
@@ -163,19 +183,7 @@ export function renderSingleProfile(name) {
   summaryDiv.textContent = `Chores assigned: ${assigned.length} (Daily: ${dailyCount}, Due this week: ${dueThisWeek})`;
   profileContainer.appendChild(summaryDiv);
 
-  if (profile.dreamJob && profile.dreamJob.toLowerCase().includes('engineer')) {
-    const iconDiv = document.createElement('div');
-    iconDiv.className = 'engineer-animation-container';
-    iconDiv.innerHTML = `
-      <svg viewBox="0 0 64 32" class="engineer-car" aria-hidden="true">
-        <rect x="8" y="12" width="48" height="10" fill="#6c757d" />
-        <rect x="18" y="6" width="20" height="8" fill="#adb5bd" />
-        <circle cx="24" cy="24" r="4" fill="#212529" />
-        <circle cx="40" cy="24" r="4" fill="#212529" />
-      </svg>`;
-    profileContainer.appendChild(iconDiv);
-  }
-
+  // Badges
   const userBadges = badges[name] || [];
   const badgeContainer = document.createElement('div');
   badgeContainer.className = 'badge-container';
@@ -218,6 +226,7 @@ export function renderSingleProfile(name) {
   }
   profileContainer.appendChild(badgeContainer);
 
+  // Points
   const pointsDiv = document.createElement('div');
   pointsDiv.className = 'points-display';
   pointsDiv.textContent = `Points: ${userPoints[name] || 0}`;
@@ -233,6 +242,7 @@ export function renderSingleProfile(name) {
   }
   profileContainer.appendChild(pointsDiv);
 
+  // Avatar upload
   if (canEdit) {
     const uploadBtn = document.createElement('input');
     uploadBtn.type = 'file';
@@ -253,6 +263,7 @@ export function renderSingleProfile(name) {
     profileContainer.appendChild(uploadBtn);
   }
 
+  // Similarities
   const sim = profileSimilarities[name];
   if (sim && Object.keys(sim).length) {
     const items = [];

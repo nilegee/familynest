@@ -10,11 +10,11 @@ import { computeProfileSimilarities, renderSingleProfile, setProfileData } from 
 import { updateGreeting, updateAdminVisibility, loadTheme } from './ui.js';
 import { setupTabListeners, setActiveTab } from './navigation.js';
 import { setupProfileEditListeners } from './profileEditListeners.js';
-import { badgeTypes } from './data.js'; // If you define badgeTypes here
+import { badgeTypes } from './data.js'; // badgeTypes comes from data.js
 
 let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores;
 
-// Single place to assign all loaded data to locals
+// Assign loaded state to locals, also inject into window if you want
 function assignData(allData) {
   wallPosts = allData.wallPosts;
   qaList = allData.qaList;
@@ -24,15 +24,23 @@ function assignData(allData) {
   userPoints = allData.userPoints;
   badges = allData.badges;
   completedChores = allData.completedChores;
+
+  // If you want dev/legacy access
+  window.wallPosts = wallPosts;
+  window.qaList = qaList;
+  window.calendarEvents = calendarEvents;
+  window.profilesData = profilesData;
+  window.chores = chores;
+  window.userPoints = userPoints;
+  window.badges = badges;
+  window.completedChores = completedChores;
 }
 
-// Main entrypoint
 export async function main() {
-  // 1. Load all data from storage (or Supabase)
   const allData = await loadAllData();
   assignData(allData);
 
-  // 2. Pass state into each module (no globals used)
+  // Inject data/state into modules (NO globals, everything passed in)
   setScoreboardData({ userPoints, badges, completedChores });
   setChoresData({
     chores,
@@ -41,35 +49,37 @@ export async function main() {
     completedChores,
     badgeTypes,
     onSave: (chores, completedChores, badges, userPoints) => {
-      // You can call your save logic here for Supabase/localStorage
-      // E.g. saveToSupabase('chores', chores) etc.
+      // Optional: Call your save logic here for Supabase/localStorage
+      // Example: saveToSupabase('chores', chores)
     }
   });
   setProfileData(profilesData);
 
-  // 3. Setup navigation/tabs
+  // Tab nav
   setupTabListeners();
   setActiveTab(0);
 
-  // 4. Render all primary content
+  // Render content
   renderWallPosts();
   renderQA();
   renderCalendarTable();
   renderCalendarEventsList();
 
-  // 5. Compute and render profile similarities
+  // Profile similarities
   Object.keys(profilesData).forEach(n => computeProfileSimilarities(n));
 
-  // 6. Render greeting, theme, admin features
+  // Greeting, admin, theme
   updateGreeting();
   updateAdminVisibility();
   loadTheme();
 
-  // 7. Render chores and scoreboard, and set up profile editing
-  renderChores('', false);
+  // Chores & scoreboard
+  renderChores('', false); // No filter, not daily only
   renderScoreboard();
+
+  // Profile editing
   setupProfileEditListeners();
 }
 
-// Ensure main runs after DOM loaded
+// Fire it up!
 document.addEventListener('DOMContentLoaded', main);
