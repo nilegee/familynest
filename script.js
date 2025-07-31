@@ -931,7 +931,7 @@
   }
 
   editProfileBtn.addEventListener('click', () => {
-    currentEditingProfile = profileNameHeading.childNodes[0].nodeValue.trim();
+    currentEditingProfile = profileNameHeading.dataset.name;
     renderSingleProfile(currentEditingProfile);
   });
 
@@ -957,7 +957,7 @@
 
   cancelProfileBtn.addEventListener('click', () => {
     currentEditingProfile = null;
-    renderSingleProfile(profileNameHeading.childNodes[0].nodeValue.trim());
+    renderSingleProfile(profileNameHeading.dataset.name);
   });
 
   function updateAdminVisibility() {
@@ -1067,6 +1067,7 @@
       const emoji = profile.dreamJob.includes('🛠️') ? '🛠️ ' : '';
       headingText = `${emoji}${job} ${name}`;
     }
+    profileNameHeading.dataset.name = name;
     profileNameHeading.childNodes[0].nodeValue = headingText;
     if (profile.avatar) {
       profileAvatar.src = profile.avatar;
