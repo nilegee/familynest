@@ -246,6 +246,8 @@
 
   <!-- Load Supabase client library before our script so `createClient` is available -->
   <script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+  <!-- Project configuration containing SUPABASE_URL and SUPABASE_KEY -->
+  <script src="./config.js"></script>
   <!-- Use a relative path for the script to ensure it loads correctly when deployed in a subdirectory -->
   <script src="./script.js" defer></script>
 </body>
