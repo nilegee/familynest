@@ -5,9 +5,10 @@ import nodemailer from 'nodemailer';
 
 const PORT = process.env.PORT || 3000;
 const DRIVE_FILE_ID = process.env.DRIVE_FILE_ID;
+let useDrive = true;
 if (!DRIVE_FILE_ID) {
-  console.error('Missing DRIVE_FILE_ID environment variable');
-  process.exit(1);
+  console.warn('DRIVE_FILE_ID not set, falling back to local data.json');
+  useDrive = false;
 }
 
 const app = express();
@@ -48,23 +49,32 @@ let data = {
 
 async function loadData() {
   try {
-    const drive = await authorize();
-    const res = await drive.files.get({ fileId: DRIVE_FILE_ID, alt: 'media' }, { responseType: 'json' });
-    data = res.data;
+    if (useDrive) {
+      const drive = await authorize();
+      const res = await drive.files.get({ fileId: DRIVE_FILE_ID, alt: 'media' }, { responseType: 'json' });
+      data = res.data;
+    } else {
+      const text = await fs.readFile('data.json', 'utf8');
+      data = JSON.parse(text);
+    }
   } catch (err) {
-    console.error('Failed to load from Drive, using defaults', err.message);
+    console.error('Failed to load data, using defaults', err.message);
   }
 }
 
 async function saveData() {
   try {
-    const drive = await authorize();
-    await drive.files.update({
-      fileId: DRIVE_FILE_ID,
-      media: { mimeType: 'application/json', body: JSON.stringify(data) }
-    });
+    if (useDrive) {
+      const drive = await authorize();
+      await drive.files.update({
+        fileId: DRIVE_FILE_ID,
+        media: { mimeType: 'application/json', body: JSON.stringify(data) }
+      });
+    } else {
+      await fs.writeFile('data.json', JSON.stringify(data, null, 2));
+    }
   } catch (err) {
-    console.error('Failed to save to Drive', err.message);
+    console.error('Failed to save data', err.message);
   }
 }
 

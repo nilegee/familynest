@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" >
+  <meta name="viewport" content="width=device-width, initial-scale=1" >
   <title>Family Dashboard - Ghassan's Style</title>
   <!-- Import custom font for the logo. Using Pacifico adds a handwritten feel to the title -->
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
   <!-- Include Font Awesome icons for consistent iconography -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" >
   <!-- Link to web app manifest so the PWA install prompt appears. Use a relative path so it works when hosted in a subfolder (e.g. GitHub Pages). -->
   <link rel="manifest" href="./manifest.json">
   <!-- Set a base URL so that all relative resources (CSS/JS/icons) are resolved relative to the app root, not the domain root. -->
   <base href="./">
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./style.css" >
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body data-user="">
@@ -36,7 +36,7 @@
   <nav class="sidebar" aria-label="Main navigation">
     <!-- Enhance the dashboard title with an emoji to give it a more playful feel -->
     <div class="logo">Family Nest 🪺</div>
-    <input type="search" id="sidebarSearch" placeholder="Search menu" aria-label="Search navigation menu" autocomplete="off"/>
+    <input type="search" id="sidebarSearch" placeholder="Search menu" aria-label="Search navigation menu" autocomplete="off">
     <ul role="menubar" aria-orientation="vertical" id="sidebarMenu">
       <li role="menuitem" tabindex="0" class="active" aria-current="page"><i class="fa-solid fa-house"></i><span>Wall</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span></li>
@@ -63,7 +63,7 @@
         <div class="date" id="currentDateDisplay" aria-live="polite" aria-atomic="true">Loading date...</div>
       </div>
       <div class="right-controls">
-        <input type="search" id="contentSearch" class="search-input" placeholder="Search content" aria-label="Search content" autocomplete="off"/>
+        <input type="search" id="contentSearch" class="search-input" placeholder="Search content" aria-label="Search content" autocomplete="off">
         <button class="bell-btn" aria-label="Notifications" id="notificationBtn" aria-live="polite" aria-atomic="true" aria-relevant="additions">
           <i class="fa-solid fa-bell"></i>
           <span id="notificationBadge" class="notification-badge" aria-hidden="true"></span>
@@ -76,16 +76,16 @@
     <section id="wall" aria-label="Wall Section">
       <h1>Wall</h1>
       <textarea id="newWallPost" placeholder="Write something..." rows="3" aria-label="New wall post" ></textarea>
-      <br/>
+      <br>
       <button class="add-btn" id="addWallPostBtn">Post</button>
       <ul class="wall-posts" aria-live="polite" aria-atomic="true" aria-relevant="additions" id="wallPostsList"></ul>
     </section>
 
-    <!-- Q&A Section -->
-    <section id="qa" aria-label="Q&A Section" hidden>
-      <h1>Q&A</h1>
+    <!-- Q&amp;A Section -->
+    <section id="qa" aria-label="Q&amp;A Section" hidden>
+      <h1>Q&amp;A</h1>
       <ul class="qa-list" aria-live="polite" aria-atomic="true" id="qaList"></ul>
-      <input type="text" id="newQuestion" placeholder="Ask a question..." aria-label="New question input" autocomplete="off"/>
+      <input type="text" id="newQuestion" placeholder="Ask a question..." aria-label="New question input" autocomplete="off">
       <button class="add-btn" id="askBtn">Ask</button>
 
       <div id="adminAnswerSection" hidden aria-live="polite" aria-atomic="true">
@@ -129,30 +129,30 @@
       <h2>Upcoming Events</h2>
       <ul class="events-list" aria-live="polite" aria-atomic="true" id="eventList"></ul>
 
-      <label for="eventStartDate">Start Date:</label><br/>
-      <input type="date" id="eventStartDate" aria-label="Event start date" />
-      <br/>
-      <label for="eventEndDate">End Date (optional):</label><br/>
-      <input type="date" id="eventEndDate" aria-label="Event end date" />
-      <br/>
-      <label for="eventDesc">Event Description:</label><br/>
-      <input type="text" id="eventDesc" placeholder="Description" aria-label="Event description" autocomplete="off" />
-      <br/>
+      <label for="eventStartDate">Start Date:</label><br>
+      <input type="date" id="eventStartDate" aria-label="Event start date" >
+      <br>
+      <label for="eventEndDate">End Date (optional):</label><br>
+      <input type="date" id="eventEndDate" aria-label="Event end date" >
+      <br>
+      <label for="eventDesc">Event Description:</label><br>
+      <input type="text" id="eventDesc" placeholder="Description" aria-label="Event description" autocomplete="off" >
+      <br>
       <button class="add-btn" id="addEventBtn">Add Event</button>
     </section>
 
     <!-- Chores Section -->
     <section id="chores" aria-label="Chores Section" hidden>
       <h1>Chores</h1>
-      <label><input type="checkbox" id="showDailyOnly" /> Show daily chores only</label>
+      <label><input type="checkbox" id="showDailyOnly" > Show daily chores only</label>
       <ul id="choresList" class="chores-list" aria-live="polite" aria-atomic="true"></ul>
       <!-- Admin-only chore creation form -->
       <div id="choreAdminPanel" hidden>
         <h2>Add Chore</h2>
-        <label for="choreDesc">Description:</label><br/>
-        <input type="text" id="choreDesc" placeholder="e.g., Water the plants" aria-label="Chore description" autocomplete="off" />
-        <br/>
-        <label for="choreAssignedTo">Assign To:</label><br/>
+        <label for="choreDesc">Description:</label><br>
+        <input type="text" id="choreDesc" placeholder="e.g., Water the plants" aria-label="Chore description" autocomplete="off" >
+        <br>
+        <label for="choreAssignedTo">Assign To:</label><br>
         <select id="choreAssignedTo" aria-label="Assign chore">
           <option value="All">All</option>
           <option value="Ghassan">Ghassan</option>
@@ -160,12 +160,12 @@
           <option value="Yazid">Yazid</option>
           <option value="Yahya">Yahya</option>
         </select>
-        <br/>
-        <label for="choreDue">Due Date:</label><br/>
-        <input type="date" id="choreDue" aria-label="Chore due date" />
-        <br/>
-        <label><input type="checkbox" id="choreDaily" /> Daily chore</label>
-        <br/>
+        <br>
+        <label for="choreDue">Due Date:</label><br>
+        <input type="date" id="choreDue" aria-label="Chore due date" >
+        <br>
+        <label><input type="checkbox" id="choreDaily" > Daily chore</label>
+        <br>
         <button class="add-btn" id="addChoreBtn">Add Chore</button>
       </div>
     </section>
@@ -180,45 +180,45 @@
     <section id="profileDetail" aria-label="Profile Detail Section" hidden>
       <h1 id="profileName" style="display:flex; align-items:center; gap:10px;">
         Profile
-        <img id="profileAvatar" alt="" class="profile-avatar" />
+        <img id="profileAvatar" alt="" class="profile-avatar" src="" >
       </h1>
       <button id="editProfileBtn" class="btn-secondary">Edit Profile</button>
       <form id="profileEditForm" class="profile-edit-form" hidden>
         <div class="profile-field">
           <label for="editBirthdate">Birthdate</label>
-          <input type="date" id="editBirthdate" />
+          <input type="date" id="editBirthdate" >
         </div>
         <div class="profile-field">
           <label for="editFavoriteColor">Favourite Colour</label>
-          <input type="text" id="editFavoriteColor" />
+          <input type="text" id="editFavoriteColor" >
         </div>
         <div class="profile-field">
           <label for="editFavoriteFood">Favourite Food</label>
-          <input type="text" id="editFavoriteFood" />
+          <input type="text" id="editFavoriteFood" >
         </div>
         <div class="profile-field">
           <label for="editDislikedFood">Disliked Food</label>
-          <input type="text" id="editDislikedFood" />
+          <input type="text" id="editDislikedFood" >
         </div>
         <div class="profile-field">
           <label for="editFavoriteWeekendActivity">Favourite Weekend Activity</label>
-          <input type="text" id="editFavoriteWeekendActivity" />
+          <input type="text" id="editFavoriteWeekendActivity" >
         </div>
         <div class="profile-field">
           <label for="editFavoriteGame">Favourite Game</label>
-          <input type="text" id="editFavoriteGame" />
+          <input type="text" id="editFavoriteGame" >
         </div>
         <div class="profile-field">
           <label for="editFavoriteMovie">Favourite Movie</label>
-          <input type="text" id="editFavoriteMovie" />
+          <input type="text" id="editFavoriteMovie" >
         </div>
         <div class="profile-field">
           <label for="editFavoriteHero">Favourite Hero</label>
-          <input type="text" id="editFavoriteHero" />
+          <input type="text" id="editFavoriteHero" >
         </div>
         <div class="profile-field">
           <label for="editProfessionTitle">Profession</label>
-          <input type="text" id="editProfessionTitle" />
+          <input type="text" id="editProfessionTitle" >
         </div>
         <div class="profile-field">
           <label for="editFunFact">Fun Fact</label>
@@ -234,7 +234,7 @@
 
   <nav class="bottom-nav" aria-label="Bottom navigation">
     <button>Wall</button>
-    <button>Q&A</button>
+    <button>Q&amp;A</button>
     <button>Calendar</button>
     <button>Chores</button>
     <button>Scoreboard</button>
