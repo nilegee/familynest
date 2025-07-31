@@ -69,12 +69,14 @@
   const currentUserKey = 'familyCurrentUser';
   const themeKey = 'familyTheme';
 // ====== Supabase Setup ======
-const supabaseUrl = 'https://zlhamcofzyozfyzcgcdg.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo';
-if (supabaseUrl === 'https://zlhamcofzyozfyzcgcdg.supabase.co' || supabaseKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo') {
-  alert('Please set supabaseUrl and supabaseKey in script.js');
+const supabaseUrl = window.SUPABASE_URL;
+const supabaseKey = window.SUPABASE_KEY;
+if (!supabaseUrl || !supabaseKey) {
+  alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
 }
-const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : createClient(supabaseUrl, supabaseKey);
+const supabase = window.supabase
+  ? window.supabase.createClient(supabaseUrl, supabaseKey)
+  : createClient(supabaseUrl, supabaseKey);
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
   // Ghassan/Mariem without entering this PIN.
@@ -569,7 +571,7 @@ const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, sup
     li.innerHTML = `
       <strong>${escapeHtml(post.member)}</strong>
       <span class="wall-post-date" title="${formatDateLocal(post.date)}">(Editing)</span>
-      <textarea class="wall-post-edit-text" aria-label="Edit post text">${post.text}</textarea>
+      <textarea class="wall-post-edit-text" aria-label="Edit post text">${escapeHtml(post.text)}</textarea>
       <div class="wall-post-edit-area">
         <button class="save-edit-btn">Save</button>
         <button class="cancel-edit-btn">Cancel</button>
@@ -692,8 +694,8 @@ const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, sup
     if (!li) return;
     const qaItem = qaList.find(item => item.id === id);
     li.innerHTML = `
-      <textarea class="qa-edit-question" aria-label="Edit question">${qaItem.q}</textarea>
-      <textarea class="qa-edit-answer" aria-label="Edit answer">${qaItem.a || ''}</textarea>
+      <textarea class="qa-edit-question" aria-label="Edit question">${escapeHtml(qaItem.q)}</textarea>
+      <textarea class="qa-edit-answer" aria-label="Edit answer">${qaItem.a ? escapeHtml(qaItem.a) : ''}</textarea>
       <div class="qa-edit-actions">
         <button class="save-qa-btn">Save</button>
         <button class="cancel-qa-btn">Cancel</button>
@@ -872,7 +874,7 @@ const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, sup
 
       const desc = document.createElement('span');
       desc.className = 'chore-desc';
-      desc.innerHTML = `${escapeHtml(item.desc)}${item.daily ? '<span class="daily-label">Daily</span>' : ''}`;
+      desc.innerHTML = `${escapeHtml(item.desc)}${item.daily ? ' <span class="daily-label">(Daily)</span>' : ''}`;
 
       const assignee = document.createElement('span');
       assignee.className = 'chore-assignee';
