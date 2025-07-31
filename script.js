@@ -1257,12 +1257,54 @@
 
   // ========== Service Worker Registration ==========
   // Use a relative path when registering the service worker so that it works on GitHub Pages or when the app is served from a subdirectory.
+  let swReg;
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        swReg = reg;
+        requestNotificationPermission();
+        checkDueItems();
+        setInterval(checkDueItems, 60 * 60 * 1000);
+      }).catch(err => {
         console.error('Service worker registration failed:', err);
       });
     });
+  }
+
+  function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  const notifiedKey = 'familyNotified';
+  let notified = JSON.parse(localStorage.getItem(notifiedKey) || '{}');
+
+  function showPush(title, body) {
+    if (swReg && Notification.permission === 'granted') {
+      swReg.showNotification(title, { body });
+    }
+  }
+
+  function checkDueItems() {
+    const today = new Date().toISOString().split('T')[0];
+    if (Array.isArray(calendarEvents)) {
+      calendarEvents.forEach(ev => {
+        if (ev.start <= today && today <= ev.end && !notified[ev.id]) {
+          showPush('Event today', ev.desc);
+          notified[ev.id] = true;
+        }
+      });
+    }
+    if (Array.isArray(chores)) {
+      chores.forEach(ch => {
+        if (!ch.daily && ch.due === today && !notified[ch.id]) {
+          showPush('Chore due', ch.desc);
+          notified[ch.id] = true;
+        }
+      });
+    }
+    localStorage.setItem(notifiedKey, JSON.stringify(notified));
   }
 
   // Kick off the initial rendering and setup

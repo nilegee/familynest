@@ -18,6 +18,11 @@ This repository now includes a minimal Node.js backend that stores app data in a
    ```
    The server listens on port `3000` by default.
 
+   To enable email reminders, set the following optional variables:
+   - `SMTP_HOST` and `SMTP_PORT`
+   - `SMTP_USER` and `SMTP_PASS` for authentication
+   - `SMTP_FROM` (defaults to `SMTP_USER`)
+
 ## Update `script.js`
 Edit `script.js` if the server URL differs. Change the `API_BASE` constant near the top of the file to point to your backend (e.g. `http://localhost:3000/api`).
 
@@ -27,5 +32,7 @@ The backend exposes the following routes:
 - `GET/POST /api/calendarEvents`
 - `GET/POST /api/chores`
 - `GET/POST /api/profiles`
+- `GET /api/reminders` to list scheduled reminders
+- `POST /api/reminders` to schedule a new reminder
 
 The client performs `POST` calls with the entire dataset and expects `JSON` responses. If the server cannot be reached, the app transparently falls back to the data stored in `localStorage`.
