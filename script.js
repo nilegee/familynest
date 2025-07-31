@@ -279,7 +279,10 @@
       favoriteGame: 'Strategy RPG',
       favoriteMovie: 'The Godfather',
       favoriteHero: 'Sherlock Holmes',
-      profession: { title: 'HR Business Partner', description: 'Helps companies manage their people so everyone works better together.' },
+      profession: {
+        title: 'HR Business Partner',
+        description: 'Keeps everyone playing nicely'
+      },
       funFact: 'Loves Egyptian food and puzzles.',
       avatar: ''
     },
@@ -292,7 +295,10 @@
       favoriteGame: 'Puzzle games',
       favoriteMovie: 'The Notebook',
       favoriteHero: 'Wonder Woman',
-      profession: { title: 'Home Manager with Masters in Computer Science', description: 'Takes care of home but also very smart with computers.' },
+      profession: {
+        title: 'Home Manager & Computer Science wizard',
+        description: 'Hacker in disguise'
+      },
       funFact: 'Master chef in the kitchen.',
       avatar: ''
     },
@@ -1103,6 +1109,10 @@
     const age = calculateAge(profile.birthdate);
     const entries = [
       { label: 'Birthdate', value: profile.birthdate, age },
+      {
+        label: 'Profession',
+        value: `${profile.profession.title}${profile.profession.description ? ' (' + profile.profession.description + ')' : ''}`
+      },
       { label: 'Favourite Colour', value: profile.favoriteColor },
       { label: 'Favourite Food', value: profile.favoriteFood },
       { label: 'Disliked Food', value: profile.dislikedFood },
@@ -1110,7 +1120,6 @@
       { label: 'Favourite Game', value: profile.favoriteGame },
       { label: 'Favourite Movie', value: profile.favoriteMovie },
       { label: 'Favourite Hero', value: profile.favoriteHero },
-      { label: 'Profession', value: profile.profession.title },
       { label: 'Fun Fact', value: profile.funFact }
     ];
     entries.forEach(item => {
