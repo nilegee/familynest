@@ -38,6 +38,21 @@
   const profileContainer = document.getElementById('profileContainer');
   const profileNameHeading = document.getElementById('profileName');
   const profileAvatar = document.getElementById('profileAvatar');
+  const editProfileBtn = document.getElementById('editProfileBtn');
+  const profileEditForm = document.getElementById('profileEditForm');
+  const saveProfileBtn = document.getElementById('saveProfileBtn');
+  const cancelProfileBtn = document.getElementById('cancelProfileBtn');
+  const similarityInfoEl = document.getElementById('similarityInfo');
+  const editBirthdate = document.getElementById('editBirthdate');
+  const editFavoriteColor = document.getElementById('editFavoriteColor');
+  const editFavoriteFood = document.getElementById('editFavoriteFood');
+  const editDislikedFood = document.getElementById('editDislikedFood');
+  const editFavoriteWeekendActivity = document.getElementById('editFavoriteWeekendActivity');
+  const editFavoriteGame = document.getElementById('editFavoriteGame');
+  const editFavoriteMovie = document.getElementById('editFavoriteMovie');
+  const editFavoriteHero = document.getElementById('editFavoriteHero');
+  const editProfessionTitle = document.getElementById('editProfessionTitle');
+  const editFunFact = document.getElementById('editFunFact');
 
   const currentDateDisplay = document.getElementById('currentDateDisplay');
 
@@ -69,6 +84,18 @@
     { id: 'star-reader', name: 'Star Reader', desc: 'Reads lots of books', icon: '📚' },
     { id: 'tech-whiz', name: 'Tech Whiz', desc: 'Great with gadgets and games', icon: '🕹️' }
   ];
+
+  const profileFieldLabels = {
+    favoriteColor: 'Favourite Colour',
+    favoriteFood: 'Favourite Food',
+    dislikedFood: 'Disliked Food',
+    favoriteWeekendActivity: 'Favourite Weekend Activity',
+    favoriteGame: 'Favourite Game',
+    favoriteMovie: 'Favourite Movie',
+    favoriteHero: 'Favourite Hero',
+    professionTitle: 'Profession',
+    funFact: 'Fun Fact'
+  };
 
   // ========== Utility Functions ==========
 
@@ -306,6 +333,10 @@
     Yazid: [],
     Yahya: []
   });
+
+  // In-memory similarities and editing state
+  let profileSimilarities = {};
+  let currentEditingProfile = null;
 
   // ========== User Selection ==========
 
@@ -830,6 +861,73 @@
     }
   }
 
+  function computeProfileSimilarities(name) {
+    const profile = profilesData[name];
+    const fields = {
+      favoriteColor: 'Favourite Colour',
+      favoriteFood: 'Favourite Food',
+      dislikedFood: 'Disliked Food',
+      favoriteWeekendActivity: 'Favourite Weekend Activity',
+      favoriteGame: 'Favourite Game',
+      favoriteMovie: 'Favourite Movie',
+      favoriteHero: 'Favourite Hero',
+      professionTitle: 'Profession',
+      funFact: 'Fun Fact'
+    };
+    const sims = {};
+    for (const otherName in profilesData) {
+      if (otherName === name) continue;
+      const other = profilesData[otherName];
+      if (!other) continue;
+      for (const key in fields) {
+        let a = null;
+        let b = null;
+        if (key === 'professionTitle') {
+          a = profile.profession.title;
+          b = other.profession.title;
+        } else {
+          a = profile[key];
+          b = other[key];
+        }
+        if (a && b && a.toLowerCase() === b.toLowerCase()) {
+          sims[key] = sims[key] || [];
+          sims[key].push(otherName);
+        }
+      }
+    }
+    profileSimilarities[name] = sims;
+  }
+
+  editProfileBtn.addEventListener('click', () => {
+    currentEditingProfile = profileNameHeading.childNodes[0].nodeValue.trim();
+    renderSingleProfile(currentEditingProfile);
+  });
+
+  saveProfileBtn.addEventListener('click', () => {
+    if (!currentEditingProfile) return;
+    const p = profilesData[currentEditingProfile];
+    p.birthdate = editBirthdate.value;
+    p.favoriteColor = editFavoriteColor.value.trim();
+    p.favoriteFood = editFavoriteFood.value.trim();
+    p.dislikedFood = editDislikedFood.value.trim();
+    p.favoriteWeekendActivity = editFavoriteWeekendActivity.value.trim();
+    p.favoriteGame = editFavoriteGame.value.trim();
+    p.favoriteMovie = editFavoriteMovie.value.trim();
+    p.favoriteHero = editFavoriteHero.value.trim();
+    p.profession.title = editProfessionTitle.value.trim();
+    p.funFact = editFunFact.value.trim();
+    saveToStorage(profilesDataKey, profilesData);
+    computeProfileSimilarities(currentEditingProfile);
+    const name = currentEditingProfile;
+    currentEditingProfile = null;
+    renderSingleProfile(name);
+  });
+
+  cancelProfileBtn.addEventListener('click', () => {
+    currentEditingProfile = null;
+    renderSingleProfile(profileNameHeading.childNodes[0].nodeValue.trim());
+  });
+
   function updateAdminVisibility() {
     const user = localStorage.getItem(currentUserKey);
     const isAdmin = adminUsers.includes(user);
@@ -929,7 +1027,32 @@
     } else {
       profileAvatar.style.display = 'none';
     }
+    const currentUser = localStorage.getItem(currentUserKey);
+    const canEdit = currentUser === name || adminUsers.includes(currentUser);
+
+    if (currentEditingProfile === name) {
+      editProfileBtn.hidden = true;
+      profileContainer.style.display = 'none';
+      similarityInfoEl.hidden = true;
+      profileEditForm.hidden = false;
+      editBirthdate.value = profile.birthdate || '';
+      editFavoriteColor.value = profile.favoriteColor || '';
+      editFavoriteFood.value = profile.favoriteFood || '';
+      editDislikedFood.value = profile.dislikedFood || '';
+      editFavoriteWeekendActivity.value = profile.favoriteWeekendActivity || '';
+      editFavoriteGame.value = profile.favoriteGame || '';
+      editFavoriteMovie.value = profile.favoriteMovie || '';
+      editFavoriteHero.value = profile.favoriteHero || '';
+      editProfessionTitle.value = profile.profession.title || '';
+      editFunFact.value = profile.funFact || '';
+      return;
+    }
+
+    profileEditForm.hidden = true;
+    editProfileBtn.hidden = !canEdit;
+    profileContainer.style.display = '';
     profileContainer.innerHTML = '';
+
     const age = calculateAge(profile.birthdate);
     const entries = [
       { label: 'Birthdate', value: profile.birthdate, age },
@@ -971,7 +1094,6 @@
     }
     badgeContainer.appendChild(badgeList);
 
-    const currentUser = localStorage.getItem(currentUserKey);
     if (adminUsers.includes(currentUser)) {
       const awardDiv = document.createElement('div');
       awardDiv.className = 'badge-award';
@@ -1009,7 +1131,7 @@
     }
     profileContainer.appendChild(pointsDiv);
 
-    if (currentUser === name || adminUsers.includes(currentUser)) {
+    if (canEdit) {
       const uploadBtn = document.createElement('input');
       uploadBtn.type = 'file';
       uploadBtn.accept = 'image/*';
@@ -1028,6 +1150,19 @@
       });
       profileContainer.appendChild(uploadBtn);
     }
+
+    const sim = profileSimilarities[name];
+    if (sim && Object.keys(sim).length) {
+      const items = [];
+      for (const key in sim) {
+        const label = profileFieldLabels[key] || key;
+        items.push(`${label} matches ${sim[key].join(', ')}`);
+      }
+      similarityInfoEl.innerHTML = `<h3>Things in Common</h3><ul>${items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul>`;
+      similarityInfoEl.hidden = false;
+    } else {
+      similarityInfoEl.hidden = true;
+    }
   }
 
 
@@ -1039,6 +1174,7 @@
     renderQA();
     renderCalendarTable();
     renderCalendarEventsList();
+    Object.keys(profilesData).forEach(n => computeProfileSimilarities(n));
     updateGreeting();
     updateAdminVisibility();
     renderChores();
