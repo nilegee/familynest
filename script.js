@@ -293,28 +293,53 @@ async function saveToSupabase(table, data) {
     return defaultValue;
   }
 
-  async function loadFromSupabase(table, defaultValue) {
-    table = resolveTable(table);
-    if (!supabaseEnabled) {
+async function loadFromSupabase(table, defaultValue) {
+  table = resolveTable(table);
+  if (!supabaseEnabled) {
+    return loadFromLocal(table, defaultValue);
+  }
+  const { data, error } = await supabase.from(table).select('*');
+  if (error) {
+    if (error.code === 'PGRST205') {
+      console.info(`Supabase table '${table}' not found - switching to localStorage.`);
+      supabaseEnabled = false;
       return loadFromLocal(table, defaultValue);
     }
-    const { data, error } = await supabase.from(table).select('*');
-    if (error) {
-      if (error.code === 'PGRST205') {
-        console.info(`Supabase table '${table}' not found - switching to localStorage.`);
-        supabaseEnabled = false;
-        return loadFromLocal(table, defaultValue);
-      }
-      console.warn('Supabase load failed:', error);
-      return defaultValue;
-    }
-    if (Array.isArray(defaultValue)) return data || defaultValue;
+    console.warn('Supabase load failed:', error);
+    return defaultValue;
+  }
+  // Special case for profiles
+  if (table === 'profiles') {
     const obj = {};
     data.forEach(row => {
-      if (row.name !== undefined && 'value' in row) obj[row.name] = row.value;
+      obj[row.name] = {
+        birthdate: row.birthdate,
+        favoriteColor: row.favoriteColor,
+        favoriteFood: row.favoriteFood,
+        dislikedFood: row.dislikedFood,
+        favoriteWeekendActivity: row.favoriteWeekendActivity,
+        favoriteGame: row.favoriteGame,
+        favoriteMovie: row.favoriteMovie,
+        favoriteHero: row.favoriteHero,
+        profession: {
+          title: row.professionTitle,
+          description: row.professionDes
+        },
+        funFact: row.funFact,
+        avatar: row.avatar,
+        dreamJob: row.dreamJob
+      };
     });
     return Object.keys(obj).length ? obj : defaultValue;
   }
+  if (Array.isArray(defaultValue)) return data || defaultValue;
+  const obj = {};
+  data.forEach(row => {
+    if (row.name !== undefined && 'value' in row) obj[row.name] = row.value;
+  });
+  return Object.keys(obj).length ? obj : defaultValue;
+}
+
   // ========== Data Declarations ==========
   let wallPosts;
   let qaList;
