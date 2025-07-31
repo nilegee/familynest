@@ -75,6 +75,7 @@
   const userPointsKey = 'familyUserPoints';
   const badgesKey = 'familyBadges';
   const themeKey = 'familyTheme';
+  const completedChoresKey = "familyCompletedChores";
 
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
@@ -136,12 +137,13 @@
   };
 
   const defaultChores = [
-    { id: generateId(), desc: "Pray 5 times", assignedTo: "All", due: "", daily: true },
-    { id: generateId(), desc: "Make your bed", assignedTo: "All", due: "", daily: true },
-    { id: generateId(), desc: "Read stories", assignedTo: "Yahya", due: "", daily: false }
+    { id: generateId(), desc: "Pray 5 times", assignedTo: "All", due: "", daily: true, completed: false },
+    { id: generateId(), desc: "Make your bed", assignedTo: "All", due: "", daily: true, completed: false },
+    { id: generateId(), desc: "Read stories", assignedTo: "Yahya", due: "", daily: false, completed: false }
   ];
   const defaultUserPoints = { Ghassan: 0, Mariem: 0, Yazid: 0, Yahya: 0 };
   const defaultBadges = { Ghassan: [], Mariem: [], Yazid: [], Yahya: [] };
+  const defaultCompletedChores = { Ghassan: 0, Mariem: 0, Yazid: 0, Yahya: 0 };
   // ========== Utility Functions ==========
 
   function escapeHtml(text) {
@@ -257,6 +259,7 @@
   let chores;
   let userPoints;
   let badges;
+  let completedChores;
   // In-memory similarities and editing state
 
   function injectDefaultQA() {
@@ -283,8 +286,10 @@
     calendarEvents = await loadFromStorage(calendarEventsKey, defaultCalendarEvents);
     profilesData = await loadFromStorage(profilesDataKey, defaultProfilesData);
     chores = await loadFromStorage(choresKey, defaultChores);
+    chores.forEach(c => { if (typeof c.completed !== "boolean") c.completed = false; });
     userPoints = await loadFromStorage(userPointsKey, defaultUserPoints);
     badges = await loadFromStorage(badgesKey, defaultBadges);
+    completedChores = await loadFromStorage(completedChoresKey, defaultCompletedChores);
   }
   let profileSimilarities = {};
   let currentEditingProfile = null;
@@ -786,17 +791,49 @@
     }
     if (filterText) {
       const f = filterText.toLowerCase();
-      filtered = filtered.filter(item => item.desc.toLowerCase().includes(f) || (item.assignedTo && item.assignedTo.toLowerCase().includes(f)));
+      filtered = filtered.filter(item => item.desc.toLowerCase().includes(f) ||
+        (item.assignedTo && item.assignedTo.toLowerCase().includes(f)));
     }
     filtered.forEach(item => {
       const li = document.createElement('li');
       li.setAttribute('data-id', item.id);
-      const dueHtml = item.daily ? '' : `<span class="chore-due">${item.due}</span>`;
-      li.innerHTML = `
-        <span class="chore-desc">${escapeHtml(item.desc)}${item.daily ? '<span class="daily-label">Daily</span>' : ''}</span>
-        <span class="chore-assignee">${item.assignedTo}</span>
-        ${dueHtml}
-      `;
+      li.classList.toggle('completed', item.completed);
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = item.completed;
+      checkbox.addEventListener('change', () => {
+        item.completed = checkbox.checked;
+        li.classList.toggle('completed', item.completed);
+        saveToStorage(choresKey, chores);
+        if (item.assignedTo && item.assignedTo !== 'All') {
+          const delta = checkbox.checked ? 1 : -1;
+          completedChores[item.assignedTo] = (completedChores[item.assignedTo] || 0) + delta;
+          if (completedChores[item.assignedTo] < 0) completedChores[item.assignedTo] = 0;
+          saveToStorage(completedChoresKey, completedChores);
+          renderScoreboard();
+        }
+      });
+
+      const desc = document.createElement('span');
+      desc.className = 'chore-desc';
+      desc.innerHTML = `${escapeHtml(item.desc)}${item.daily ? '<span class="daily-label">Daily</span>' : ''}`;
+
+      const assignee = document.createElement('span');
+      assignee.className = 'chore-assignee';
+      assignee.textContent = item.assignedTo;
+
+      li.appendChild(checkbox);
+      li.appendChild(desc);
+      li.appendChild(assignee);
+
+      if (!item.daily) {
+        const dueSpan = document.createElement('span');
+        dueSpan.className = 'chore-due';
+        dueSpan.textContent = item.due;
+        li.appendChild(dueSpan);
+      }
+
       list.appendChild(li);
     });
   }
@@ -864,7 +901,7 @@
         .join('');
       const li = document.createElement('li');
       li.innerHTML = `<span>${escapeHtml(name)}</span>` +
-        `<span>${userPoints[name] || 0} pts</span>` +
+        `<span>${userPoints[name] || 0} pts | ${completedChores[name] || 0} chores</span>` +
         `<span class="scoreboard-badges">${badgeHtml}</span>`;
       scoreboardList.appendChild(li);
     });
@@ -919,7 +956,7 @@
       return;
     }
     const id = generateId();
-    chores.push({ id, desc, assignedTo, due: daily ? '' : due, daily });
+    chores.push({ id, desc, assignedTo, due: daily ? '' : due, daily, completed: false });
     saveToStorage(choresKey, chores);
     renderChores(contentSearch.value);
     // Award points and badges for assigning chores
