@@ -1,6 +1,6 @@
 // main.js
 
-import { loadAllData } from './dataLoader.js';
+import { loadAllData } from './storage.js'; // <--- fix import to your real loader file
 import { renderWallPosts } from './wall.js';
 import { renderQA } from './qa.js';
 import { renderCalendarTable, renderCalendarEventsList } from './calendar.js';
@@ -37,7 +37,6 @@ export async function main() {
   const allData = await loadAllData();
   assignData(allData);
 
-  // Initial user check & selection handled inside dataLoader (or here if you move it)
   // Set up tab navigation
   setupTabListeners();
 
@@ -64,8 +63,6 @@ export async function main() {
 
   // Setup profile editing listeners
   setupProfileEditListeners();
-
-  // You can add additional event listeners for service worker, theme, notifications, etc.
 }
 
 document.addEventListener('DOMContentLoaded', main);
