@@ -36,3 +36,12 @@ The backend exposes the following routes:
 - `POST /api/reminders` to schedule a new reminder
 
 The client performs `POST` calls with the entire dataset and expects `JSON` responses. If the server cannot be reached, the app transparently falls back to the data stored in `localStorage`.
+
+## Supabase Integration Status
+
+The front‑end includes configuration for a future Supabase setup in `script.js`,
+but the application still depends on the Node.js server for all persistence and
+reminder email functionality. Data is stored in Google Drive through
+`server.js`, and the client communicates with it via the REST endpoints listed
+above. Supabase is not yet used for reads or writes, so removing the Node
+server would break data syncing and scheduled reminders.
