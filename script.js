@@ -1,4 +1,4 @@
-(() => {
+(async () => {
   // A self‑invoking function to encapsulate all variables and avoid polluting the global scope. The code below is identical to the original script.js, with one key change: the service worker is registered using a relative path ('./sw.js') so that it registers correctly when the app is hosted in a subfolder (e.g., GitHub Pages).
 
   // ========== Cached DOM Elements ==========
@@ -78,6 +78,13 @@
 
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
+  const API_BASE = "http://localhost:3000/api";
+  const endpointMap = {
+    [wallPostsKey]: "/wallPosts",
+    [calendarEventsKey]: "/calendarEvents",
+    [choresKey]: "/chores",
+    [profilesDataKey]: "/profiles"
+  };
   // Ghassan/Mariem without entering this PIN.
   const adminUsers = ['Ghassan', 'Mariem'];
   const adminPin = '4321';
@@ -102,6 +109,39 @@
     funFact: 'Fun Fact'
   };
 
+
+  const defaultWallPosts = [
+    { id: generateId(), member: "Ghassan", text: "Just finished organizing the garden!", date: "2025-07-30T09:00:00", reactions: { "👍": 1, "❤️": 2 }, edited: false, userReactions: {} },
+    { id: generateId(), member: "Yazid", text: "I won the game last night!", date: "2025-07-29T20:45:00", reactions: { "😂": 3 }, edited: false, userReactions: {} }
+  ];
+
+  const defaultQAList = [
+    { id: generateId(), q: "What's for dinner?", a: "We’re having Koshari!" },
+    { id: generateId(), q: "When is the next family trip?", a: "Next month, inshallah." }
+  ];
+
+  const defaultCalendarEvents = [
+    { id: generateId(), start: "2025-08-11", end: "2025-08-14", desc: "Hotel visit - Centara Mirage Beach Resort" },
+    { id: generateId(), start: "2025-08-31", end: "2025-08-31", desc: "Ghassan Birthday" },
+    { id: generateId(), start: "2025-10-23", end: "2025-10-23", desc: "Yahya Birthday" },
+    { id: generateId(), start: "2025-01-30", end: "2025-01-30", desc: "Mariem Birthday" },
+    { id: generateId(), start: "2025-03-28", end: "2025-03-28", desc: "Yazid Birthday" }
+  ];
+
+  const defaultProfilesData = {
+    Ghassan: { birthdate: "1981-08-31", favoriteColor: "Purple", favoriteFood: "Koshari", dislikedFood: "Spicy food", favoriteWeekendActivity: "Reading", favoriteGame: "Strategy RPG", favoriteMovie: "The Godfather", favoriteHero: "Sherlock Holmes", profession: { title: "HR Business Partner", description: "Helps companies manage their people so everyone works better together." }, funFact: "Loves Egyptian food and puzzles.", avatar: "" },
+    Mariem: { birthdate: "1990-01-30", favoriteColor: "Teal", favoriteFood: "Grilled fish", dislikedFood: "Fast food", favoriteWeekendActivity: "Yoga", favoriteGame: "Puzzle games", favoriteMovie: "The Notebook", favoriteHero: "Wonder Woman", profession: { title: "Home Manager with Masters in Computer Science", description: "Takes care of home but also very smart with computers." }, funFact: "Master chef in the kitchen.", avatar: "" },
+    Yazid: { birthdate: "2014-03-28", favoriteColor: "Blue", favoriteFood: "Pizza", dislikedFood: "Vegetables", favoriteWeekendActivity: "Playing football", favoriteGame: "Roblox", favoriteMovie: "Avengers", favoriteHero: "Iron Man", profession: { title: "Student in Year 6", description: "Learning many things in school and loves sports." }, funFact: "Fast runner in school races.", avatar: "", dreamJob: "Engineer 🛠️" },
+    Yahya: { birthdate: "2017-10-23", favoriteColor: "Green", favoriteFood: "Burgers", dislikedFood: "Seafood", favoriteWeekendActivity: "Drawing", favoriteGame: "Minecraft", favoriteMovie: "Toy Story", favoriteHero: "Batman", profession: { title: "Student in Year 3", description: "Enjoys school and learning new things every day." }, funFact: "Can draw superheroes very well.", avatar: "", dreamJob: "Engineer 🛠️" }
+  };
+
+  const defaultChores = [
+    { id: generateId(), desc: "Pray 5 times", assignedTo: "All", due: "", daily: true },
+    { id: generateId(), desc: "Make your bed", assignedTo: "All", due: "", daily: true },
+    { id: generateId(), desc: "Read stories", assignedTo: "Yahya", due: "", daily: false }
+  ];
+  const defaultUserPoints = { Ghassan: 0, Mariem: 0, Yazid: 0, Yahya: 0 };
+  const defaultBadges = { Ghassan: [], Mariem: [], Yazid: [], Yahya: [] };
   // ========== Utility Functions ==========
 
   function escapeHtml(text) {
@@ -170,7 +210,17 @@
     alert(message);
   }
 
-  function saveToStorage(key, data) {
+  async function saveToStorage(key, data) {
+    const endpoint = API_BASE + endpointMap[key];
+    try {
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch (e) {
+      console.warn('Server save failed:', e);
+    }
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
@@ -179,173 +229,63 @@
     }
   }
 
-  function loadFromStorage(key, defaultValue) {
+  async function loadFromStorage(key, defaultValue) {
+    const endpoint = API_BASE + endpointMap[key];
     try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return defaultValue;
-      return JSON.parse(raw);
-    } catch {
-      return defaultValue;
+      const res = await fetch(endpoint);
+      if (!res.ok) throw new Error('Bad response');
+      const data = await res.json();
+      localStorage.setItem(key, JSON.stringify(data));
+      return data;
+    } catch (e) {
+      console.warn('Server load failed:', e);
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return defaultValue;
+        return JSON.parse(raw);
+      } catch {
+        return defaultValue;
+      }
     }
   }
 
   // ========== Data Declarations ==========
-  let wallPosts = loadFromStorage(wallPostsKey, [
-    {
-      id: generateId(),
-      member: 'Ghassan',
-      text: 'Just finished organizing the garden!',
-      date: '2025-07-30T09:00:00',
-      reactions: { '👍': 1, '❤️': 2 },
-      edited: false,
-      userReactions: {}
-    },
-    {
-      id: generateId(),
-      member: 'Yazid',
-      text: 'I won the game last night!',
-      date: '2025-07-29T20:45:00',
-      reactions: { '😂': 3 },
-      edited: false,
-      userReactions: {}
-    }
-  ]);
+  let wallPosts;
+  let qaList;
+  let calendarEvents;
+  let profilesData;
+  let chores;
+  let userPoints;
+  let badges;
+  // In-memory similarities and editing state
 
-  // Ensure each loaded post has a userReactions object to track per-user interactions
-  wallPosts.forEach(post => {
-    if (!post.userReactions) post.userReactions = {};
-  });
-
-  // Q&A list. We load from storage and provide some default Q&A pairs.  In addition to
-  // casual family questions, we include gentle answers to common faith and
-  // life questions suitable for children.  These defaults are only added
-  // once when the app first runs (if they are not already present).  The
-  // answers are deliberately simplified summaries of Islamic teachings.
-  let qaList = loadFromStorage(qaListKey, [
-    { id: generateId(), q: "What's for dinner?", a: 'We’re having Koshari!' },
-    { id: generateId(), q: 'When is the next family trip?', a: 'Next month, inshallah.' }
-  ]);
-
-  // Inject additional default Q&A entries about faith and life.  We avoid
-  // duplicating questions by checking the question text.  These will only
-  // appear once and are stored in localStorage like other Q&A entries.
-  (function ensureDefaultQA() {
+  function injectDefaultQA() {
     const defaults = [
-      {
-        q: 'I have a friend in class wearing a cross or praying to an elephant or praying to Jesus',
-        a: 'People follow different religions. In Islam we believe in one God and we pray only to Him, but we respect others’ choices. The Qur’an teaches that Jesus said we should worship God alone.'
-      },
-      {
-        q: 'Is Jesus God?',
-        a: 'Muslims see Jesus (peace be upon him) as one of God’s greatest messengers. He called people to worship God alone and never claimed to be divine.'
-      },
-      {
-        q: 'Why do people die?',
-        a: 'Life in this world is temporary; death is the door to the next life. The Qur’an says every soul will taste death and that this life is but a test. Death lets us return to Allah and be rewarded for our good deeds.'
-      },
-      {
-        q: 'Will Papa die? If Papa dies how will I see him?',
-        a: 'Everyone, even prophets, passes away. Islam teaches that the soul continues; if we live righteously, we hope to reunite in Paradise. Good deeds and prayers for loved ones keep us connected.'
-      },
-      {
-        q: 'Are we going to meet in Jannah?',
-        a: 'That’s the goal! Paradise is for those who believe and do good. Families who love and help each other for Allah’s sake can be reunited there, so keep praying and doing good.'
-      }
+      { q: 'I have a friend in class wearing a cross or praying to an elephant or praying to Jesus', a: 'People follow different religions. In Islam we believe in one God and we pray only to Him, but we respect others’ choices. The Qur’an teaches that Jesus said we should worship God alone.' },
+      { q: 'Is Jesus God?', a: 'Muslims see Jesus (peace be upon him) as one of God’s greatest messengers. He called people to worship God alone and never claimed to be divine.' },
+      { q: 'Why do people die?', a: 'Life in this world is temporary; death is the door to the next life. The Qur’an says every soul will taste death and that this life is but a test. Death lets us return to Allah and be rewarded for our good deeds.' },
+      { q: 'Will Papa die? If Papa dies how will I see him?', a: 'Everyone, even prophets, passes away. Islam teaches that the soul continues; if we live righteously, we hope to reunite in Paradise. Good deeds and prayers for loved ones keep us connected.' },
+      { q: 'Are we going to meet in Jannah?', a: 'That’s the goal! Paradise is for those who believe and do good. Families who love and help each other for Allah’s sake can be reunited there, so keep praying and doing good.' }
     ];
     defaults.forEach(item => {
-      if (!qaList.some(existing => existing.q === item.q)) {
+      if (!qaList.some(q => q.q === item.q)) {
         qaList.push({ id: generateId(), q: item.q, a: item.a });
       }
     });
-    // Persist any newly injected defaults
     saveToStorage(qaListKey, qaList);
-  })();
+  }
 
-  let calendarEvents = loadFromStorage(calendarEventsKey, [
-    { id: generateId(), start: '2025-08-11', end: '2025-08-14', desc: 'Hotel visit - Centara Mirage Beach Resort' },
-    { id: generateId(), start: '2025-08-31', end: '2025-08-31', desc: 'Ghassan Birthday' },
-    { id: generateId(), start: '2025-10-23', end: '2025-10-23', desc: 'Yahya Birthday' },
-    { id: generateId(), start: '2025-01-30', end: '2025-01-30', desc: 'Mariem Birthday' },
-    { id: generateId(), start: '2025-03-28', end: '2025-03-28', desc: 'Yazid Birthday' }
-  ]);
-
-  let profilesData = loadFromStorage(profilesDataKey, {
-    Ghassan: {
-      birthdate: '1981-08-31',
-      favoriteColor: 'Purple',
-      favoriteFood: 'Koshari',
-      dislikedFood: 'Spicy food',
-      favoriteWeekendActivity: 'Reading',
-      favoriteGame: 'Strategy RPG',
-      favoriteMovie: 'The Godfather',
-      favoriteHero: 'Sherlock Holmes',
-      profession: { title: 'HR Business Partner', description: 'Helps companies manage their people so everyone works better together.' },
-      funFact: 'Loves Egyptian food and puzzles.',
-      avatar: ''
-    },
-    Mariem: {
-      birthdate: '1990-01-30',
-      favoriteColor: 'Teal',
-      favoriteFood: 'Grilled fish',
-      dislikedFood: 'Fast food',
-      favoriteWeekendActivity: 'Yoga',
-      favoriteGame: 'Puzzle games',
-      favoriteMovie: 'The Notebook',
-      favoriteHero: 'Wonder Woman',
-      profession: { title: 'Home Manager with Masters in Computer Science', description: 'Takes care of home but also very smart with computers.' },
-      funFact: 'Master chef in the kitchen.',
-      avatar: ''
-    },
-    Yazid: {
-      birthdate: '2014-03-28',
-      favoriteColor: 'Blue',
-      favoriteFood: 'Pizza',
-      dislikedFood: 'Vegetables',
-      favoriteWeekendActivity: 'Playing football',
-      favoriteGame: 'Roblox',
-      favoriteMovie: 'Avengers',
-      favoriteHero: 'Iron Man',
-      profession: { title: 'Student in Year 6', description: 'Learning many things in school and loves sports.' },
-      funFact: 'Fast runner in school races.',
-      avatar: '',
-      dreamJob: 'Engineer 🛠️'
-    },
-    Yahya: {
-      birthdate: '2017-10-23',
-      favoriteColor: 'Green',
-      favoriteFood: 'Burgers',
-      dislikedFood: 'Seafood',
-      favoriteWeekendActivity: 'Drawing',
-      favoriteGame: 'Minecraft',
-      favoriteMovie: 'Toy Story',
-      favoriteHero: 'Batman',
-      profession: { title: 'Student in Year 3', description: 'Enjoys school and learning new things every day.' },
-      funFact: 'Can draw superheroes very well.',
-      avatar: '',
-      dreamJob: 'Engineer 🛠️'
-    }
-  });
-
-  // ========== New Data for Chores, Points and Badges ==========
-  let chores = loadFromStorage(choresKey, [
-    { id: generateId(), desc: 'Pray 5 times', assignedTo: 'All', due: '', daily: true },
-    { id: generateId(), desc: 'Make your bed', assignedTo: 'All', due: '', daily: true },
-    { id: generateId(), desc: 'Read stories', assignedTo: 'Yahya', due: '', daily: false }
-  ]);
-  let userPoints = loadFromStorage(userPointsKey, {
-    Ghassan: 0,
-    Mariem: 0,
-    Yazid: 0,
-    Yahya: 0
-  });
-  let badges = loadFromStorage(badgesKey, {
-    Ghassan: [],
-    Mariem: [],
-    Yazid: [],
-    Yahya: []
-  });
-
-  // In-memory similarities and editing state
+  async function loadAllData() {
+    wallPosts = await loadFromStorage(wallPostsKey, defaultWallPosts);
+    wallPosts.forEach(p => { if (!p.userReactions) p.userReactions = {}; });
+    qaList = await loadFromStorage(qaListKey, defaultQAList);
+    injectDefaultQA();
+    calendarEvents = await loadFromStorage(calendarEventsKey, defaultCalendarEvents);
+    profilesData = await loadFromStorage(profilesDataKey, defaultProfilesData);
+    chores = await loadFromStorage(choresKey, defaultChores);
+    userPoints = await loadFromStorage(userPointsKey, defaultUserPoints);
+    badges = await loadFromStorage(badgesKey, defaultBadges);
+  }
   let profileSimilarities = {};
   let currentEditingProfile = null;
 
@@ -1324,6 +1264,6 @@
   }
 
   // Kick off the initial rendering and setup
-  init();
+  loadAllData().then(init);
 
 })();
