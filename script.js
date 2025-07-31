@@ -69,8 +69,8 @@
   const currentUserKey = 'familyCurrentUser';
   const themeKey = 'familyTheme';
 // ====== Supabase Setup ======
-const supabaseUrl = window.https://zlhamcofzyozfyzcgcdg.supabase.co;
-const supabaseKey = window.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo;
+const supabaseUrl = "https://zlhamcofzyozfyzcgcdg.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo";
 if (!supabaseUrl || !supabaseKey) {
   alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
 }
