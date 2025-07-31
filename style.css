@@ -92,6 +92,14 @@ nav.sidebar li {
   transition: background-color 0.3s ease, color 0.3s ease;
   user-select: none;
 }
+nav.sidebar li i {
+  width: 20px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+nav.sidebar li span {
+  flex: 1;
+}
 nav.sidebar li:hover {
   background: var(--color-primary);
   color: white;
