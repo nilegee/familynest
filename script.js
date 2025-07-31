@@ -35,6 +35,7 @@
   const addEventBtn = document.getElementById('addEventBtn');
 
   const showDailyOnlyCheckbox = document.getElementById('showDailyOnly');
+  const scoreboardList = document.getElementById('scoreboardList');
 
   const profileDetailSection = document.getElementById('profileDetail');
   const profileContainer = document.getElementById('profileContainer');
@@ -60,6 +61,7 @@
 
   const notificationBtn = document.getElementById('notificationBtn');
   const notificationBadge = document.getElementById('notificationBadge');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
 
   // ========== Constants and Keys ==========
   const currentUserKey = 'familyCurrentUser';
@@ -72,6 +74,7 @@
   const choresKey = 'familyChores';
   const userPointsKey = 'familyUserPoints';
   const badgesKey = 'familyBadges';
+  const themeKey = 'familyTheme';
 
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
@@ -861,6 +864,7 @@
   function incrementPoints(user, amount = 1) {
     userPoints[user] = (userPoints[user] || 0) + amount;
     saveToStorage(userPointsKey, userPoints);
+    renderScoreboard();
   }
 
   function grantBadge(user, badgeId) {
@@ -870,6 +874,7 @@
     if (!badges[user].some(b => b.id === badgeId)) {
       badges[user].push(badge);
       saveToStorage(badgesKey, badges);
+      renderScoreboard();
     }
   }
 
@@ -908,6 +913,21 @@
       }
     }
     profileSimilarities[name] = sims;
+  }
+
+  function renderScoreboard() {
+    if (!scoreboardList) return;
+    scoreboardList.innerHTML = '';
+    Object.keys(userPoints).forEach(name => {
+      const badgeHtml = (badges[name] || [])
+        .map(b => `<span title="${escapeHtml(b.name)}">${b.icon}</span>`)
+        .join('');
+      const li = document.createElement('li');
+      li.innerHTML = `<span>${escapeHtml(name)}</span>` +
+        `<span>${userPoints[name] || 0} pts</span>` +
+        `<span class="scoreboard-badges">${badgeHtml}</span>`;
+      scoreboardList.appendChild(li);
+    });
   }
 
   editProfileBtn.addEventListener('click', () => {
@@ -1009,6 +1029,9 @@
       case 'Chores':
         renderChores(filter, showDailyOnlyCheckbox.checked);
         break;
+      case 'Scoreboard':
+        renderScoreboard();
+        break;
       case 'Ghassan':
       case 'Mariem':
       case 'Yazid':
@@ -1047,10 +1070,10 @@
     profileNameHeading.childNodes[0].nodeValue = headingText;
     if (profile.avatar) {
       profileAvatar.src = profile.avatar;
-      profileAvatar.style.display = 'inline-block';
     } else {
-      profileAvatar.style.display = 'none';
+      profileAvatar.src = 'icons/default-avatar.svg';
     }
+    profileAvatar.style.display = 'inline-block';
     const currentUser = localStorage.getItem(currentUserKey);
     const canEdit = currentUser === name || adminUsers.includes(currentUser);
 
@@ -1215,6 +1238,8 @@
     updateGreeting();
     updateAdminVisibility();
     renderChores('', showDailyOnlyCheckbox.checked);
+    renderScoreboard();
+    loadTheme();
   }
 
   // Update the greeting line to include the current date and time for the user
@@ -1224,6 +1249,21 @@
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     currentDateDisplay.textContent = now.toLocaleDateString(undefined, options);
     currentUserDisplay.textContent = user;
+  }
+
+  function loadTheme() {
+    const theme = localStorage.getItem(themeKey) || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    if (themeToggleBtn) themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', current);
+      localStorage.setItem(themeKey, current);
+      themeToggleBtn.textContent = current === 'dark' ? '☀️' : '🌙';
+    });
   }
 
   // ===== Responsive sidebar toggling =====
