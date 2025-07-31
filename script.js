@@ -314,6 +314,7 @@
   function setCurrentUser(user) {
     localStorage.setItem(currentUserKey, user);
     currentUserDisplay.textContent = user;
+    document.body.dataset.user = user;
     updateGreeting();
   }
 
