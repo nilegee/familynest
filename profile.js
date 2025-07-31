@@ -1,6 +1,7 @@
 // profile.js
 
-import { escapeHtml, calculateAge, saveToSupabase, generateId } from './util.js';
+import { escapeHtml, calculateAge } from './util.js';
+import { saveToSupabase } from './storage.js';
 import { badges, badgeTypes, userPoints, grantBadge, incrementPoints, completedChores } from './data.js';
 
 export let profilesData = {};
