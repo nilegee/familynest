@@ -760,17 +760,18 @@ const supabase = window.supabase
     qEdit.focus();
   }
 
-  function renderAdminQuestionOptions() {
-    // Populate the dropdown with unanswered questions for admin to answer
-    questionSelect.innerHTML = '';
-    qaList.filter(item => !item.a).forEach(item => {
-      const option = document.createElement('option');
-      option.value = item.id;
-      option.textContent = item.q;
-      questionSelect.appendChild(option);
-    });
-    adminAnswerSection.hidden = questionSelect.options.length === 0;
-  }
+function renderAdminQuestionOptions() {
+  // Populate the dropdown with unanswered questions for admin to answer
+  questionSelect.innerHTML = '';
+  if (!Array.isArray(qaList)) return; // <-- THIS IS THE FIX!
+  qaList.filter(item => !item.a).forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.id;
+    option.textContent = item.q;
+    questionSelect.appendChild(option);
+  });
+  adminAnswerSection.hidden = questionSelect.options.length === 0;
+}
 
   saveAnswerBtn.addEventListener('click', () => {
     const selected = questionSelect.value;
