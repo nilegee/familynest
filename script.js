@@ -1193,6 +1193,7 @@ function renderAdminQuestionOptions() {
     if (!profilesData) {
       profilesData = { ...defaultProfilesData };
     }
+    if (!Array.isArray(chores)) chores = [];   // <--- ADD THIS LINE!
     const profile = profilesData[name];
     if (!profile) {
       profileContainer.innerHTML = '<p>Profile not found.</p>';
