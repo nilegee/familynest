@@ -1,6 +1,7 @@
 // profile.js
 
-import { escapeHtml, calculateAge, saveToSupabase, generateId } from './util.js';
+import { escapeHtml, calculateAge } from './util.js';
+import { saveToSupabase } from './storage.js';
 
 // These will be set via setProfileData etc.
 let profilesData = {};
