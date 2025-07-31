@@ -1,40 +1,28 @@
 // scoreboard.js
 
-import { escapeHtml } from './util.js'; // assuming you have this helper, otherwise inline below
+let _userPoints = {};
+let _badges = {};
+let _completedChores = {};
 
-// Expects these DOM elements to exist:
-const scoreboardList = document.getElementById('scoreboardList');
-
-// Data dependencies (must be set before calling renderScoreboard)
-let userPoints = {};
-let badges = {};
-let completedChores = {};
-
-// Called to update dependencies from main app:
-export function setScoreboardData({ userPoints: up, badges: b, completedChores: cc }) {
-  userPoints = up || {};
-  badges = b || {};
-  completedChores = cc || {};
+export function setScoreboardData({ userPoints, badges, completedChores }) {
+  _userPoints = userPoints;
+  _badges = badges;
+  _completedChores = completedChores;
 }
 
-// Core rendering function:
 export function renderScoreboard() {
+  const scoreboardList = document.getElementById('scoreboardList');
   if (!scoreboardList) return;
-  if (!userPoints || typeof userPoints !== 'object') return;
-  if (!badges || typeof badges !== 'object') return;
-  if (!completedChores || typeof completedChores !== 'object') return;
 
   scoreboardList.innerHTML = '';
-  Object.keys(userPoints).forEach(name => {
-    const badgeHtml = (badges[name] || [])
-      .map(b => `<span title="${escapeHtml(b.name)}">${b.icon}</span>`)
+  Object.keys(_userPoints).forEach(name => {
+    const badgeHtml = (_badges[name] || [])
+      .map(b => `<span title="${b.name}">${b.icon}</span>`)
       .join('');
     const li = document.createElement('li');
-    li.innerHTML = `
-      <span>${escapeHtml(name)}</span>
-      <span>${userPoints[name] || 0} pts | ${completedChores[name] || 0} chores</span>
-      <span class="scoreboard-badges">${badgeHtml}</span>
-    `;
+    li.innerHTML = `<span>${name}</span>
+      <span>${_userPoints[name] || 0} pts | ${_completedChores[name] || 0} chores</span>
+      <span class="scoreboard-badges">${badgeHtml}</span>`;
     scoreboardList.appendChild(li);
   });
 }

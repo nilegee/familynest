@@ -1,7 +1,7 @@
 // profileEditListeners.js
 
 import { profilesData, currentEditingProfile, renderSingleProfile, computeProfileSimilarities } from './profile.js';
-import { saveToSupabase } from './util.js';
+import { saveToSupabase } from './utils.js';
 
 export function setupProfileEditListeners() {
   const editProfileBtn = document.getElementById('editProfileBtn');

@@ -1,45 +1,61 @@
 // chores.js
 
-import { escapeHtml, generateId, showAlert } from './util.js';
-import { saveToSupabase } from './storage.js';
-import { badges, badgeTypes, userPoints, completedChores, chores, renderScoreboard } from './globals.js';
+import { renderScoreboard } from './scoreboard.js';
+
+let _chores = [];
+let _badges = {};
+let _userPoints = {};
+let _completedChores = {};
+let _badgeTypes = [];
+let _onSave = () => {};
+
+export function setChoresData({
+  chores,
+  badges,
+  userPoints,
+  completedChores,
+  badgeTypes,
+  onSave // callback: (updatedChores, updatedCompletedChores, updatedBadges, updatedUserPoints) => void
+}) {
+  _chores = chores;
+  _badges = badges;
+  _userPoints = userPoints;
+  _completedChores = completedChores;
+  _badgeTypes = badgeTypes || [];
+  _onSave = typeof onSave === "function" ? onSave : () => {};
+}
+
+// ---- MAIN RENDERING ----
 
 export function renderChores(filterText = '', dailyOnly = false) {
   const list = document.getElementById('choresList');
+  if (!list) return;
   list.innerHTML = '';
-  let filtered = Array.isArray(chores) ? chores : [];
+
+  let filtered = Array.isArray(_chores) ? [..._chores] : [];
   if (dailyOnly) filtered = filtered.filter(item => item.daily);
   if (filterText) {
     const f = filterText.toLowerCase();
-    filtered = filtered.filter(item =>
-      item.desc.toLowerCase().includes(f) ||
-      (item.assignedTo && item.assignedTo.toLowerCase().includes(f))
+    filtered = filtered.filter(
+      item =>
+        item.desc.toLowerCase().includes(f) ||
+        (item.assignedTo && item.assignedTo.toLowerCase().includes(f))
     );
   }
+
   filtered.forEach(item => {
     const li = document.createElement('li');
     li.setAttribute('data-id', item.id);
-    li.classList.toggle('completed', item.completed);
+    li.classList.toggle('completed', !!item.completed);
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    checkbox.checked = item.completed;
-    checkbox.addEventListener('change', () => {
-      item.completed = checkbox.checked;
-      li.classList.toggle('completed', item.completed);
-      saveToSupabase('chores', chores);
-      if (item.assignedTo && item.assignedTo !== 'All') {
-        const delta = checkbox.checked ? 1 : -1;
-        completedChores[item.assignedTo] = (completedChores[item.assignedTo] || 0) + delta;
-        if (completedChores[item.assignedTo] < 0) completedChores[item.assignedTo] = 0;
-        saveToSupabase('completed_chores', completedChores);
-        renderScoreboard();
-      }
-    });
+    checkbox.checked = !!item.completed;
+    checkbox.addEventListener('change', () => handleChoreCheck(item, checkbox, li));
 
     const desc = document.createElement('span');
     desc.className = 'chore-desc';
-    desc.innerHTML = `${escapeHtml(item.desc)}${item.daily ? ' <span class="daily-label">(Daily)</span>' : ''}`;
+    desc.innerHTML = `${item.desc}${item.daily ? ' <span class="daily-label">(Daily)</span>' : ''}`;
 
     const assignee = document.createElement('span');
     assignee.className = 'chore-assignee';
@@ -52,53 +68,92 @@ export function renderChores(filterText = '', dailyOnly = false) {
     if (!item.daily) {
       const dueSpan = document.createElement('span');
       dueSpan.className = 'chore-due';
-      dueSpan.textContent = item.due;
+      dueSpan.textContent = item.due || '';
       li.appendChild(dueSpan);
+    }
+
+    // Admin delete button (if you want)
+    if (window.localStorage.getItem('familyCurrentUser') === 'Ghassan' /*or admin logic*/) {
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '🗑️';
+      delBtn.title = 'Delete chore';
+      delBtn.className = 'chore-delete-btn';
+      delBtn.onclick = () => deleteChore(item.id);
+      li.appendChild(delBtn);
     }
 
     list.appendChild(li);
   });
 }
 
-export function incrementPoints(user, amount = 1) {
-  userPoints[user] = (userPoints[user] || 0) + amount;
-  saveToSupabase('user_points', userPoints);
+// ---- CHORE CHECK LOGIC ----
+
+function handleChoreCheck(item, checkbox, li) {
+  item.completed = checkbox.checked;
+  li.classList.toggle('completed', item.completed);
+
+  // Update completedChores count per user
+  if (item.assignedTo && item.assignedTo !== 'All') {
+    const delta = checkbox.checked ? 1 : -1;
+    _completedChores[item.assignedTo] = (_completedChores[item.assignedTo] || 0) + delta;
+    if (_completedChores[item.assignedTo] < 0) _completedChores[item.assignedTo] = 0;
+
+    // Give point & badge if every 5 chores
+    _userPoints[item.assignedTo] = (_userPoints[item.assignedTo] || 0) + (checkbox.checked ? 1 : -1);
+    if (_userPoints[item.assignedTo] % 5 === 0 && checkbox.checked) {
+      grantBadge(item.assignedTo, 'super-helper');
+    }
+  }
+
+  // Persist changes (API, localStorage, Supabase, etc.)
+  _onSave(_chores, _completedChores, _badges, _userPoints);
   renderScoreboard();
 }
 
-export function grantBadge(user, badgeId) {
-  const badge = badgeTypes.find(b => b.id === badgeId);
-  if (!badge) return;
-  badges[user] = badges[user] || [];
-  if (!badges[user].some(b => b.id === badgeId)) {
-    badges[user].push(badge);
-    saveToSupabase('badges', badges);
-    renderScoreboard();
+// ---- ADD/DELETE CHORE ----
+
+export function addChore({ desc, assignedTo, due, daily }) {
+  const id = '_' + Math.random().toString(36).slice(2, 11);
+  const newChore = {
+    id,
+    desc,
+    assignedTo,
+    due: daily ? '' : due,
+    daily: !!daily,
+    completed: false
+  };
+  _chores.push(newChore);
+  _onSave(_chores, _completedChores, _badges, _userPoints);
+  renderChores();
+}
+
+export function deleteChore(id) {
+  const idx = _chores.findIndex(ch => ch.id === id);
+  if (idx !== -1) {
+    _chores.splice(idx, 1);
+    _onSave(_chores, _completedChores, _badges, _userPoints);
+    renderChores();
   }
 }
 
-// Add chore logic (admin only, call this in your main.js setup)
-export function setupAddChoreBtn() {
-  const addChoreBtn = document.getElementById('addChoreBtn');
-  addChoreBtn.addEventListener('click', () => {
-    const desc = document.getElementById('choreDesc').value.trim();
-    const assignedTo = document.getElementById('choreAssignedTo').value;
-    const due = document.getElementById('choreDue').value;
-    const daily = document.getElementById('choreDaily').checked;
-    if (!desc || (!daily && !due)) {
-      showAlert('Please enter a description' + (daily ? '' : ' and due date') + '.');
-      return;
-    }
-    const id = generateId();
-    chores.push({ id, desc, assignedTo, due: daily ? '' : due, daily, completed: false });
-    saveToSupabase('chores', chores);
-    renderChores(document.getElementById('contentSearch').value);
-    if (assignedTo !== 'All') {
-      incrementPoints(assignedTo);
-      if ((userPoints[assignedTo] || 0) % 5 === 0) {
-        grantBadge(assignedTo, 'super-helper');
-      }
-    }
-    // incrementNotification(); // Optionally call from notification.js if needed
-  });
+// ---- BADGE LOGIC ----
+
+function grantBadge(user, badgeId) {
+  const badge = _badgeTypes.find(b => b.id === badgeId);
+  if (!badge) return;
+  _badges[user] = _badges[user] || [];
+  if (!_badges[user].some(b => b.id === badgeId)) {
+    _badges[user].push(badge);
+    _onSave(_chores, _completedChores, _badges, _userPoints);
+  }
+}
+
+// ---- Utility: For main.js to get current chores state
+export function getChoresData() {
+  return {
+    chores: _chores,
+    badges: _badges,
+    userPoints: _userPoints,
+    completedChores: _completedChores
+  };
 }
