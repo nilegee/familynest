@@ -10,3 +10,5 @@ FamilyNest now stores all data in [Supabase](https://supabase.com). The front en
 
 Once those values are set, the application will read and write wall posts, calendar events, chores and profile information directly from Supabase tables.
 
+If the configured Supabase project is missing any of the expected tables, the application will now fall back to using browser `localStorage` so that it can still run without errors.
+

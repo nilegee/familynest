@@ -77,6 +77,7 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = window.supabase
   ? window.supabase.createClient(supabaseUrl, supabaseKey)
   : createClient(supabaseUrl, supabaseKey);
+  let supabaseEnabled = true;
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
   // Ghassan/Mariem without entering this PIN.
@@ -222,21 +223,54 @@ const supabase = window.supabase
     alert(message);
   }
 
+  function saveToLocal(table, data) {
+    try {
+      localStorage.setItem(`fn_${table}`, JSON.stringify(data));
+    } catch (e) {
+      console.warn('Local storage save failed:', e);
+    }
+  }
+
   async function saveToSupabase(table, data) {
+    if (!supabaseEnabled) {
+      saveToLocal(table, data);
+      return;
+    }
     const payload = Array.isArray(data)
       ? data
       : Object.entries(data).map(([name, value]) => ({ name, value }));
     const { error } = await supabase.from(table).upsert(payload);
     if (error) {
       console.error('Supabase save error:', error);
+      if (error.code === 'PGRST205') {
+        supabaseEnabled = false;
+        saveToLocal(table, data);
+      }
       showAlert('Could not save data.');
     }
   }
 
+  function loadFromLocal(table, defaultValue) {
+    try {
+      const stored = localStorage.getItem(`fn_${table}`);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {
+      console.warn('Local storage load failed:', e);
+    }
+    return defaultValue;
+  }
+
   async function loadFromSupabase(table, defaultValue) {
+    if (!supabaseEnabled) {
+      return loadFromLocal(table, defaultValue);
+    }
     const { data, error } = await supabase.from(table).select('*');
     if (error) {
       console.warn('Supabase load failed:', error);
+      if (error.code === 'PGRST205') {
+        supabaseEnabled = false;
+        return loadFromLocal(table, defaultValue);
+      }
       return defaultValue;
     }
     if (Array.isArray(defaultValue)) return data || defaultValue;
@@ -1093,7 +1127,19 @@ const supabase = window.supabase
   // ========== Profile Logic ==========
 
   function renderSingleProfile(name) {
+    if (!profilesData) {
+      profilesData = { ...defaultProfilesData };
+    }
     const profile = profilesData[name];
+    if (!profile) {
+      profileContainer.innerHTML = '<p>Profile not found.</p>';
+      profileNameHeading.dataset.name = name;
+      profileNameHeading.childNodes[0].nodeValue = name;
+      profileAvatar.src = 'icons/default-avatar.svg';
+      profileAvatar.alt = 'Avatar for ' + name;
+      profileAvatar.style.display = 'inline-block';
+      return;
+    }
     let headingText = name;
     if (profile.dreamJob) {
       const job = profile.dreamJob.replace('🛠️', '').trim();
