@@ -1353,13 +1353,8 @@
   sidebarTabs.forEach(li => {
     li.addEventListener('click', () => {
       if (window.innerWidth <= 700 && sidebarEl) {
-        if (!window.matchMedia('(orientation: portrait)').matches) {
-          sidebarEl.classList.remove('open');
-          if (sidebarOverlayEl) sidebarOverlayEl.classList.remove('visible');
-        } else {
-          sidebarEl.classList.add('open');
-          if (sidebarOverlayEl) sidebarOverlayEl.classList.add('visible');
-        }
+        sidebarEl.classList.remove('open');
+        if (sidebarOverlayEl) sidebarOverlayEl.classList.remove('visible');
       }
     });
   });
