@@ -35,4 +35,4 @@ The backend exposes the following routes:
 - `GET /api/reminders` to list scheduled reminders
 - `POST /api/reminders` to schedule a new reminder
 
-The client performs `POST` calls with the entire dataset and expects `JSON` responses. If the server cannot be reached, the app transparently falls back to the data stored in `localStorage`.
+The client performs `POST` calls with the entire dataset and expects `JSON` responses.

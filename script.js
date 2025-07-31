@@ -66,7 +66,6 @@
   const themeToggleBtn = document.getElementById('themeToggleBtn');
 
   // ========== Constants and Keys ==========
-  const currentUserKey = 'familyCurrentUser';
   const wallPostsKey = 'familyWallPosts';
   const qaListKey = 'familyQAList';
   const calendarEventsKey = 'familyCalendarEvents';
@@ -76,15 +75,10 @@
   const choresKey = 'familyChores';
   const userPointsKey = 'familyUserPoints';
   const badgesKey = 'familyBadges';
-  const themeKey = 'familyTheme';
   const completedChoresKey = "familyCompletedChores";
-// ====== Supabase Setup ======
-const supabaseUrl = 'https://zlhamcofyzozfyzcgcdg.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo'; // Get from Supabase > Project Settings > API > Project API keys
-const supabase = window.supabase
-  ? window.supabase.createClient(supabaseUrl, supabaseKey)
-  : createClient(supabaseUrl, supabaseKey); // Handles both CDN and npm module
-
+  // In-memory storage for user and theme
+  let currentUserMemory = null;
+  let currentTheme = 'light';
   // Admin users and a simple PIN to restrict admin actions. In a real app
   // you would implement proper authentication. Kids cannot log in as
   const API_BASE = "http://localhost:3000/api";
@@ -248,12 +242,7 @@ const supabase = window.supabase
     } catch (e) {
       console.warn('Server save failed:', e);
     }
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-    } catch (e) {
-      console.error('Storage error:', e);
-      showAlert('Could not save data. Storage might be full or restricted.');
-    }
+    // Data is kept only in memory when server calls fail
   }
 
   async function loadFromStorage(key, defaultValue) {
@@ -262,17 +251,10 @@ const supabase = window.supabase
       const res = await fetch(endpoint);
       if (!res.ok) throw new Error('Bad response');
       const data = await res.json();
-      localStorage.setItem(key, JSON.stringify(data));
       return data;
     } catch (e) {
       console.warn('Server load failed:', e);
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return defaultValue;
-        return JSON.parse(raw);
-      } catch {
-        return defaultValue;
-      }
+      return defaultValue;
     }
   }
   // ========== Data Declarations ==========
@@ -329,16 +311,15 @@ const supabase = window.supabase
   }
 
   function checkUserSelection() {
-    const user = localStorage.getItem(currentUserKey);
-    if (!user) {
+    if (!currentUserMemory) {
       showUserModal();
     } else {
-      setCurrentUser(user);
+      setCurrentUser(currentUserMemory);
     }
   }
 
   function setCurrentUser(user) {
-    localStorage.setItem(currentUserKey, user);
+    currentUserMemory = user;
     currentUserDisplay.textContent = user;
     document.body.dataset.user = user;
     updateGreeting();
@@ -534,7 +515,7 @@ const supabase = window.supabase
     if (e.target.classList.contains('reaction-btn')) {
       // Handle reaction toggling per user
       const reaction = e.target.getAttribute('data-reaction');
-      const currentUser = localStorage.getItem(currentUserKey);
+      const currentUser = currentUserMemory;
       if (!currentUser) {
         showAlert('Please select your user first.');
         showUserModal();
@@ -560,7 +541,7 @@ const supabase = window.supabase
       renderWallPosts(contentSearch.value);
       incrementNotification();
     } else if (e.target.classList.contains('reply-btn')) {
-      const currentUser = localStorage.getItem(currentUserKey);
+      const currentUser = currentUserMemory;
       if (!currentUser) {
         showAlert('Please select your user first.');
         showUserModal();
@@ -637,7 +618,7 @@ const supabase = window.supabase
       showAlert('Please enter something to post.');
       return;
     }
-    const currentUser = localStorage.getItem(currentUserKey);
+    const currentUser = currentUserMemory;
     if (!currentUser) {
       showAlert('Please select your user first.');
       showUserModal();
@@ -1024,7 +1005,7 @@ const supabase = window.supabase
   });
 
   function updateAdminVisibility() {
-    const user = localStorage.getItem(currentUserKey);
+    const user = currentUserMemory;
     const isAdmin = adminUsers.includes(user);
     document.getElementById('choreAdminPanel').hidden = !isAdmin;
     adminAnswerSection.hidden = !isAdmin || !qaList.some(item => !item.a);
@@ -1138,7 +1119,7 @@ const supabase = window.supabase
     }
     profileAvatar.alt = 'Avatar for ' + name;
     profileAvatar.style.display = 'inline-block';
-    const currentUser = localStorage.getItem(currentUserKey);
+    const currentUser = currentUserMemory;
     const canEdit = currentUser === name || adminUsers.includes(currentUser);
 
     if (currentEditingProfile === name) {
@@ -1334,7 +1315,7 @@ const supabase = window.supabase
   }
   // Update the greeting line to include the current date and time for the user
   function updateGreeting() {
-    const user = localStorage.getItem(currentUserKey) || 'Guest';
+    const user = currentUserMemory || 'Guest';
     const now = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     currentDateDisplay.textContent = now.toLocaleDateString(undefined, options);
@@ -1342,16 +1323,15 @@ const supabase = window.supabase
   }
 
   function loadTheme() {
-    const theme = localStorage.getItem(themeKey) || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-    if (themeToggleBtn) themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (themeToggleBtn) themeToggleBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
   }
 
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      currentTheme = current;
       document.documentElement.setAttribute('data-theme', current);
-      localStorage.setItem(themeKey, current);
       themeToggleBtn.textContent = current === 'dark' ? '☀️' : '🌙';
     });
   }
@@ -1424,8 +1404,7 @@ const supabase = window.supabase
     }
   }
 
-  const notifiedKey = 'familyNotified';
-  let notified = JSON.parse(localStorage.getItem(notifiedKey) || '{}');
+  let notified = {};
 
   function showPush(title, body) {
     if (swReg && Notification.permission === 'granted') {
@@ -1451,7 +1430,6 @@ const supabase = window.supabase
         }
       });
     }
-    localStorage.setItem(notifiedKey, JSON.stringify(notified));
   }
 
   // Kick off the initial rendering and setup
