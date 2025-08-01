@@ -3,8 +3,8 @@
 import { loadAllData } from './storage.js';
 import { renderWallPosts } from './wall.js';
 import { setupQA, renderQA } from './qa.js';
-import { renderCalendarTable, renderCalendarEventsList } from './calendar.js';
-import { renderChores, setChoresData } from './chores.js';
+import { setupCalendar, renderCalendarTable, renderCalendarEventsList } from './calendar.js';
+import { renderChores, setChoresData, setupChoresUI } from './chores.js';
 import { renderScoreboard, setScoreboardData } from './scoreboard.js';
 import { computeProfileSimilarities, renderSingleProfile, setProfileData } from './profile.js';
 import { updateGreeting, updateAdminVisibility, loadTheme } from './ui.js';
@@ -70,6 +70,26 @@ export async function main() {
     saveAnswerBtnRef: document.getElementById('saveAnswerBtn')
   });
 
+  setupCalendar({
+    calendarEventsRef: calendarEvents,
+    calendarBodyRef: document.getElementById('calendarBody'),
+    eventListElRef: document.getElementById('eventList'),
+    contentSearchRef: document.getElementById('contentSearch'),
+    eventStartDateRef: document.getElementById('eventStartDate'),
+    eventEndDateRef: document.getElementById('eventEndDate'),
+    eventDescRef: document.getElementById('eventDesc'),
+    addEventBtnRef: document.getElementById('addEventBtn')
+  });
+
+  setupChoresUI({
+    addBtnRef: document.getElementById('addChoreBtn'),
+    descInputRef: document.getElementById('choreDesc'),
+    assignedToRef: document.getElementById('choreAssignedTo'),
+    dueInputRef: document.getElementById('choreDue'),
+    dailyCheckboxRef: document.getElementById('choreDaily'),
+    showDailyOnlyRef: document.getElementById('showDailyOnly')
+  });
+
   // Tab nav
   setupTabListeners();
   setActiveTab(0);
@@ -77,8 +97,6 @@ export async function main() {
   // Render content (all null-checked in modules)
   renderWallPosts();
   renderQA();
-  renderCalendarTable();
-  renderCalendarEventsList();
 
   // Profile similarities
   Object.keys(profilesData).forEach(n => computeProfileSimilarities(n));
