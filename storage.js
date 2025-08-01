@@ -21,14 +21,18 @@ export function resolveTable(name) {
 // ========== Supabase Setup ==========
 const supabaseUrl = window.SUPABASE_URL || '';
 const supabaseKey = window.SUPABASE_KEY || '';
-if (!supabaseUrl || !supabaseKey) {
-  alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
-}
-const supabase = window.supabase
-  ? window.supabase.createClient(supabaseUrl, supabaseKey)
-  : createClient(supabaseUrl, supabaseKey);
 
 let supabaseEnabled = true;
+let supabase;
+
+if (!supabaseUrl || !supabaseKey) {
+  alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
+  supabaseEnabled = false;
+} else {
+  supabase = window.supabase
+    ? window.supabase.createClient(supabaseUrl, supabaseKey)
+    : createClient(supabaseUrl, supabaseKey);
+}
 
 export function saveToLocal(table, data) {
   table = resolveTable(table);
