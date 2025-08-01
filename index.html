@@ -171,6 +171,12 @@
     <!-- Scoreboard Section -->
     <section id="scoreboard" aria-label="Scoreboard Section" hidden>
       <h1>Scoreboard</h1>
+      <label for="scoreSortBy" class="score-sort-label">Sort by:</label>
+      <select id="scoreSortBy" class="score-sort-select">
+        <option value="points">Points</option>
+        <option value="name">Name</option>
+        <option value="chores">Completed Chores</option>
+      </select>
       <ul id="scoreboardList" class="scoreboard-list"></ul>
       <button id="resetScoreboardBtn" class="btn-secondary">Reset Scoreboard</button>
     </section>
