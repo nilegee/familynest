@@ -58,9 +58,14 @@
         </button>
         <button id="themeToggleBtn" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
         <div class="profile-dropdown">
-          <button id="profileMenuBtn" aria-label="Account menu" hidden><i class="fa-solid fa-user"></i></button>
+          <button id="profileMenuBtn" aria-label="Account menu" hidden>
+            <img id="avatarMenuImg" class="avatar-small" src="icons/default-avatar.svg" alt="User avatar">
+          </button>
           <div id="profileMenu" class="profile-menu" hidden>
-            <button id="signOutBtn">Sign Out</button>
+            <button id="profileMenuProfile">Profile</button>
+            <button id="profileMenuSettings">Settings</button>
+            <hr>
+            <button id="signOutBtn" class="sign-out">Sign Out</button>
           </div>
         </div>
       </div>

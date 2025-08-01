@@ -7,7 +7,7 @@ import { setupCalendar, renderCalendarTable, renderCalendarEventsList } from './
 import { renderChores, setChoresData, setupChoresUI } from './chores.js';
 import { renderScoreboard, setScoreboardData, setupScoreboardListeners } from './scoreboard.js';
 import { computeProfileSimilarities, renderSingleProfile, setProfileData } from './profile.js';
-import { updateGreeting, updateAdminVisibility, loadTheme } from './ui.js';
+import { updateGreeting, updateAdminVisibility, loadTheme, updateUserAvatar } from './ui.js';
 import { setupTabListeners, setActiveTab, setupSidebarToggle } from './navigation.js';
 import { setupProfileEditListeners } from './profileEditListeners.js';
 import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
@@ -110,6 +110,7 @@ export async function main() {
 
   // Greeting, admin, theme
   updateGreeting();
+  updateUserAvatar();
   updateAdminVisibility();
   loadTheme();
 

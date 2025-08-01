@@ -202,23 +202,34 @@ main.content {
   position: absolute;
   right: 0;
   top: 100%;
-  background: var(--color-card);
+  background: rgba(255, 255, 255, 0.95);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   padding: 0.5rem;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(2px);
   z-index: 1000;
 }
 .profile-menu button {
   background: none;
   border: none;
-  padding: 0.3rem 0.5rem;
+  padding: 0.4rem 0.6rem;
   text-align: left;
   cursor: pointer;
+  font-size: 0.9rem;
 }
 .profile-menu button:hover {
   background: var(--color-border);
+}
+.profile-menu .sign-out {
+  color: #d32f2f;
+}
+.profile-menu hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 0.4rem 0;
 }
 .topbar .search-input {
   padding: 0.5rem 1rem;
@@ -802,6 +813,16 @@ button.btn-secondary:hover {
   user-select: none;
 }
 
+.avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+  user-select: none;
+}
+
 /* Engineering animation for Yazid and Yahya */
 .engineer-animation-container {
   margin-bottom: 1rem;
@@ -982,10 +1003,13 @@ nav.bottom-nav {
   border-top: 1px solid var(--color-border);
   box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
   z-index: 997;
-  justify-content: space-around;
+  justify-content: flex-start;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 nav.bottom-nav button {
-  flex: 1 0 auto;
+  flex: 0 0 72px;
   padding: 0.6rem 0.4rem;
   background: none;
   border: none;
@@ -1002,6 +1026,28 @@ nav.bottom-nav button i {
 }
 nav.bottom-nav button.active {
   color: var(--color-primary);
+  font-weight: 700;
+  background: rgba(0,0,0,0.05);
+}
+nav.bottom-nav::-webkit-scrollbar {
+  display: none;
+}
+nav.bottom-nav::before,
+nav.bottom-nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+}
+nav.bottom-nav::before {
+  left: 0;
+  background: linear-gradient(to right, var(--color-card), transparent);
+}
+nav.bottom-nav::after {
+  right: 0;
+  background: linear-gradient(to left, var(--color-card), transparent);
 }
 
 @media (max-width: 600px) {
