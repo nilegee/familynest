@@ -30,7 +30,21 @@ export function renderScoreboard() {
 
   const medals = ['🥇', '🥈', '🥉'];
   names.forEach((name, idx) => {
-    const allBadges = (_badges[name] || []).slice().sort((a,b)=>{
+    let rawBadges = _badges[name];
+    let allBadges = [];
+    if (Array.isArray(rawBadges)) {
+      allBadges = rawBadges.slice();
+    } else if (typeof rawBadges === 'string') {
+      try {
+        const parsed = JSON.parse(rawBadges);
+        if (Array.isArray(parsed)) allBadges = parsed.slice();
+      } catch (e) {
+        allBadges = [];
+      }
+    } else if (rawBadges && typeof rawBadges === 'object') {
+      allBadges = Object.values(rawBadges);
+    }
+    allBadges.sort((a,b)=>{
       return new Date(b.dateGiven) - new Date(a.dateGiven);
     });
     const badgeHtml = allBadges.slice(0,3)
