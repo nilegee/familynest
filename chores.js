@@ -108,7 +108,7 @@ function handleChoreCheck(item, checkbox, li) {
     // Give point & badge if every 5 chores
     _userPoints[item.assignedTo] = (_userPoints[item.assignedTo] || 0) + (checkbox.checked ? 1 : -1);
     if (_userPoints[item.assignedTo] % 5 === 0 && checkbox.checked) {
-      grantBadge(item.assignedTo, 'super-helper');
+      grantBadge(item.assignedTo, 'star-helper', 'Completed 5 chores');
     }
   }
 
@@ -190,14 +190,20 @@ export function setupChoresUI({
 
 // ---- BADGE LOGIC ----
 
-function grantBadge(user, badgeId) {
+function grantBadge(user, badgeId, note = '') {
   const badge = _badgeTypes.find(b => b.id === badgeId);
   if (!badge) return;
   _badges[user] = _badges[user] || [];
-  if (!_badges[user].some(b => b.id === badgeId)) {
-    _badges[user].push(badge);
-    _onSave(_chores, _completedChores, _badges, _userPoints);
-  }
+  const newBadge = {
+    badgeId,
+    name: badge.name,
+    icon: badge.icon,
+    dateGiven: new Date().toISOString(),
+    note,
+    id: '_' + Math.random().toString(36).slice(2, 11)
+  };
+  _badges[user].unshift(newBadge);
+  _onSave(_chores, _completedChores, _badges, _userPoints);
 }
 
 // ---- Utility: For main.js to get current chores state

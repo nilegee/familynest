@@ -30,14 +30,18 @@ export function renderScoreboard() {
 
   const medals = ['🥇', '🥈', '🥉'];
   names.forEach((name, idx) => {
-    const badgeHtml = (_badges[name] || [])
-      .map(b => `<span title="${b.name}">${b.icon}</span>`)
+    const allBadges = (_badges[name] || []).slice().sort((a,b)=>{
+      return new Date(b.dateGiven) - new Date(a.dateGiven);
+    });
+    const badgeHtml = allBadges.slice(0,3)
+      .map(b => `<span title="${b.name}${b.note ? ' - ' + b.note : ''}">${b.icon}</span>`)
       .join('');
+    const allTitles = allBadges.map(b => `${b.icon} ${b.name}${b.note ? ' - '+b.note : ''}`).join('\n');
     const li = document.createElement('li');
     if (idx < 3) li.classList.add(`top-${idx + 1}`);
     li.innerHTML = `<span>${idx < 3 ? medals[idx] : ''} ${name}</span>
       <span>${_userPoints[name] || 0} pts | ${_completedChores[name] || 0} chores</span>
-      <span class="scoreboard-badges">${badgeHtml}</span>`;
+      <span class="scoreboard-badges" title="${allTitles}">${badgeHtml}</span>`;
     scoreboardList.appendChild(li);
   });
 }
