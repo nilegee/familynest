@@ -31,14 +31,18 @@ export function setupCalendar({
   eventDesc = eventDescRef;
   addEventBtn = addEventBtnRef;
 
-  addEventBtn.addEventListener('click', addCalendarEvent);
-  calendarBody.addEventListener('click', calendarTableClickHandler);
+  if (addEventBtn) addEventBtn.addEventListener('click', addCalendarEvent);
+  if (calendarBody) calendarBody.addEventListener('click', calendarTableClickHandler);
 
   renderCalendarTable();
   renderCalendarEventsList();
 }
 
 export function renderCalendarTable() {
+  // Defensive: Bail if the calendar body is missing
+  calendarBody = document.getElementById('calendarBody');
+  if (!calendarBody) return;
+
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -71,6 +75,8 @@ export function renderCalendarTable() {
 }
 
 export function renderCalendarEventsList(filterDesc = '') {
+  eventListEl = document.getElementById('eventList');
+  if (!eventListEl) return;
   eventListEl.innerHTML = '';
   const events = Array.isArray(calendarEvents) ? calendarEvents : [];
   let filtered = events;
@@ -104,7 +110,7 @@ function addCalendarEvent() {
   eventStartDate.value = '';
   eventEndDate.value = '';
   eventDesc.value = '';
-  renderCalendarEventsList(contentSearch.value);
+  renderCalendarEventsList(contentSearch ? contentSearch.value : '');
   renderCalendarTable();
 }
 
