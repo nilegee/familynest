@@ -54,6 +54,24 @@ export const defaultWallPosts = [
     edited: false,
     userReactions: {},
     replies: []
+  },
+  {
+    id: generateId(),
+    member: "Mariem",
+    text: "What's your favorite family activity?",
+    date: "2025-07-28T18:00:00",
+    reactions: {},
+    edited: false,
+    userReactions: {},
+    replies: [],
+    poll: {
+      multiple: false,
+      options: [
+        { id: generateId(), text: "Game night", votes: [] },
+        { id: generateId(), text: "Movie time", votes: [] },
+        { id: generateId(), text: "Outdoor adventure", votes: [] }
+      ]
+    }
   }
 ];
 

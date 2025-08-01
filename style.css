@@ -380,6 +380,62 @@ ul.wall-posts li strong {
   font-size: 1rem;
 }
 
+/* ==== Poll creation fields ==== */
+.poll-fields {
+  margin-top: 0.5rem;
+}
+.poll-fields input {
+  display: block;
+  margin: 0.25rem 0;
+  border-radius: 8px;
+  padding: 0.4rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+}
+.poll-fields button {
+  margin-top: 0.25rem;
+}
+
+/* ==== Poll display ==== */
+.poll-question {
+  margin-top: 0.3rem;
+  font-weight: 600;
+}
+.poll-options {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+.poll-options li {
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.poll-options button {
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.poll-bar {
+  flex-grow: 1;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.poll-bar-fill {
+  background: var(--accent-color);
+  height: 100%;
+  display: block;
+}
+.poll-count {
+  font-size: 0.8rem;
+}
+
 ul.qa-list {
   list-style: none;
   padding: 0;
