@@ -6,7 +6,7 @@ import {
   renderSingleProfile,
   computeProfileSimilarities
 } from './profile.js';
-import { saveToSupabase } from './storage.js';
+import { saveToSupabase, saveToLocal } from './storage.js';
 
 export function setupProfileEditListeners() {
   const editProfileBtn = document.getElementById('editProfileBtn');
@@ -39,7 +39,8 @@ export function setupProfileEditListeners() {
     p.profession.title = document.getElementById('editProfessionTitle').value.trim();
     p.funFact = document.getElementById('editFunFact').value.trim();
 
-    saveToSupabase('profiles', profilesData);
+    saveToLocal('profiles', profilesData);
+    saveToSupabase('profiles', { [name]: p }, { skipLocal: true });
     computeProfileSimilarities(name);
     setCurrentEditingProfile(null);
     renderSingleProfile(name);

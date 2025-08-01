@@ -45,12 +45,11 @@ export function saveToLocal(table, data) {
 
 export async function saveToSupabase(table, data, opts = {}) {
   table = resolveTable(table);
+  const { replace = false, skipLocal = false } = opts;
   if (!supabaseEnabled) {
-    saveToLocal(table, data);
+    if (!skipLocal) saveToLocal(table, data);
     return;
   }
-
-  const { replace = false } = opts;
 
   let payload;
   if (table === 'profiles') {
@@ -94,12 +93,12 @@ export async function saveToSupabase(table, data, opts = {}) {
     if (error.code === 'PGRST205') {
       console.info(`Supabase table '${table}' not found - using localStorage.`);
       supabaseEnabled = false;
-      saveToLocal(table, data);
+      if (!skipLocal) saveToLocal(table, data);
       return;
     }
     console.error('Supabase save error:', error);
     showAlert('Could not save data. Changes stored locally.');
-    saveToLocal(table, data);
+    if (!skipLocal) saveToLocal(table, data);
   }
 }
 
