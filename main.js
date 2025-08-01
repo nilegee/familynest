@@ -1,7 +1,7 @@
 // main.js
 
 import { loadAllData } from './storage.js';
-import { renderWallPosts } from './wall.js';
+import { renderWallPosts, setupWallListeners, setWallData } from './wall.js';
 import { renderQA } from './qa.js';
 import { renderCalendarTable, renderCalendarEventsList } from './calendar.js';
 import { renderChores, setChoresData } from './chores.js';
@@ -25,7 +25,6 @@ function assignData(allData) {
   badges = allData.badges;
   completedChores = allData.completedChores;
 
-  // If you want dev/legacy access
   window.wallPosts = wallPosts;
   window.qaList = qaList;
   window.calendarEvents = calendarEvents;
@@ -55,6 +54,10 @@ export async function main() {
   });
   setProfileData(profilesData);
 
+  // WALL MODULE: Inject wall posts array and user key
+  setWallData({ wallPostsRef: wallPosts, userKey: 'familyCurrentUser' });
+  setupWallListeners();
+
   // Tab nav
   setupTabListeners();
   setActiveTab(0);
@@ -81,5 +84,4 @@ export async function main() {
   setupProfileEditListeners();
 }
 
-// Fire it up!
 document.addEventListener('DOMContentLoaded', main);
