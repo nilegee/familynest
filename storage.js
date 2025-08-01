@@ -112,9 +112,9 @@ export async function deleteFromSupabase(table, id) {
     }
     return true;
   }
-  const { data, error } = await supabase.from(table).delete().eq('id', id).select();
-  if (error || !data || data.length === 0) {
-    console.error('Supabase delete error:', error || 'No rows deleted');
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) {
+    console.error('Supabase delete error:', error);
     showAlert('Could not delete data from server. Entry removed locally.');
     const current = loadFromLocal(table, []);
     if (Array.isArray(current)) {
