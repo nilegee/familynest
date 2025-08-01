@@ -3,7 +3,7 @@
 import { escapeHtml, calculateAge } from './util.js';
 import { saveToSupabase } from './storage.js';
 
-// These will be set via setProfileData etc.
+// Internal state - set ONLY via setProfileData
 let profilesData = {};
 let badgeTypes = [];
 let badges = {};
@@ -12,16 +12,22 @@ let completedChores = {};
 export let currentEditingProfile = null;
 export let profileSimilarities = {};
 
-// Optionally let main.js call this to inject/replace shared state.
-export function setProfileData(data, badgeData = {}, badgeTypeData = [], userPts = {}, completed = {}) {
-  profilesData = data;
-  badges = badgeData;
-  badgeTypes = badgeTypeData;
-  userPoints = userPts;
-  completedChores = completed;
+// Main.js should call this to inject all required state objects
+export function setProfileData({
+  profiles = {},
+  badgesData = {},
+  badgeTypesData = [],
+  userPointsData = {},
+  completedChoresData = {}
+} = {}) {
+  profilesData = profiles;
+  badges = badgesData;
+  badgeTypes = badgeTypesData;
+  userPoints = userPointsData;
+  completedChores = completedChoresData;
 }
 
-// Grant badge and increment points should ideally be imported, but can be local here for now:
+// --- Local badge and points helpers ---
 function grantBadge(user, badgeId) {
   const badge = badgeTypes.find(b => b.id === badgeId);
   if (!badge) return;
@@ -29,14 +35,14 @@ function grantBadge(user, badgeId) {
   if (!badges[user].some(b => b.id === badgeId)) {
     badges[user].push(badge);
     saveToSupabase('badges', badges);
-    // You may want to refresh scoreboard here!
+    // Optionally: re-render scoreboard elsewhere
   }
 }
 
 function incrementPoints(user, amount = 1) {
   userPoints[user] = (userPoints[user] || 0) + amount;
   saveToSupabase('user_points', userPoints);
-  // You may want to refresh scoreboard here!
+  // Optionally: re-render scoreboard elsewhere
 }
 
 const adminUsers = ['Ghassan', 'Mariem'];
