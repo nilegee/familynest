@@ -65,4 +65,43 @@ if (profileMenuBtn && profileMenu) {
       profileMenuBtn.setAttribute('aria-expanded', 'false');
     }
   });
+
+  const profileBtn = document.getElementById('profileMenuProfile');
+  const settingsBtn = document.getElementById('profileMenuSettings');
+  const signOutBtn = document.getElementById('signOutBtn');
+  if (profileBtn) {
+    profileBtn.addEventListener('click', () => {
+      const user = localStorage.getItem(currentUserKey);
+      const tabs = Array.from(document.querySelectorAll('nav.sidebar li'));
+      const idx = tabs.findIndex(t => t.textContent.trim() === user);
+      if (idx >= 0) {
+        import('./navigation.js').then(m => m.setActiveTab(idx));
+      }
+      profileMenu.hidden = true;
+    });
+  }
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      alert('Settings coming soon!');
+      profileMenu.hidden = true;
+    });
+  }
+  if (signOutBtn) {
+    signOutBtn.classList.add('sign-out');
+  }
+}
+
+export function updateUserAvatar() {
+  const img = document.getElementById('avatarMenuImg');
+  const user = localStorage.getItem(currentUserKey);
+  const profiles = window.profilesData || {};
+  if (img) {
+    if (user && profiles[user] && profiles[user].avatar) {
+      img.src = profiles[user].avatar;
+      img.alt = `Avatar for ${user}`;
+    } else {
+      img.src = 'icons/default-avatar.svg';
+      img.alt = 'User avatar';
+    }
+  }
 }
