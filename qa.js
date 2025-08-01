@@ -101,13 +101,16 @@ function setupQAListeners() {
       const index = qaList.findIndex(item => item.id === id);
       if (index === -1) return;
 
-      if (e.target.classList.contains('delete-q-btn')) {
+      const delBtn = e.target.closest('.delete-q-btn');
+      const editBtn = e.target.closest('.edit-q-btn');
+
+      if (delBtn) {
         if (confirm('Delete this question?')) {
           qaList.splice(index, 1);
           saveToSupabase('qa_table', qaList);
           renderQA(contentSearch?.value || '');
         }
-      } else if (e.target.classList.contains('edit-q-btn')) {
+      } else if (editBtn) {
         enterQAEditMode(id);
       }
     });

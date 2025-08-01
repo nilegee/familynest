@@ -1,10 +1,10 @@
 // profileEditListeners.js
 
-import { 
-  getProfilesData, 
-  currentEditingProfile, 
-  renderSingleProfile, 
-  computeProfileSimilarities 
+import {
+  getProfilesData,
+  setCurrentEditingProfile,
+  renderSingleProfile,
+  computeProfileSimilarities
 } from './profile.js';
 import { saveToSupabase } from './storage.js';
 
@@ -17,13 +17,14 @@ export function setupProfileEditListeners() {
   
   // Enter edit mode
   editProfileBtn.addEventListener('click', () => {
-    window.currentEditingProfile = profileNameHeading.dataset.name;
-    renderSingleProfile(window.currentEditingProfile);
+    const name = profileNameHeading.dataset.name;
+    setCurrentEditingProfile(name);
+    renderSingleProfile(name);
   });
 
   // Save profile
   saveProfileBtn.addEventListener('click', () => {
-    const name = window.currentEditingProfile;
+    const name = profileNameHeading.dataset.name;
     if (!name) return;
     const profilesData = getProfilesData(); // <-- Use the getter
     const p = profilesData[name];
@@ -40,13 +41,13 @@ export function setupProfileEditListeners() {
 
     saveToSupabase('profiles', profilesData);
     computeProfileSimilarities(name);
-    window.currentEditingProfile = null;
+    setCurrentEditingProfile(null);
     renderSingleProfile(name);
   });
 
   // Cancel edit
   cancelProfileBtn.addEventListener('click', () => {
-    window.currentEditingProfile = null;
+    setCurrentEditingProfile(null);
     renderSingleProfile(profileNameHeading.dataset.name);
   });
 }

@@ -1,5 +1,7 @@
 // scoreboard.js
 
+import { saveToSupabase } from './storage.js';
+
 let _userPoints = {};
 let _badges = {};
 let _completedChores = {};
@@ -25,4 +27,25 @@ export function renderScoreboard() {
       <span class="scoreboard-badges">${badgeHtml}</span>`;
     scoreboardList.appendChild(li);
   });
+}
+
+export function resetScoreboard() {
+  _userPoints = {};
+  _badges = {};
+  _completedChores = {};
+  saveToSupabase('user_points', _userPoints);
+  saveToSupabase('badges', _badges);
+  saveToSupabase('completed_chores', _completedChores);
+  renderScoreboard();
+}
+
+export function setupScoreboardListeners() {
+  const resetBtn = document.getElementById('resetScoreboardBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Reset all scores and badges?')) {
+        resetScoreboard();
+      }
+    });
+  }
 }

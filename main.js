@@ -1,11 +1,11 @@
 // main.js
 
 import { loadAllData } from './storage.js';
-import { renderWallPosts } from './wall.js';
+import { renderWallPosts, setWallData, setupWallListeners } from './wall.js';
 import { setupQA, renderQA } from './qa.js';
 import { setupCalendar, renderCalendarTable, renderCalendarEventsList } from './calendar.js';
 import { renderChores, setChoresData, setupChoresUI } from './chores.js';
-import { renderScoreboard, setScoreboardData } from './scoreboard.js';
+import { renderScoreboard, setScoreboardData, setupScoreboardListeners } from './scoreboard.js';
 import { computeProfileSimilarities, renderSingleProfile, setProfileData } from './profile.js';
 import { updateGreeting, updateAdminVisibility, loadTheme } from './ui.js';
 import { setupTabListeners, setActiveTab } from './navigation.js';
@@ -40,6 +40,10 @@ function assignData(allData) {
 export async function main() {
   const allData = await loadAllData();
   assignData(allData);
+
+  // Wall data and interactions
+  setWallData({ wallPostsRef: wallPosts, userKey: 'familyCurrentUser' });
+  setupWallListeners();
 
   // Scoreboard & chores data (no globals)
   setScoreboardData({ userPoints, badges, completedChores });
@@ -109,6 +113,7 @@ export async function main() {
   // Chores & scoreboard
   renderChores('', false);
   renderScoreboard();
+  setupScoreboardListeners();
 
   // Profile editing
   setupProfileEditListeners();
