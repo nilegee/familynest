@@ -1,6 +1,6 @@
 // calendar.js
 
-import { saveToSupabase } from './storage.js';
+import { saveToSupabase, deleteFromSupabase } from './storage.js';
 import { generateId, showAlert } from './util.js';
 
 let calendarEvents = [];
@@ -33,6 +33,7 @@ export function setupCalendar({
 
   if (addEventBtn) addEventBtn.addEventListener('click', addCalendarEvent);
   if (calendarBody) calendarBody.addEventListener('click', calendarTableClickHandler);
+  if (eventListEl) eventListEl.addEventListener('click', eventListClickHandler);
 
   renderCalendarTable();
   renderCalendarEventsList();
@@ -88,7 +89,9 @@ export function renderCalendarEventsList(filterDesc = '') {
     const li = document.createElement('li');
     li.setAttribute('data-id', ev.id);
     li.setAttribute('tabindex', '0');
-    li.textContent = `${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''}: ${ev.desc}`;
+    li.innerHTML = `<span>${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''}: ${ev.desc}</span>
+      <button class="edit-event-btn">✏️</button>
+      <button class="delete-event-btn">🗑️</button>`;
     eventListEl.appendChild(li);
   });
 }
@@ -105,8 +108,16 @@ function addCalendarEvent() {
     showAlert('End date cannot be before start date.');
     return;
   }
-  calendarEvents.push({ id: generateId(), start, end: end || start, desc });
-  saveToSupabase('calendar_events', calendarEvents);
+  const overlap = calendarEvents.some(ev =>
+    (start <= ev.end && (end || start) >= ev.start)
+  );
+  if (overlap) {
+    showAlert('Event overlaps with an existing one.');
+    return;
+  }
+  const newEvent = { id: generateId(), start, end: end || start, desc };
+  calendarEvents.push(newEvent);
+  saveToSupabase('calendar_events', newEvent);
   eventStartDate.value = '';
   eventEndDate.value = '';
   eventDesc.value = '';
@@ -122,5 +133,33 @@ function calendarTableClickHandler(e) {
   if (filtered.length) {
     const msg = filtered.map(ev => `${ev.desc} (${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''})`).join('\n');
     alert(msg);
+  }
+}
+
+async function eventListClickHandler(e) {
+  const li = e.target.closest('li[data-id]');
+  if (!li) return;
+  const id = li.getAttribute('data-id');
+  const idx = calendarEvents.findIndex(ev => ev.id === id);
+  if (idx === -1) return;
+
+  if (e.target.classList.contains('delete-event-btn')) {
+    if (confirm('Delete this event?')) {
+      calendarEvents.splice(idx, 1);
+      await deleteFromSupabase('calendar_events', id);
+      renderCalendarEventsList(contentSearch ? contentSearch.value : '');
+      renderCalendarTable();
+    }
+  } else if (e.target.classList.contains('edit-event-btn')) {
+    const ev = calendarEvents[idx];
+    const desc = prompt('Event description:', ev.desc) || ev.desc;
+    const start = prompt('Start date (YYYY-MM-DD):', ev.start) || ev.start;
+    const end = prompt('End date (YYYY-MM-DD):', ev.end) || ev.end;
+    ev.desc = desc.trim();
+    ev.start = start;
+    ev.end = end;
+    saveToSupabase('calendar_events', ev);
+    renderCalendarEventsList(contentSearch ? contentSearch.value : '');
+    renderCalendarTable();
   }
 }

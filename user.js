@@ -1,5 +1,6 @@
 import { updateGreeting, updateAdminVisibility } from './ui.js';
-import { adminUsers, adminPin } from './data.js';
+import { adminUsers } from './data.js';
+const adminPin = window.ADMIN_PIN || '';
 
 export function initUserSwitching() {
   const modal = document.getElementById('userSelectModal');

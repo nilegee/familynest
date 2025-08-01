@@ -1,7 +1,6 @@
 // data.js
 
 export const adminUsers = ['Ghassan', 'Mariem'];
-export const adminPin = '4321';
 
 export const badgeTypes = [
   { id: 'super-helper', name: 'Super Helper', desc: 'Completed many chores', icon: '🏅' },

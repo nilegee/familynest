@@ -1,6 +1,6 @@
 // main.js
 
-import { loadAllData } from './storage.js';
+import { loadAllData, saveToSupabase } from './storage.js';
 import { renderWallPosts, setWallData, setupWallListeners } from './wall.js';
 import { setupQA, renderQA } from './qa.js';
 import { setupCalendar, renderCalendarTable, renderCalendarEventsList } from './calendar.js';
@@ -54,7 +54,10 @@ export async function main() {
     completedChores,
     badgeTypes,
     onSave: (chores, completedChores, badges, userPoints) => {
-      // You can save to Supabase here if needed
+      saveToSupabase('chores', chores, { replace: true });
+      saveToSupabase('completed_chores', completedChores);
+      saveToSupabase('badges', badges);
+      saveToSupabase('user_points', userPoints);
     }
   });
   setProfileData(profilesData);
