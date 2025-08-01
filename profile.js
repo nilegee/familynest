@@ -1,7 +1,7 @@
 // profile.js
 
 import { escapeHtml, calculateAge } from './util.js';
-import { saveToSupabase } from './storage.js';
+import { saveToSupabase, saveToLocal } from './storage.js';
 import { renderScoreboard } from './scoreboard.js';
 
 // These will be set via setProfileData etc.
@@ -268,7 +268,8 @@ export function renderSingleProfile(name) {
         const reader = new FileReader();
         reader.onload = () => {
           profile.avatar = reader.result;
-          saveToSupabase('profiles', profilesData);
+          saveToLocal('profiles', profilesData);
+          saveToSupabase('profiles', { [name]: profile }, { skipLocal: true });
           renderSingleProfile(name);
         };
         reader.readAsDataURL(file);
