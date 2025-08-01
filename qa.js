@@ -2,6 +2,7 @@
 
 import { saveToSupabase, deleteFromSupabase } from './storage.js';
 import { escapeHtml, generateId, showAlert } from './util.js';
+import { notify } from './notifications.js';
 
 // These should be injected by main.js/init
 let qaList = [];
@@ -91,6 +92,7 @@ function setupQAListeners() {
       saveToSupabase('qa_table', item);
       if (newQuestionInput) newQuestionInput.value = '';
       renderQA(contentSearch?.value || '');
+      notify('qa', 'New question', q);
     });
   }
 
@@ -131,6 +133,7 @@ function setupQAListeners() {
         saveToSupabase('qa_table', qaItem);
         if (answerInput) answerInput.value = '';
         renderQA(contentSearch?.value || '');
+        notify('answer', 'New answer', qaItem.q);
       }
     });
   }

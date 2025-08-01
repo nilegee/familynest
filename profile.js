@@ -152,6 +152,10 @@ export function renderSingleProfile(name) {
     document.getElementById('editFavoriteHero').value = profile.favoriteHero || '';
     document.getElementById('editProfessionTitle').value = profile.profession.title || '';
     document.getElementById('editFunFact').value = profile.funFact || '';
+    document.getElementById('notifyWall').checked = profile.notifications?.wall !== false;
+    document.getElementById('notifyQa').checked = profile.notifications?.qa !== false;
+    document.getElementById('notifyCalendar').checked = profile.notifications?.calendar !== false;
+    document.getElementById('notifyAnswer').checked = profile.notifications?.answer !== false;
     profileEditForm.querySelectorAll('label').forEach((label) => {
       let icon = label.querySelector('.edit-icon');
       if (!icon) {

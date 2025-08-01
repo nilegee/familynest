@@ -38,6 +38,12 @@ export function setupProfileEditListeners() {
     p.favoriteHero = document.getElementById('editFavoriteHero').value.trim();
     p.profession.title = document.getElementById('editProfessionTitle').value.trim();
     p.funFact = document.getElementById('editFunFact').value.trim();
+    p.notifications = {
+      wall: document.getElementById('notifyWall').checked,
+      qa: document.getElementById('notifyQa').checked,
+      calendar: document.getElementById('notifyCalendar').checked,
+      answer: document.getElementById('notifyAnswer').checked
+    };
 
     saveToLocal('profiles', profilesData);
     saveToSupabase('profiles', { [name]: p }, { skipLocal: true });

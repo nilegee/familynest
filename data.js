@@ -100,7 +100,8 @@ export const defaultProfilesData = {
     favoriteHero: "Sherlock Holmes",
     profession: { title: "HR Business Partner", description: "Helps companies manage their people so everyone works better together." },
     funFact: "Loves Egyptian food and puzzles.",
-    avatar: ""
+    avatar: "",
+    notifications: { wall: true, qa: true, calendar: true, answer: true }
   },
   Mariem: {
     birthdate: "1990-01-30",
@@ -113,7 +114,8 @@ export const defaultProfilesData = {
     favoriteHero: "Wonder Woman",
     profession: { title: "Home Manager with Masters in Computer Science", description: "Takes care of home but also very smart with computers." },
     funFact: "Master chef in the kitchen.",
-    avatar: ""
+    avatar: "",
+    notifications: { wall: true, qa: true, calendar: true, answer: true }
   },
   Yazid: {
     birthdate: "2014-03-28",
@@ -127,7 +129,8 @@ export const defaultProfilesData = {
     profession: { title: "Student in Year 6", description: "Learning many things in school and loves sports." },
     funFact: "Fast runner in school races.",
     avatar: "",
-    dreamJob: "Engineer 🛠️"
+    dreamJob: "Engineer 🛠️",
+    notifications: { wall: true, qa: true, calendar: true, answer: true }
   },
   Yahya: {
     birthdate: "2017-10-23",
@@ -141,7 +144,8 @@ export const defaultProfilesData = {
     profession: { title: "Student in Year 3", description: "Enjoys school and learning new things every day." },
     funFact: "Can draw superheroes very well.",
     avatar: "",
-    dreamJob: "Engineer 🛠️"
+    dreamJob: "Engineer 🛠️",
+    notifications: { wall: true, qa: true, calendar: true, answer: true }
   }
 };
 

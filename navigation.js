@@ -1,6 +1,7 @@
 // navigation.js
 
 import { renderSingleProfile } from './profile.js';
+import { clearTabDot } from './notifications.js';
 
 const sidebarTabs = Array.from(document.querySelectorAll('nav.sidebar li'));
 const bottomTabs = Array.from(document.querySelectorAll('nav.bottom-nav button'));
@@ -17,6 +18,8 @@ export function setActiveTab(index) {
   bottomTabs.forEach((tab, i) => {
     tab.classList.toggle('active', i === index);
   });
+  const activeDataTab = sidebarTabs[index].dataset.tab;
+  if (activeDataTab) clearTabDot(activeDataTab);
   sections.forEach(sec => sec.hidden = true);
   const tabName = sidebarTabs[index].textContent.trim();
   switch (tabName) {

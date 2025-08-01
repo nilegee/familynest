@@ -29,11 +29,11 @@
     <div class="logo">Family Nest 🪺</div>
     <input type="search" id="sidebarSearch" placeholder="Search menu" aria-label="Search navigation menu" autocomplete="off">
     <ul role="menubar" aria-orientation="vertical" id="sidebarMenu">
-      <li role="menuitem" tabindex="0" class="active" aria-current="page"><i class="fa-solid fa-house"></i><span>Wall</span></li>
-      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span></li>
-      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span></li>
-      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-broom"></i><span>Chores</span></li>
-      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span></li>
+      <li data-tab="wall" role="menuitem" tabindex="0" class="active" aria-current="page"><i class="fa-solid fa-house"></i><span>Wall</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="qa" role="menuitem" tabindex="-1"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="calendar" role="menuitem" tabindex="-1"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="chores" role="menuitem" tabindex="-1"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="scoreboard" role="menuitem" tabindex="-1"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Ghassan</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Mariem</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Yazid</span></li>
@@ -241,6 +241,13 @@
           <label for="editFunFact">Fun Fact</label>
           <textarea id="editFunFact" rows="3"></textarea>
         </div>
+        <fieldset class="profile-field">
+          <legend>Notifications</legend>
+          <label><input type="checkbox" id="notifyWall"> Wall posts</label><br>
+          <label><input type="checkbox" id="notifyQa"> Questions</label><br>
+          <label><input type="checkbox" id="notifyCalendar"> Calendar events</label><br>
+          <label><input type="checkbox" id="notifyAnswer"> Answers</label>
+        </fieldset>
         <button type="button" id="saveProfileBtn" class="btn-primary">Save</button>
         <button type="button" id="cancelProfileBtn" class="btn-secondary">Cancel</button>
       </form>
@@ -254,11 +261,11 @@
   </button>
 
   <nav class="bottom-nav" aria-label="Bottom navigation">
-    <button aria-label="Wall"><i class="fa-solid fa-house"></i><span>Wall</span></button>
-    <button aria-label="Q and A"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span></button>
-    <button aria-label="Calendar"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span></button>
-    <button aria-label="Chores"><i class="fa-solid fa-broom"></i><span>Chores</span></button>
-    <button aria-label="Scoreboard"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span></button>
+    <button data-tab="wall" aria-label="Wall"><i class="fa-solid fa-house"></i><span>Wall</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="qa" aria-label="Q and A"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="calendar" aria-label="Calendar"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="chores" aria-label="Chores"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="scoreboard" aria-label="Scoreboard"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></button>
     <button aria-label="Ghassan profile"><i class="fa-solid fa-user"></i><span>Ghassan</span></button>
     <button aria-label="Mariem profile"><i class="fa-solid fa-user"></i><span>Mariem</span></button>
     <button aria-label="Yazid profile"><i class="fa-solid fa-user"></i><span>Yazid</span></button>

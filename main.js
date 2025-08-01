@@ -11,6 +11,7 @@ import { updateGreeting, updateAdminVisibility, loadTheme, updateUserAvatar } fr
 import { setupTabListeners, setActiveTab, setupSidebarToggle } from './navigation.js';
 import { setupProfileEditListeners } from './profileEditListeners.js';
 import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
+import { initNotifications, clearTabDot } from './notifications.js';
 
 let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores;
 
@@ -39,6 +40,7 @@ function assignData(allData) {
 export async function main() {
   const allData = await loadAllData();
   assignData(allData);
+  await initNotifications();
 
   // Wall data and interactions
   setWallData({ wallPostsRef: wallPosts, userKey: 'familyCurrentUser' });
