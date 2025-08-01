@@ -98,6 +98,12 @@ export async function saveToSupabase(table, data, opts = {}) {
       if (!skipLocal) saveToLocal(table, data);
       return;
     }
+    if (error.code === '23502') {
+      console.info(`Supabase schema mismatch for '${table}' - using localStorage.`);
+      supabaseEnabled = false;
+      if (!skipLocal) saveToLocal(table, data);
+      return;
+    }
     console.error('Supabase save error:', error);
     showAlert('Could not save data. Changes stored locally.');
     if (!skipLocal) saveToLocal(table, data);

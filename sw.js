@@ -2,13 +2,13 @@
 
 const CACHE_NAME = 'family-hub-v1';
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/main.js', // Change to your actual entry file
-  '/styles.css',
-  '/icons/default-avatar.svg',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  './',
+  './index.html',
+  './main.js',
+  './style.css',
+  './icons/default-avatar.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   // Add more static assets if needed
 ];
 
