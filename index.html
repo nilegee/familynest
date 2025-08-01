@@ -20,21 +20,10 @@
   <script src="./config.js"></script>
 </head>
 <body data-user="">
+  <div id="authContainer"><button id="signInBtn">Sign in with Google</button></div>
+  <button id="signOutBtn" hidden>Sign Out</button>
 
-  <!-- User Selection Modal -->
-  <div id="userSelectModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1" class="modal-hidden">
-    <div class="modal-content" role="document">
-      <h2 id="modalTitle">Select Your User</h2>
-      <select id="userSelect" aria-label="Select User">
-        <option value="" disabled selected>Select your name</option>
-        <option value="Ghassan">Ghassan</option>
-        <option value="Mariem">Mariem</option>
-        <option value="Yazid">Yazid</option>
-        <option value="Yahya">Yahya</option>
-      </select>
-      <button id="confirmUserBtn" class="btn-primary">Confirm</button>
-    </div>
-  </div>
+
 
   <nav class="sidebar" aria-label="Main navigation">
     <div class="logo">Family Nest 🪺</div>
@@ -50,7 +39,6 @@
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Yazid</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Yahya</span></li>
     </ul>
-    <button id="changeUserBtn" class="btn-secondary" aria-label="Change User">Switch User</button>
   </nav>
 
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -249,6 +237,7 @@
     <button>Yahya</button>
   </nav>
 
+  <script type="module" src="./auth.js"></script>
   <!-- Modular JS loader -->
   <script type="module" src="./main.js"></script>
 </body>

@@ -1,4 +1,3 @@
 // Example configuration for Supabase and admin PIN
 window.SUPABASE_URL = 'https://zlhamcofzyozfyzcgcdg.supabase.co';
 window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo';
-window.ADMIN_PIN = '0000';
