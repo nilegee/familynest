@@ -5,16 +5,16 @@ import { escapeHtml, generateId, showAlert } from './util.js';
 
 // These should be injected by main.js/init
 let qaList = [];
-let qaListEl;
-let contentSearch;
-let askBtn;
-let newQuestionInput;
-let adminUsers;
-let currentUserKey;
-let questionSelect;
-let adminAnswerSection;
-let answerInput;
-let saveAnswerBtn;
+let qaListEl = null;
+let contentSearch = null;
+let askBtn = null;
+let newQuestionInput = null;
+let adminUsers = [];
+let currentUserKey = 'familyCurrentUser';
+let questionSelect = null;
+let adminAnswerSection = null;
+let answerInput = null;
+let saveAnswerBtn = null;
 
 export function setupQA({
   qaListRef,
@@ -30,22 +30,26 @@ export function setupQA({
   saveAnswerBtnRef
 }) {
   qaList = qaListRef;
-  qaListEl = qaListElRef;
-  contentSearch = contentSearchRef;
-  askBtn = askBtnRef;
-  newQuestionInput = newQuestionInputRef;
-  adminUsers = adminUsersRef;
-  currentUserKey = currentUserKeyRef;
-  questionSelect = questionSelectRef;
-  adminAnswerSection = adminAnswerSectionRef;
-  answerInput = answerInputRef;
-  saveAnswerBtn = saveAnswerBtnRef;
+  qaListEl = qaListElRef || document.getElementById('qaList');
+  contentSearch = contentSearchRef || document.getElementById('contentSearch');
+  askBtn = askBtnRef || document.getElementById('askBtn');
+  newQuestionInput = newQuestionInputRef || document.getElementById('newQuestion');
+  adminUsers = adminUsersRef || [];
+  currentUserKey = currentUserKeyRef || 'familyCurrentUser';
+  questionSelect = questionSelectRef || document.getElementById('questionSelect');
+  adminAnswerSection = adminAnswerSectionRef || document.getElementById('adminAnswerSection');
+  answerInput = answerInputRef || document.getElementById('answerInput');
+  saveAnswerBtn = saveAnswerBtnRef || document.getElementById('saveAnswerBtn');
 
   setupQAListeners();
   renderQA();
 }
 
 export function renderQA(filterText = '') {
+  // Defensive: only run if element exists!
+  qaListEl = qaListEl || document.getElementById('qaList');
+  if (!qaListEl) return;
+
   qaListEl.innerHTML = '';
   const list = Array.isArray(qaList) ? qaList : [];
   let filtered = list;
@@ -74,50 +78,58 @@ export function renderQA(filterText = '') {
 }
 
 function setupQAListeners() {
-  askBtn.addEventListener('click', () => {
-    const q = newQuestionInput.value.trim();
-    if (!q) {
-      showAlert('Please enter your question.');
-      return;
-    }
-    const id = generateId();
-    qaList.unshift({ id, q, a: '' });
-    saveToSupabase('qa_table', qaList);
-    newQuestionInput.value = '';
-    renderQA(contentSearch.value);
-  });
-
-  qaListEl.addEventListener('click', (e) => {
-    const li = e.target.closest('li');
-    if (!li) return;
-    const id = li.getAttribute('data-id');
-    const index = qaList.findIndex(item => item.id === id);
-    if (index === -1) return;
-
-    if (e.target.classList.contains('delete-q-btn')) {
-      if (confirm('Delete this question?')) {
-        qaList.splice(index, 1);
-        saveToSupabase('qa_table', qaList);
-        renderQA(contentSearch.value);
+  if (askBtn) {
+    askBtn.addEventListener('click', () => {
+      const q = newQuestionInput?.value.trim();
+      if (!q) {
+        showAlert('Please enter your question.');
+        return;
       }
-    } else if (e.target.classList.contains('edit-q-btn')) {
-      enterQAEditMode(id);
-    }
-  });
+      const id = generateId();
+      qaList.unshift({ id, q, a: '' });
+      saveToSupabase('qa_table', qaList);
+      if (newQuestionInput) newQuestionInput.value = '';
+      renderQA(contentSearch?.value || '');
+    });
+  }
 
-  saveAnswerBtn.addEventListener('click', () => {
-    const selected = questionSelect.value;
-    const answer = answerInput.value.trim();
-    if (!selected || !answer) {
-      showAlert('Select a question and type an answer.');
-      return;
-    }
-    const qaItem = qaList.find(item => item.id === selected);
-    qaItem.a = answer;
-    saveToSupabase('qa_table', qaList);
-    answerInput.value = '';
-    renderQA(contentSearch.value);
-  });
+  if (qaListEl) {
+    qaListEl.addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (!li) return;
+      const id = li.getAttribute('data-id');
+      const index = qaList.findIndex(item => item.id === id);
+      if (index === -1) return;
+
+      if (e.target.classList.contains('delete-q-btn')) {
+        if (confirm('Delete this question?')) {
+          qaList.splice(index, 1);
+          saveToSupabase('qa_table', qaList);
+          renderQA(contentSearch?.value || '');
+        }
+      } else if (e.target.classList.contains('edit-q-btn')) {
+        enterQAEditMode(id);
+      }
+    });
+  }
+
+  if (saveAnswerBtn) {
+    saveAnswerBtn.addEventListener('click', () => {
+      const selected = questionSelect?.value;
+      const answer = answerInput?.value.trim();
+      if (!selected || !answer) {
+        showAlert('Select a question and type an answer.');
+        return;
+      }
+      const qaItem = qaList.find(item => item.id === selected);
+      if (qaItem) {
+        qaItem.a = answer;
+        saveToSupabase('qa_table', qaList);
+        if (answerInput) answerInput.value = '';
+        renderQA(contentSearch?.value || '');
+      }
+    });
+  }
 }
 
 function enterQAEditMode(id) {
@@ -147,15 +159,16 @@ function enterQAEditMode(id) {
     qaItem.q = newQ;
     qaItem.a = newA;
     saveToSupabase('qa_table', qaList);
-    renderQA(contentSearch.value);
+    renderQA(contentSearch?.value || '');
   });
   cancelBtn.addEventListener('click', () => {
-    renderQA(contentSearch.value);
+    renderQA(contentSearch?.value || '');
   });
   qEdit.focus();
 }
 
 function renderAdminQuestionOptions() {
+  if (!questionSelect) return;
   questionSelect.innerHTML = '';
   if (!Array.isArray(qaList)) return;
   qaList.filter(item => !item.a).forEach(item => {
@@ -164,5 +177,7 @@ function renderAdminQuestionOptions() {
     option.textContent = item.q;
     questionSelect.appendChild(option);
   });
-  adminAnswerSection.hidden = questionSelect.options.length === 0;
+  if (adminAnswerSection) {
+    adminAnswerSection.hidden = questionSelect.options.length === 0;
+  }
 }
