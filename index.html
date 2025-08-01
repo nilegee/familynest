@@ -22,7 +22,6 @@
 </head>
 <body data-user="">
   <div id="authContainer"><button id="signInBtn">Sign in with Google</button></div>
-  <button id="signOutBtn" hidden>Sign Out</button>
 
 
 
@@ -58,6 +57,12 @@
           <span id="notificationBadge" class="notification-badge" aria-hidden="true"></span>
         </button>
         <button id="themeToggleBtn" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        <div class="profile-dropdown">
+          <button id="profileMenuBtn" aria-label="Account menu" hidden><i class="fa-solid fa-user"></i></button>
+          <div id="profileMenu" class="profile-menu" hidden>
+            <button id="signOutBtn">Sign Out</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -222,20 +227,20 @@
     </section>
   </main>
 
-  <button id="floatingMenuBtn" class="floating-menu-btn" aria-label="Open menu">
-    <i class="fa-solid fa-bars"></i>
+  <button id="floatingMenuBtn" class="floating-menu-btn" aria-label="Open menu" title="Menu">
+    <i class="fa-solid fa-ellipsis-vertical"></i>
   </button>
 
   <nav class="bottom-nav" aria-label="Bottom navigation">
-    <button>Wall</button>
-    <button>Q&amp;A</button>
-    <button>Calendar</button>
-    <button>Chores</button>
-    <button>Scoreboard</button>
-    <button>Ghassan</button>
-    <button>Mariem</button>
-    <button>Yazid</button>
-    <button>Yahya</button>
+    <button aria-label="Wall"><i class="fa-solid fa-house"></i><span>Wall</span></button>
+    <button aria-label="Q and A"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span></button>
+    <button aria-label="Calendar"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span></button>
+    <button aria-label="Chores"><i class="fa-solid fa-broom"></i><span>Chores</span></button>
+    <button aria-label="Scoreboard"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span></button>
+    <button aria-label="Ghassan profile"><i class="fa-solid fa-user"></i><span>Ghassan</span></button>
+    <button aria-label="Mariem profile"><i class="fa-solid fa-user"></i><span>Mariem</span></button>
+    <button aria-label="Yazid profile"><i class="fa-solid fa-user"></i><span>Yazid</span></button>
+    <button aria-label="Yahya profile"><i class="fa-solid fa-user"></i><span>Yahya</span></button>
   </nav>
 
   <script type="module" src="./auth.js"></script>

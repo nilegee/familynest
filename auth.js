@@ -15,13 +15,18 @@ const allowed = {
 export function initAuth(onSignedIn) {
   const signInBtn = document.getElementById('signInBtn');
   const signOutBtn = document.getElementById('signOutBtn');
+  const profileMenu = document.getElementById('profileMenu');
+  const profileMenuBtn = document.getElementById('profileMenuBtn');
   const authContainer = document.getElementById('authContainer');
 
   signInBtn?.addEventListener('click', () => {
     supabase.auth.signInWithOAuth({ provider: 'google' });
   });
 
-  signOutBtn?.addEventListener('click', () => supabase.auth.signOut());
+  signOutBtn?.addEventListener('click', () => {
+    profileMenu.hidden = true;
+    supabase.auth.signOut();
+  });
 
   supabase.auth.onAuthStateChange(async (_event, session) => {
     const user = session?.user || null;
@@ -30,6 +35,7 @@ export function initAuth(onSignedIn) {
       document.body.dataset.user = user.email;
       authContainer.hidden = true;
       signOutBtn.hidden = false;
+      profileMenuBtn.hidden = false;
       if (typeof onSignedIn === 'function') onSignedIn();
     } else {
       if (user && !allowed[user.email]) {
@@ -40,6 +46,7 @@ export function initAuth(onSignedIn) {
       document.body.dataset.user = '';
       authContainer.hidden = false;
       signOutBtn.hidden = true;
+      profileMenuBtn.hidden = true;
     }
   });
 }

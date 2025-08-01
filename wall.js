@@ -61,10 +61,10 @@ export function renderWallPosts(filterText = '') {
       <span class="wall-post-date" title="${formatDateLocal(post.date)}">(${timeAgo(post.date)})${post.edited ? ' (edited)' : ''}</span>
       <div class="wall-post-text">${safeText}</div>
       <div class="wall-post-actions" aria-label="Post actions">
-        <button class="like-btn reaction-btn" aria-label="Like post" data-reaction="👍">Like ${post.reactions && post.reactions['👍'] ? post.reactions['👍'] : 0}</button>
+        <button class="reaction-btn" aria-label="Thumbs up" data-reaction="👍">👍 ${post.reactions && post.reactions['👍'] ? post.reactions['👍'] : 0}</button>
+        <button class="reaction-btn" aria-label="Heart" data-reaction="❤️">❤️ ${post.reactions && post.reactions['❤️'] ? post.reactions['❤️'] : 0}</button>
+        <button class="reaction-btn" aria-label="Laugh" data-reaction="😂">😂 ${post.reactions && post.reactions['😂'] ? post.reactions['😂'] : 0}</button>
         <button class="reply-btn" aria-label="Reply to post">Reply</button>
-        <button class="reaction-btn" aria-label="Heart reaction" data-reaction="❤️">❤️ ${post.reactions && post.reactions['❤️'] ? post.reactions['❤️'] : 0}</button>
-        <button class="reaction-btn" aria-label="Laugh reaction" data-reaction="😂">😂 ${post.reactions && post.reactions['😂'] ? post.reactions['😂'] : 0}</button>
         <button class="edit-btn" aria-label="Edit post"><i class="fa-solid fa-pen-to-square"></i></button>
         <button class="delete-btn" aria-label="Delete post"><i class="fa-solid fa-trash"></i></button>
       </div>
@@ -101,7 +101,8 @@ export function setupWallListeners() {
       } else if (btn.classList.contains('delete-btn')) {
         if (confirm('Delete this post?')) {
           wallPosts.splice(postIndex, 1);
-          await deleteFromSupabase('wall_posts', postId);
+          const ok = await deleteFromSupabase('wall_posts', postId);
+          if (!ok) showAlert('Post could not be removed from server.');
           saveToLocal('wall_posts', wallPosts);
           renderWallPosts(contentSearch ? contentSearch.value : '');
         }

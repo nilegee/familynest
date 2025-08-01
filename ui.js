@@ -50,3 +50,19 @@ if (themeToggleBtn) {
     themeToggleBtn.textContent = current === 'dark' ? '☀️' : '🌙';
   });
 }
+
+const profileMenuBtn = document.getElementById('profileMenuBtn');
+const profileMenu = document.getElementById('profileMenu');
+if (profileMenuBtn && profileMenu) {
+  profileMenuBtn.addEventListener('click', () => {
+    const isOpen = !profileMenu.hidden;
+    profileMenu.hidden = isOpen;
+    profileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+  });
+  document.addEventListener('click', (e) => {
+    if (!profileMenu.contains(e.target) && e.target !== profileMenuBtn) {
+      profileMenu.hidden = true;
+      profileMenuBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
