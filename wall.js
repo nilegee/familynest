@@ -82,7 +82,7 @@ export function setupWallListeners() {
   const contentSearch = getContentSearch();
 
   if (wallPostsList) {
-    wallPostsList.addEventListener('click', e => {
+    wallPostsList.addEventListener('click', async e => {
       const li = e.target.closest('li[data-id]');
       if (!li) return;
       const postId = li.getAttribute('data-id');
@@ -101,8 +101,8 @@ export function setupWallListeners() {
       } else if (btn.classList.contains('delete-btn')) {
         if (confirm('Delete this post?')) {
           wallPosts.splice(postIndex, 1);
-          deleteFromSupabase('wall_posts', postId);
-          saveToSupabase('wall_posts', wallPosts);
+          await deleteFromSupabase('wall_posts', postId);
+          await saveToSupabase('wall_posts', wallPosts);
           renderWallPosts(contentSearch ? contentSearch.value : '');
         }
       }
