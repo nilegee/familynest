@@ -1,6 +1,6 @@
 // profile.js
 
-import { escapeHtml, calculateAge, generateId } from './util.js';
+import { escapeHtml, calculateAge, generateId, normalizeBadgeArray } from './util.js';
 import { saveToSupabase, saveToLocal } from './storage.js';
 import { renderScoreboard } from './scoreboard.js';
 
@@ -36,7 +36,7 @@ export function setProfileData(
 function grantBadge(user, badgeId, note = '') {
   const badge = badgeTypes.find((b) => b.id === badgeId);
   if (!badge) return;
-  badges[user] = badges[user] || [];
+  badges[user] = normalizeBadgeArray(badges[user]);
   const newBadge = {
     badgeId,
     name: badge.name,

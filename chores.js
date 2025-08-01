@@ -1,6 +1,6 @@
 // chores.js
 
-import { showAlert } from "./util.js";
+import { showAlert, normalizeBadgeArray } from "./util.js";
 import { renderScoreboard } from './scoreboard.js';
 
 let _chores = [];
@@ -193,7 +193,7 @@ export function setupChoresUI({
 function grantBadge(user, badgeId, note = '') {
   const badge = _badgeTypes.find(b => b.id === badgeId);
   if (!badge) return;
-  _badges[user] = _badges[user] || [];
+  _badges[user] = normalizeBadgeArray(_badges[user]);
   const newBadge = {
     badgeId,
     name: badge.name,

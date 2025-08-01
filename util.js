@@ -77,3 +77,18 @@ export function generateId() {
 export function showAlert(message) {
   alert(message);
 }
+
+export function normalizeBadgeArray(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {
+      return [];
+    }
+  } else if (raw && typeof raw === 'object') {
+    return Object.values(raw);
+  }
+  return [];
+}
