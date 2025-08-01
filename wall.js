@@ -1,6 +1,6 @@
 // wall.js
 
-import { saveToSupabase, deleteFromSupabase } from './storage.js';
+import { saveToSupabase, deleteFromSupabase, saveToLocal } from './storage.js';
 import { escapeHtml, formatDateLocal, timeAgo, generateId, showAlert } from './util.js';
 
 // These should be injected by main.js/init, but we always lookup live DOM
@@ -102,6 +102,7 @@ export function setupWallListeners() {
         if (confirm('Delete this post?')) {
           wallPosts.splice(postIndex, 1);
           await deleteFromSupabase('wall_posts', postId);
+          saveToLocal('wall_posts', wallPosts);
           renderWallPosts(contentSearch ? contentSearch.value : '');
         }
       }
@@ -132,6 +133,7 @@ export function setupWallListeners() {
       };
       wallPosts.unshift(newPost);
       saveToSupabase('wall_posts', newPost);
+      saveToLocal('wall_posts', wallPosts);
       getNewWallPostInput().value = '';
       renderWallPosts(getContentSearch() ? getContentSearch().value : '');
     });
@@ -165,6 +167,7 @@ function handleReaction(postIndex, reaction, filterText) {
   }
   post.userReactions[currentUser] = userReacts;
   saveToSupabase('wall_posts', post);
+  saveToLocal('wall_posts', wallPosts);
   renderWallPosts(filterText);
 }
 
@@ -185,6 +188,7 @@ function handleReply(postIndex, filterText) {
     date: new Date().toISOString()
   });
   saveToSupabase('wall_posts', post);
+  saveToLocal('wall_posts', wallPosts);
   renderWallPosts(filterText);
 }
 
@@ -218,6 +222,7 @@ function enterWallPostEditMode(postId, filterText) {
     post.edited = true;
     post.date = new Date().toISOString();
     saveToSupabase('wall_posts', post);
+    saveToLocal('wall_posts', wallPosts);
     renderWallPosts(filterText);
   });
 
