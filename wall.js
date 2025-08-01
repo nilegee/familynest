@@ -6,6 +6,8 @@ import { escapeHtml, formatDateLocal, timeAgo, generateId, showAlert } from './u
 // These should be injected by main.js/init, but we always lookup live DOM
 let wallPosts = [];
 let currentUserKey = 'familyCurrentUser';
+// prevent attaching listeners multiple times when main() runs again
+let wallListenersInitialized = false;
 
 export function setWallData({ wallPostsRef = [], userKey = 'familyCurrentUser' }) {
   wallPosts = wallPostsRef;
@@ -76,6 +78,10 @@ export function renderWallPosts(filterText = '') {
 
 // All events setup in one go, after DOMContentLoaded
 export function setupWallListeners() {
+  if (wallListenersInitialized) {
+    return;
+  }
+
   const wallPostsList = getWallPostsList();
   const addWallPostBtn = getAddWallPostBtn();
   const newWallPostInput = getNewWallPostInput();
@@ -146,6 +152,8 @@ export function setupWallListeners() {
       renderWallPosts(contentSearch.value);
     });
   }
+
+  wallListenersInitialized = true;
 }
 
 function handleReaction(postIndex, reaction, filterText) {
