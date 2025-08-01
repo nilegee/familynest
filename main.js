@@ -8,7 +8,7 @@ import { renderChores, setChoresData, setupChoresUI } from './chores.js';
 import { renderScoreboard, setScoreboardData, setupScoreboardListeners } from './scoreboard.js';
 import { computeProfileSimilarities, renderSingleProfile, setProfileData } from './profile.js';
 import { updateGreeting, updateAdminVisibility, loadTheme } from './ui.js';
-import { setupTabListeners, setActiveTab } from './navigation.js';
+import { setupTabListeners, setActiveTab, setupSidebarToggle } from './navigation.js';
 import { setupProfileEditListeners } from './profileEditListeners.js';
 import { initUserSwitching } from './user.js';
 import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
@@ -97,6 +97,7 @@ export async function main() {
   // Tab nav
   setupTabListeners();
   setActiveTab(0);
+  setupSidebarToggle();
 
   // Render content (all null-checked in modules)
   renderWallPosts();
