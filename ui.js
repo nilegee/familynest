@@ -67,7 +67,6 @@ if (profileMenuBtn && profileMenu) {
   });
 
   const profileBtn = document.getElementById('profileMenuProfile');
-  const settingsBtn = document.getElementById('profileMenuSettings');
   const signOutBtn = document.getElementById('signOutBtn');
   if (profileBtn) {
     profileBtn.addEventListener('click', () => {
@@ -77,12 +76,6 @@ if (profileMenuBtn && profileMenu) {
       if (idx >= 0) {
         import('./navigation.js').then(m => m.setActiveTab(idx));
       }
-      profileMenu.hidden = true;
-    });
-  }
-  if (settingsBtn) {
-    settingsBtn.addEventListener('click', () => {
-      alert('Settings coming soon!');
       profileMenu.hidden = true;
     });
   }
