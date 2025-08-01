@@ -1,6 +1,6 @@
 // wall.js
 
-import { saveToSupabase } from './storage.js';
+import { saveToSupabase, deleteFromSupabase } from './storage.js';
 import { escapeHtml, formatDateLocal, timeAgo, generateId, showAlert } from './util.js';
 
 // These should be injected by main.js/init, but we always lookup live DOM
@@ -32,7 +32,9 @@ export function renderWallPosts(filterText = '') {
   if (!wallPostsList) return; // DOM not ready yet!
   wallPostsList.innerHTML = '';
 
-  const posts = Array.isArray(wallPosts) ? wallPosts : [];
+  const posts = Array.isArray(wallPosts)
+    ? [...wallPosts].sort((a, b) => new Date(b.date) - new Date(a.date))
+    : [];
   let filteredPosts = posts;
   if (filterText) {
     const f = filterText.toLowerCase();
@@ -99,6 +101,7 @@ export function setupWallListeners() {
       } else if (btn.classList.contains('delete-btn')) {
         if (confirm('Delete this post?')) {
           wallPosts.splice(postIndex, 1);
+          deleteFromSupabase('wall_posts', postId);
           saveToSupabase('wall_posts', wallPosts);
           renderWallPosts(contentSearch ? contentSearch.value : '');
         }
