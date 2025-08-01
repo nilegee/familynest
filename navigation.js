@@ -73,3 +73,24 @@ export function setupTabListeners() {
     });
   });
 }
+
+export function setupSidebarToggle() {
+  const sidebar = document.querySelector('nav.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const floatBtn = document.getElementById('floatingMenuBtn');
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+
+  if (!sidebar || !overlay) return;
+
+  function toggle() {
+    const isOpen = sidebar.classList.toggle('open');
+    overlay.classList.toggle('visible', isOpen);
+    if (floatBtn) floatBtn.setAttribute('aria-expanded', isOpen);
+    if (hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', isOpen);
+  }
+
+  [floatBtn, hamburgerBtn].forEach(btn => {
+    if (btn) btn.addEventListener('click', toggle);
+  });
+  overlay.addEventListener('click', toggle);
+}
