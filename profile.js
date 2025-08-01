@@ -2,6 +2,7 @@
 
 import { escapeHtml, calculateAge } from './util.js';
 import { saveToSupabase } from './storage.js';
+import { renderScoreboard } from './scoreboard.js';
 
 // These will be set via setProfileData etc.
 let profilesData = {};
@@ -11,6 +12,10 @@ let userPoints = {};
 let completedChores = {};
 export let currentEditingProfile = null;
 export let profileSimilarities = {};
+
+export function setCurrentEditingProfile(name) {
+  currentEditingProfile = name;
+}
 
 // Optionally let main.js call this to inject/replace shared state.
 export function setProfileData(
@@ -35,14 +40,14 @@ function grantBadge(user, badgeId) {
   if (!badges[user].some((b) => b.id === badgeId)) {
     badges[user].push(badge);
     saveToSupabase('badges', badges);
-    // You may want to refresh scoreboard here!
+    renderScoreboard();
   }
 }
 
 function incrementPoints(user, amount = 1) {
   userPoints[user] = (userPoints[user] || 0) + amount;
   saveToSupabase('user_points', userPoints);
-  // You may want to refresh scoreboard here!
+  renderScoreboard();
 }
 
 const adminUsers = ['Ghassan', 'Mariem'];
