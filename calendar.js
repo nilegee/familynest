@@ -2,6 +2,7 @@
 
 import { saveToSupabase, deleteFromSupabase } from './storage.js';
 import { generateId, showAlert } from './util.js';
+import { notify } from './notifications.js';
 
 let calendarEvents = [];
 let calendarBody;
@@ -123,6 +124,7 @@ function addCalendarEvent() {
   eventDesc.value = '';
   renderCalendarEventsList(contentSearch ? contentSearch.value : '');
   renderCalendarTable();
+  notify('calendar', 'New event', desc);
 }
 
 function calendarTableClickHandler(e) {

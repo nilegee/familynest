@@ -105,6 +105,7 @@ nav.sidebar li {
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
   user-select: none;
+  position: relative;
 }
 nav.sidebar li i {
   width: 20px;
@@ -289,6 +290,16 @@ main.content {
   padding: 2px 6px;
   display: none;
   user-select: none;
+}
+.tab-notify-dot {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: #f44336;
+  border-radius: 50%;
+  display: none;
 }
 
 h1, h2, h3 {
@@ -1111,6 +1122,7 @@ nav.bottom-nav button {
   align-items: center;
   gap: 2px;
   font-size: 0.75rem;
+  position: relative;
 }
 nav.bottom-nav button i {
   font-size: 1.2rem;

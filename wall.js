@@ -2,6 +2,7 @@
 
 import { saveToSupabase, deleteFromSupabase, saveToLocal } from './storage.js';
 import { escapeHtml, formatDateLocal, timeAgo, generateId, showAlert } from './util.js';
+import { notify } from './notifications.js';
 
 // These should be injected by main.js/init, but we always lookup live DOM
 let wallPosts = [];
@@ -215,6 +216,7 @@ export function setupWallListeners() {
       saveToLocal('wall_posts', wallPosts);
       getNewWallPostInput().value = '';
       renderWallPosts(getContentSearch() ? getContentSearch().value : '');
+      notify('wall', 'New wall post', `${currentUser}: ${text}`);
     });
   }
 
