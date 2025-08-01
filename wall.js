@@ -102,7 +102,6 @@ export function setupWallListeners() {
         if (confirm('Delete this post?')) {
           wallPosts.splice(postIndex, 1);
           await deleteFromSupabase('wall_posts', postId);
-          await saveToSupabase('wall_posts', wallPosts);
           renderWallPosts(contentSearch ? contentSearch.value : '');
         }
       }
@@ -121,7 +120,7 @@ export function setupWallListeners() {
         showAlert('Please select your user first.');
         return;
       }
-      wallPosts.unshift({
+      const newPost = {
         id: generateId(),
         member: currentUser,
         text,
@@ -130,8 +129,9 @@ export function setupWallListeners() {
         edited: false,
         userReactions: {},
         replies: []
-      });
-      saveToSupabase('wall_posts', wallPosts);
+      };
+      wallPosts.unshift(newPost);
+      saveToSupabase('wall_posts', newPost);
       getNewWallPostInput().value = '';
       renderWallPosts(getContentSearch() ? getContentSearch().value : '');
     });
@@ -164,7 +164,7 @@ function handleReaction(postIndex, reaction, filterText) {
     post.reactions[reaction] = (post.reactions[reaction] || 0) + 1;
   }
   post.userReactions[currentUser] = userReacts;
-  saveToSupabase('wall_posts', wallPosts);
+  saveToSupabase('wall_posts', post);
   renderWallPosts(filterText);
 }
 
@@ -184,7 +184,7 @@ function handleReply(postIndex, filterText) {
     text: replyText.trim(),
     date: new Date().toISOString()
   });
-  saveToSupabase('wall_posts', wallPosts);
+  saveToSupabase('wall_posts', post);
   renderWallPosts(filterText);
 }
 
@@ -217,7 +217,7 @@ function enterWallPostEditMode(postId, filterText) {
     post.text = newText;
     post.edited = true;
     post.date = new Date().toISOString();
-    saveToSupabase('wall_posts', wallPosts);
+    saveToSupabase('wall_posts', post);
     renderWallPosts(filterText);
   });
 

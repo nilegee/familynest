@@ -19,8 +19,8 @@ export function resolveTable(name) {
 }
 
 // ========== Supabase Setup ==========
-const supabaseUrl = window.SUPABASE_URL || "https://zlhamcofzyozfyzcgcdg.supabase.co";
-const supabaseKey = window.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaGFtY29menlvemZ5emNnY2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTM0MjIsImV4cCI6MjA2OTUyOTQyMn0.CqMDQgfpbyWTi3RgA_eitd_Qf7aJu0WruETtws6B5Mo";
+const supabaseUrl = window.SUPABASE_URL || '';
+const supabaseKey = window.SUPABASE_KEY || '';
 if (!supabaseUrl || !supabaseKey) {
   alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
 }
@@ -39,12 +39,14 @@ export function saveToLocal(table, data) {
   }
 }
 
-export async function saveToSupabase(table, data) {
+export async function saveToSupabase(table, data, opts = {}) {
   table = resolveTable(table);
   if (!supabaseEnabled) {
     saveToLocal(table, data);
     return;
   }
+
+  const { replace = false } = opts;
 
   let payload;
   if (table === 'profiles') {
@@ -65,9 +67,22 @@ export async function saveToSupabase(table, data) {
       dreamJob: value.dreamJob || null,
     }));
   } else {
-    payload = Array.isArray(data)
-      ? data
-      : Object.entries(data).map(([name, value]) => ({ name, value }));
+    if (Array.isArray(data)) {
+      payload = data;
+    } else if (data && typeof data === 'object' && 'id' in data) {
+      payload = [data];
+    } else {
+      payload = Object.entries(data).map(([name, value]) => ({ name, value }));
+    }
+  }
+
+  if (replace && Array.isArray(data)) {
+    try {
+      const ids = data.map(d => `'${d.id}'`).join(',');
+      await supabase.from(table).delete().not('id', 'in', `(${ids || 'null'})`);
+    } catch (e) {
+      console.warn('Replace mode cleanup failed:', e);
+    }
   }
 
   const { error } = await supabase.from(table).upsert(payload);
@@ -79,7 +94,8 @@ export async function saveToSupabase(table, data) {
       return;
     }
     console.error('Supabase save error:', error);
-    showAlert('Could not save data.');
+    showAlert('Could not save data. Changes stored locally.');
+    saveToLocal(table, data);
   }
 }
 
@@ -96,7 +112,12 @@ export async function deleteFromSupabase(table, id) {
   const { error } = await supabase.from(table).delete().eq('id', id);
   if (error) {
     console.error('Supabase delete error:', error);
-    showAlert('Could not delete data.');
+    showAlert('Could not delete data. Entry will be removed locally.');
+    const current = loadFromLocal(table, []);
+    if (Array.isArray(current)) {
+      const filtered = current.filter(item => item.id !== id);
+      saveToLocal(table, filtered);
+    }
   }
 }
 
@@ -124,7 +145,8 @@ export async function loadFromSupabase(table, defaultValue) {
       return loadFromLocal(table, defaultValue);
     }
     console.warn('Supabase load failed:', error);
-    return defaultValue;
+    supabaseEnabled = false;
+    return loadFromLocal(table, defaultValue);
   }
   if (table === 'profiles') {
     const obj = {};

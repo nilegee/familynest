@@ -1,5 +1,6 @@
 // chores.js
 
+import { showAlert } from "./util.js";
 import { renderScoreboard } from './scoreboard.js';
 
 let _chores = [];
@@ -119,6 +120,14 @@ function handleChoreCheck(item, checkbox, li) {
 // ---- ADD/DELETE CHORE ----
 
 export function addChore({ desc, assignedTo, due, daily }) {
+  if (!desc) {
+    showAlert('Description required.');
+    return;
+  }
+  if (!assignedTo) {
+    showAlert('Please assign the chore.');
+    return;
+  }
   const id = '_' + Math.random().toString(36).slice(2, 11);
   const newChore = {
     id,

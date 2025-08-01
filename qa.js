@@ -1,6 +1,6 @@
 // qa.js
 
-import { saveToSupabase } from './storage.js';
+import { saveToSupabase, deleteFromSupabase } from './storage.js';
 import { escapeHtml, generateId, showAlert } from './util.js';
 
 // These should be injected by main.js/init
@@ -86,15 +86,16 @@ function setupQAListeners() {
         return;
       }
       const id = generateId();
-      qaList.unshift({ id, q, a: '' });
-      saveToSupabase('qa_table', qaList);
+      const item = { id, q, a: '' };
+      qaList.unshift(item);
+      saveToSupabase('qa_table', item);
       if (newQuestionInput) newQuestionInput.value = '';
       renderQA(contentSearch?.value || '');
     });
   }
 
   if (qaListEl) {
-    qaListEl.addEventListener('click', (e) => {
+    qaListEl.addEventListener('click', async (e) => {
       const li = e.target.closest('li');
       if (!li) return;
       const id = li.getAttribute('data-id');
@@ -106,8 +107,8 @@ function setupQAListeners() {
 
       if (delBtn) {
         if (confirm('Delete this question?')) {
-          qaList.splice(index, 1);
-          saveToSupabase('qa_table', qaList);
+          const [removed] = qaList.splice(index, 1);
+          await deleteFromSupabase('qa_table', removed.id);
           renderQA(contentSearch?.value || '');
         }
       } else if (editBtn) {
@@ -127,7 +128,7 @@ function setupQAListeners() {
       const qaItem = qaList.find(item => item.id === selected);
       if (qaItem) {
         qaItem.a = answer;
-        saveToSupabase('qa_table', qaList);
+        saveToSupabase('qa_table', qaItem);
         if (answerInput) answerInput.value = '';
         renderQA(contentSearch?.value || '');
       }
@@ -161,7 +162,7 @@ function enterQAEditMode(id) {
     }
     qaItem.q = newQ;
     qaItem.a = newA;
-    saveToSupabase('qa_table', qaList);
+    saveToSupabase('qa_table', qaItem);
     renderQA(contentSearch?.value || '');
   });
   cancelBtn.addEventListener('click', () => {
