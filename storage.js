@@ -83,6 +83,23 @@ export async function saveToSupabase(table, data) {
   }
 }
 
+export async function deleteFromSupabase(table, id) {
+  table = resolveTable(table);
+  if (!supabaseEnabled) {
+    const current = loadFromLocal(table, []);
+    if (Array.isArray(current)) {
+      const filtered = current.filter(item => item.id !== id);
+      saveToLocal(table, filtered);
+    }
+    return;
+  }
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) {
+    console.error('Supabase delete error:', error);
+    showAlert('Could not delete data.');
+  }
+}
+
 export function loadFromLocal(table, defaultValue) {
   table = resolveTable(table);
   try {
