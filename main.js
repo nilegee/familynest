@@ -1,8 +1,8 @@
 // main.js
 
 import { loadAllData } from './storage.js';
-import { renderWallPosts, setupWallListeners, setWallData } from './wall.js';
-import { renderQA } from './qa.js';
+import { renderWallPosts } from './wall.js';
+import { setupQA, renderQA } from './qa.js';
 import { renderCalendarTable, renderCalendarEventsList } from './calendar.js';
 import { renderChores, setChoresData } from './chores.js';
 import { renderScoreboard, setScoreboardData } from './scoreboard.js';
@@ -10,7 +10,7 @@ import { computeProfileSimilarities, renderSingleProfile, setProfileData } from 
 import { updateGreeting, updateAdminVisibility, loadTheme } from './ui.js';
 import { setupTabListeners, setActiveTab } from './navigation.js';
 import { setupProfileEditListeners } from './profileEditListeners.js';
-import { badgeTypes } from './data.js'; // badgeTypes comes from data.js
+import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
 
 let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores;
 
@@ -25,6 +25,7 @@ function assignData(allData) {
   badges = allData.badges;
   completedChores = allData.completedChores;
 
+  // If you want dev/legacy access
   window.wallPosts = wallPosts;
   window.qaList = qaList;
   window.calendarEvents = calendarEvents;
@@ -39,7 +40,7 @@ export async function main() {
   const allData = await loadAllData();
   assignData(allData);
 
-  // Inject data/state into modules (NO globals, everything passed in)
+  // Scoreboard & chores data (no globals)
   setScoreboardData({ userPoints, badges, completedChores });
   setChoresData({
     chores,
@@ -48,21 +49,31 @@ export async function main() {
     completedChores,
     badgeTypes,
     onSave: (chores, completedChores, badges, userPoints) => {
-      // Optional: Call your save logic here for Supabase/localStorage
-      // Example: saveToSupabase('chores', chores)
+      // You can save to Supabase here if needed
     }
   });
   setProfileData(profilesData);
 
-  // WALL MODULE: Inject wall posts array and user key
-  setWallData({ wallPostsRef: wallPosts, userKey: 'familyCurrentUser' });
-  setupWallListeners();
+  // Q&A robust setup (NO undefined errors!)
+  setupQA({
+    qaListRef: qaList,
+    qaListElRef: document.getElementById('qaList'),
+    contentSearchRef: document.getElementById('contentSearch'),
+    askBtnRef: document.getElementById('askBtn'),
+    newQuestionInputRef: document.getElementById('newQuestion'),
+    adminUsersRef: ['Ghassan', 'Mariem'],
+    currentUserKeyRef: 'familyCurrentUser',
+    questionSelectRef: document.getElementById('questionSelect'),
+    adminAnswerSectionRef: document.getElementById('adminAnswerSection'),
+    answerInputRef: document.getElementById('answerInput'),
+    saveAnswerBtnRef: document.getElementById('saveAnswerBtn')
+  });
 
   // Tab nav
   setupTabListeners();
   setActiveTab(0);
 
-  // Render content
+  // Render content (all null-checked in modules)
   renderWallPosts();
   renderQA();
   renderCalendarTable();
@@ -77,11 +88,12 @@ export async function main() {
   loadTheme();
 
   // Chores & scoreboard
-  renderChores('', false); // No filter, not daily only
+  renderChores('', false);
   renderScoreboard();
 
   // Profile editing
   setupProfileEditListeners();
 }
 
+// Fire it up!
 document.addEventListener('DOMContentLoaded', main);
