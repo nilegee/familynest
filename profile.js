@@ -211,7 +211,21 @@ export function renderSingleProfile(name) {
   profileContainer.appendChild(summaryDiv);
 
   // Badges
-  const userBadges = (badges[name] || []).slice().sort((a, b) => {
+  let rawBadges = badges[name];
+  let userBadges = [];
+  if (Array.isArray(rawBadges)) {
+    userBadges = rawBadges.slice();
+  } else if (typeof rawBadges === 'string') {
+    try {
+      const parsed = JSON.parse(rawBadges);
+      if (Array.isArray(parsed)) userBadges = parsed.slice();
+    } catch (e) {
+      userBadges = [];
+    }
+  } else if (rawBadges && typeof rawBadges === 'object') {
+    userBadges = Object.values(rawBadges);
+  }
+  userBadges.sort((a, b) => {
     return new Date(b.dateGiven) - new Date(a.dateGiven);
   });
   const badgeContainer = document.createElement('div');
