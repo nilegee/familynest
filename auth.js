@@ -1,5 +1,5 @@
 import { main } from "./main.js";
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const supabaseUrl = window.SUPABASE_URL;
 const supabaseKey = window.SUPABASE_KEY;
