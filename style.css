@@ -1,16 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
 
 /*
   Define a soft pastel colour palette for the family dashboard. These CSS variables
   make it easy to tweak the look and feel consistently across the app. The
-  primary colour is a gentle lilac, secondary is a mint green and the accent
-  colour is a soft sky blue. Backgrounds are off‑white to reduce eye strain.
+  primary colour is a soft lavender, secondary is mint green and the accent
+  colour is a light blue. Backgrounds use a near‑white shade to reduce eye strain.
 */
 :root {
-  --color-primary: #b39ddb;   /* lilac */
-  --color-secondary: #81c784; /* mint */
-  --color-accent: #90caf9;    /* soft blue */
-  --color-background: #f7f7fa; /* off‑white */
+  --color-primary: #c5cae9;   /* lavender */
+  --color-secondary: #a8e6cf; /* mint */
+  --color-accent: #b3e5fc;    /* light blue */
+  --color-background: #fafcff; /* light background */
   --color-card: #ffffff;
   --color-text: #333333;
   --color-border: #e0e0e0;
@@ -304,6 +305,7 @@ main.content {
 
 h1, h2, h3 {
   margin: 0 0 1rem 0;
+  font-family: 'Poppins', 'Inter', sans-serif;
   font-weight: 700;
   color: #222;
   user-select: none;
