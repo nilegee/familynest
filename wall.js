@@ -3,35 +3,35 @@
 import { saveToSupabase } from './storage.js';
 import { escapeHtml, formatDateLocal, timeAgo, generateId, showAlert } from './util.js';
 
-// These should be injected by main.js/init
+// These should be injected by main.js/init, but we always lookup live DOM
 let wallPosts = [];
-let wallPostsList;
-let contentSearch;
-let newWallPostInput;
-let addWallPostBtn;
-let currentUserKey;
+let currentUserKey = 'familyCurrentUser';
 
-export function setupWall({
-  wallPostsRef,
-  wallPostsListRef,
-  contentSearchRef,
-  newWallPostInputRef,
-  addWallPostBtnRef,
-  currentUserKeyRef
-}) {
+export function setWallData({ wallPostsRef = [], userKey = 'familyCurrentUser' }) {
   wallPosts = wallPostsRef;
-  wallPostsList = wallPostsListRef;
-  contentSearch = contentSearchRef;
-  newWallPostInput = newWallPostInputRef;
-  addWallPostBtn = addWallPostBtnRef;
-  currentUserKey = currentUserKeyRef;
-  // Set up events
-  setupWallListeners();
-  renderWallPosts();
+  currentUserKey = userKey;
 }
 
+// Helper to always get the DOM element fresh
+function getWallPostsList() {
+  return document.getElementById('wallPostsList');
+}
+function getContentSearch() {
+  return document.getElementById('contentSearch');
+}
+function getNewWallPostInput() {
+  return document.getElementById('newWallPost');
+}
+function getAddWallPostBtn() {
+  return document.getElementById('addWallPostBtn');
+}
+
+// Main render
 export function renderWallPosts(filterText = '') {
+  const wallPostsList = getWallPostsList();
+  if (!wallPostsList) return; // DOM not ready yet!
   wallPostsList.innerHTML = '';
+
   const posts = Array.isArray(wallPosts) ? wallPosts : [];
   let filteredPosts = posts;
   if (filterText) {
@@ -59,10 +59,10 @@ export function renderWallPosts(filterText = '') {
       <span class="wall-post-date" title="${formatDateLocal(post.date)}">(${timeAgo(post.date)})${post.edited ? ' (edited)' : ''}</span>
       <div class="wall-post-text">${safeText}</div>
       <div class="wall-post-actions" aria-label="Post actions">
-        <button class="like-btn reaction-btn" aria-label="Like post" data-reaction="👍">Like ${post.reactions['👍'] || 0}</button>
+        <button class="like-btn reaction-btn" aria-label="Like post" data-reaction="👍">Like ${post.reactions && post.reactions['👍'] ? post.reactions['👍'] : 0}</button>
         <button class="reply-btn" aria-label="Reply to post">Reply</button>
-        <button class="reaction-btn" aria-label="Heart reaction" data-reaction="❤️">❤️ ${post.reactions['❤️'] || 0}</button>
-        <button class="reaction-btn" aria-label="Laugh reaction" data-reaction="😂">😂 ${post.reactions['😂'] || 0}</button>
+        <button class="reaction-btn" aria-label="Heart reaction" data-reaction="❤️">❤️ ${post.reactions && post.reactions['❤️'] ? post.reactions['❤️'] : 0}</button>
+        <button class="reaction-btn" aria-label="Laugh reaction" data-reaction="😂">😂 ${post.reactions && post.reactions['😂'] ? post.reactions['😂'] : 0}</button>
         <button class="edit-btn" aria-label="Edit post"><i class="fa-solid fa-pen-to-square"></i></button>
         <button class="delete-btn" aria-label="Delete post"><i class="fa-solid fa-trash"></i></button>
       </div>
@@ -72,59 +72,74 @@ export function renderWallPosts(filterText = '') {
   });
 }
 
-function setupWallListeners() {
-  if (!wallPostsList || !addWallPostBtn) return;
-  // Post actions
-  wallPostsList.addEventListener('click', e => {
-    const li = e.target.closest('li');
-    if (!li) return;
-    const postId = li.getAttribute('data-id');
-    const postIndex = wallPosts.findIndex(p => p.id === postId);
-    if (postIndex === -1) return;
+// All events setup in one go, after DOMContentLoaded
+export function setupWallListeners() {
+  const wallPostsList = getWallPostsList();
+  const addWallPostBtn = getAddWallPostBtn();
+  const newWallPostInput = getNewWallPostInput();
+  const contentSearch = getContentSearch();
 
-    if (e.target.classList.contains('reaction-btn')) {
-      handleReaction(postIndex, e.target.getAttribute('data-reaction'));
-    } else if (e.target.classList.contains('reply-btn')) {
-      handleReply(postIndex);
-    } else if (e.target.classList.contains('edit-btn')) {
-      enterWallPostEditMode(postId);
-    } else if (e.target.classList.contains('delete-btn')) {
-      if (confirm('Delete this post?')) {
-        wallPosts.splice(postIndex, 1);
-        saveToSupabase('wall_posts', wallPosts);
-        renderWallPosts(contentSearch.value);
+  if (wallPostsList) {
+    wallPostsList.addEventListener('click', e => {
+      const li = e.target.closest('li[data-id]');
+      if (!li) return;
+      const postId = li.getAttribute('data-id');
+      const postIndex = wallPosts.findIndex(p => p.id === postId);
+      if (postIndex === -1) return;
+
+      if (e.target.classList.contains('reaction-btn')) {
+        handleReaction(postIndex, e.target.getAttribute('data-reaction'), contentSearch ? contentSearch.value : '');
+      } else if (e.target.classList.contains('reply-btn')) {
+        handleReply(postIndex, contentSearch ? contentSearch.value : '');
+      } else if (e.target.classList.contains('edit-btn')) {
+        enterWallPostEditMode(postId, contentSearch ? contentSearch.value : '');
+      } else if (e.target.classList.contains('delete-btn')) {
+        if (confirm('Delete this post?')) {
+          wallPosts.splice(postIndex, 1);
+          saveToSupabase('wall_posts', wallPosts);
+          renderWallPosts(contentSearch ? contentSearch.value : '');
+        }
       }
-    }
-  });
-
-  addWallPostBtn.addEventListener('click', () => {
-    const text = newWallPostInput.value.trim();
-    if (!text) {
-      showAlert('Please enter something to post.');
-      return;
-    }
-    const currentUser = localStorage.getItem(currentUserKey);
-    if (!currentUser) {
-      showAlert('Please select your user first.');
-      return;
-    }
-    wallPosts.unshift({
-      id: generateId(),
-      member: currentUser,
-      text,
-      date: new Date().toISOString(),
-      reactions: {},
-      edited: false,
-      userReactions: {},
-      replies: []
     });
-    saveToSupabase('wall_posts', wallPosts);
-    newWallPostInput.value = '';
-    renderWallPosts(contentSearch.value);
-  });
+  }
+
+  if (addWallPostBtn) {
+    addWallPostBtn.addEventListener('click', () => {
+      const text = getNewWallPostInput().value.trim();
+      if (!text) {
+        showAlert('Please enter something to post.');
+        return;
+      }
+      const currentUser = localStorage.getItem(currentUserKey);
+      if (!currentUser) {
+        showAlert('Please select your user first.');
+        return;
+      }
+      wallPosts.unshift({
+        id: generateId(),
+        member: currentUser,
+        text,
+        date: new Date().toISOString(),
+        reactions: {},
+        edited: false,
+        userReactions: {},
+        replies: []
+      });
+      saveToSupabase('wall_posts', wallPosts);
+      getNewWallPostInput().value = '';
+      renderWallPosts(getContentSearch() ? getContentSearch().value : '');
+    });
+  }
+
+  // (Optional) Add instant search filtering
+  if (contentSearch) {
+    contentSearch.addEventListener('input', () => {
+      renderWallPosts(contentSearch.value);
+    });
+  }
 }
 
-function handleReaction(postIndex, reaction) {
+function handleReaction(postIndex, reaction, filterText) {
   const currentUser = localStorage.getItem(currentUserKey);
   if (!currentUser) {
     showAlert('Please select your user first.');
@@ -144,10 +159,10 @@ function handleReaction(postIndex, reaction) {
   }
   post.userReactions[currentUser] = userReacts;
   saveToSupabase('wall_posts', wallPosts);
-  renderWallPosts(contentSearch.value);
+  renderWallPosts(filterText);
 }
 
-function handleReply(postIndex) {
+function handleReply(postIndex, filterText) {
   const currentUser = localStorage.getItem(currentUserKey);
   if (!currentUser) {
     showAlert('Please select your user first.');
@@ -164,11 +179,12 @@ function handleReply(postIndex) {
     date: new Date().toISOString()
   });
   saveToSupabase('wall_posts', wallPosts);
-  renderWallPosts(contentSearch.value);
+  renderWallPosts(filterText);
 }
 
-function enterWallPostEditMode(postId) {
-  const li = wallPostsList.querySelector(`li[data-id="${postId}"]`);
+function enterWallPostEditMode(postId, filterText) {
+  const wallPostsList = getWallPostsList();
+  const li = wallPostsList ? wallPostsList.querySelector(`li[data-id="${postId}"]`) : null;
   if (!li) return;
   const post = wallPosts.find(p => p.id === postId);
   if (!post) return;
@@ -196,11 +212,11 @@ function enterWallPostEditMode(postId) {
     post.edited = true;
     post.date = new Date().toISOString();
     saveToSupabase('wall_posts', wallPosts);
-    renderWallPosts(contentSearch.value);
+    renderWallPosts(filterText);
   });
 
   cancelBtn.addEventListener('click', () => {
-    renderWallPosts(contentSearch.value);
+    renderWallPosts(filterText);
   });
 
   textarea.focus();
