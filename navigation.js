@@ -1,5 +1,7 @@
 // navigation.js
 
+import { renderSingleProfile } from './profile.js';
+
 const sidebarTabs = Array.from(document.querySelectorAll('nav.sidebar li'));
 const bottomTabs = Array.from(document.querySelectorAll('nav.bottom-nav button'));
 const sections = Array.from(document.querySelectorAll('main.content > section'));
@@ -38,13 +40,13 @@ export function setActiveTab(index) {
     case 'Yazid':
     case 'Yahya':
       document.getElementById('profileDetail').hidden = false;
-      // renderSingleProfile(tabName); // leave this call in main.js
+      renderSingleProfile(tabName);
       break;
   }
   // updateSearchFilters(); // wire up in main if needed
   if (['Ghassan', 'Mariem', 'Yazid', 'Yahya'].includes(tabName)) {
     document.getElementById('profileDetail').hidden = false;
-    // renderSingleProfile(tabName);
+    renderSingleProfile(tabName);
   } else {
     document.getElementById('profileDetail').hidden = true;
   }

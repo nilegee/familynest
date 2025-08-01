@@ -10,6 +10,7 @@ import { computeProfileSimilarities, renderSingleProfile, setProfileData } from 
 import { updateGreeting, updateAdminVisibility, loadTheme } from './ui.js';
 import { setupTabListeners, setActiveTab } from './navigation.js';
 import { setupProfileEditListeners } from './profileEditListeners.js';
+import { initUserSwitching } from './user.js';
 import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
 
 let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores;
@@ -93,6 +94,9 @@ export async function main() {
 
   // Profile editing
   setupProfileEditListeners();
+
+  // User selection modal
+  initUserSwitching();
 }
 
 // Fire it up!
