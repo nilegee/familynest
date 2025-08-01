@@ -8,6 +8,12 @@ let _userPoints = {};
 let _completedChores = {};
 let _badgeTypes = [];
 let _onSave = () => {};
+let showDailyOnlyCheckbox;
+let addChoreBtn;
+let choreDescInput;
+let choreAssignedTo;
+let choreDueInput;
+let choreDailyCheckbox;
 
 export function setChoresData({
   chores,
@@ -134,6 +140,43 @@ export function deleteChore(id) {
     _onSave(_chores, _completedChores, _badges, _userPoints);
     renderChores();
   }
+}
+
+export function setupChoresUI({
+  addBtnRef,
+  descInputRef,
+  assignedToRef,
+  dueInputRef,
+  dailyCheckboxRef,
+  showDailyOnlyRef
+} = {}) {
+  addChoreBtn = addBtnRef || document.getElementById('addChoreBtn');
+  choreDescInput = descInputRef || document.getElementById('choreDesc');
+  choreAssignedTo = assignedToRef || document.getElementById('choreAssignedTo');
+  choreDueInput = dueInputRef || document.getElementById('choreDue');
+  choreDailyCheckbox = dailyCheckboxRef || document.getElementById('choreDaily');
+  showDailyOnlyCheckbox = showDailyOnlyRef || document.getElementById('showDailyOnly');
+
+  addChoreBtn?.addEventListener('click', () => {
+    const desc = choreDescInput?.value.trim();
+    if (!desc) {
+      alert('Please enter a chore description.');
+      return;
+    }
+    addChore({
+      desc,
+      assignedTo: choreAssignedTo?.value || 'All',
+      due: choreDueInput?.value || '',
+      daily: !!choreDailyCheckbox?.checked
+    });
+    if (choreDescInput) choreDescInput.value = '';
+    if (choreDueInput) choreDueInput.value = '';
+    if (choreDailyCheckbox) choreDailyCheckbox.checked = false;
+  });
+
+  showDailyOnlyCheckbox?.addEventListener('change', () => {
+    renderChores('', showDailyOnlyCheckbox.checked);
+  });
 }
 
 // ---- BADGE LOGIC ----

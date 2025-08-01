@@ -1,4 +1,5 @@
 import { updateGreeting, updateAdminVisibility } from './ui.js';
+import { adminUsers, adminPin } from './data.js';
 
 export function initUserSwitching() {
   const modal = document.getElementById('userSelectModal');
@@ -21,6 +22,13 @@ export function initUserSwitching() {
   confirmBtn?.addEventListener('click', () => {
     const user = select?.value;
     if (!user) return;
+    if (adminUsers.includes(user)) {
+      const pin = prompt('Enter admin PIN:');
+      if (pin !== adminPin) {
+        alert('Incorrect PIN');
+        return;
+      }
+    }
     localStorage.setItem(key, user);
     hideModal();
     updateGreeting();
