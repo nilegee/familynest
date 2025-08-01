@@ -24,19 +24,31 @@ export function timeAgo(dateStr) {
   const now = new Date();
   const past = new Date(dateStr);
   const diff = now - past;
+  if (isNaN(past)) return dateStr;
   if (diff < 0) return 'in the future';
+
   const seconds = Math.floor(diff / 1000);
+  if (seconds < 10) return 'just now';
   if (seconds < 60) return `${seconds} sec ago`;
+
   const minutes = Math.floor(seconds / 60);
+  if (minutes === 1) return '1 min ago';
   if (minutes < 60) return `${minutes} min ago`;
+
   const hours = Math.floor(minutes / 60);
+  if (hours === 1) return '1 hr ago';
   if (hours < 24) return `${hours} hr ago`;
+
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} day${days > 1 ? 's' : ''} ago`;
+  if (days === 1) return 'Yesterday';
+  if (days < 30) return `${days} days ago`;
+
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months} month${months > 1 ? 's' : ''} ago`;
+  if (months === 1) return '1 month ago';
+  if (months < 12) return `${months} months ago`;
+
   const years = Math.floor(months / 12);
-  return `${years} year${years > 1 ? 's' : ''} ago`;
+  return years === 1 ? '1 year ago' : `${years} years ago`;
 }
 
 export function calculateAge(dateStr) {

@@ -110,18 +110,20 @@ export async function deleteFromSupabase(table, id) {
       const filtered = current.filter(item => item.id !== id);
       saveToLocal(table, filtered);
     }
-    return;
+    return true;
   }
-  const { error } = await supabase.from(table).delete().eq('id', id);
-  if (error) {
-    console.error('Supabase delete error:', error);
-    showAlert('Could not delete data. Entry will be removed locally.');
+  const { data, error } = await supabase.from(table).delete().eq('id', id).select();
+  if (error || !data || data.length === 0) {
+    console.error('Supabase delete error:', error || 'No rows deleted');
+    showAlert('Could not delete data from server. Entry removed locally.');
     const current = loadFromLocal(table, []);
     if (Array.isArray(current)) {
       const filtered = current.filter(item => item.id !== id);
       saveToLocal(table, filtered);
     }
+    return false;
   }
+  return true;
 }
 
 export function loadFromLocal(table, defaultValue) {
