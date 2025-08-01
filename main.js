@@ -59,7 +59,7 @@ export async function main() {
       saveToSupabase('user_points', userPoints);
     }
   });
-  setProfileData(profilesData);
+  setProfileData(profilesData, badges, badgeTypes, userPoints, completedChores);
 
   // Q&A robust setup (NO undefined errors!)
   setupQA({

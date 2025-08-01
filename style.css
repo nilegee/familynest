@@ -640,6 +640,19 @@ ul.chores-list li button {
   font-size: 0.9rem;
   cursor: pointer;
 }
+.badge-award input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+.badge-remove {
+  margin-left: 0.3rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #333;
+}
 
 /* Similarity info styling */
 .similarity-info {

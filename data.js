@@ -2,11 +2,18 @@
 
 export const adminUsers = ['Ghassan', 'Mariem'];
 
+// Fixed catalog of badges available in the app
 export const badgeTypes = [
-  { id: 'super-helper', name: 'Super Helper', desc: 'Completed many chores', icon: '🏅' },
-  { id: 'kind-heart', name: 'Kind Heart', desc: 'Always kind and helpful', icon: '💖' },
-  { id: 'star-reader', name: 'Star Reader', desc: 'Reads lots of books', icon: '📚' },
-  { id: 'tech-whiz', name: 'Tech Whiz', desc: 'Great with gadgets and games', icon: '🕹️' }
+  { id: 'star-helper', name: 'Star Helper', icon: '🌟' },
+  { id: 'early-bird', name: 'Early Bird', icon: '🐦' },
+  { id: 'quiz-master', name: 'Quiz Master', icon: '🧠' },
+  { id: 'chef-of-week', name: 'Chef of the Week', icon: '🍳' },
+  { id: 'kind-heart', name: 'Kind Heart', icon: '💖' },
+  { id: 'bookworm', name: 'Bookworm', icon: '📚' },
+  { id: 'super-organizer', name: 'Super Organizer', icon: '📅' },
+  { id: 'clean-champ', name: 'Clean Champ', icon: '🧹' },
+  { id: 'team-player', name: 'Team Player', icon: '🤝' },
+  { id: 'birthday-boss', name: 'Birthday Boss', icon: '🎂' }
 ];
 
 export const profileFieldLabels = {

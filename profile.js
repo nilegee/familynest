@@ -1,6 +1,6 @@
 // profile.js
 
-import { escapeHtml, calculateAge } from './util.js';
+import { escapeHtml, calculateAge, generateId } from './util.js';
 import { saveToSupabase, saveToLocal } from './storage.js';
 import { renderScoreboard } from './scoreboard.js';
 
@@ -33,15 +33,28 @@ export function setProfileData(
 }
 
 // Grant badge and increment points should ideally be imported, but can be local here for now:
-function grantBadge(user, badgeId) {
+function grantBadge(user, badgeId, note = '') {
   const badge = badgeTypes.find((b) => b.id === badgeId);
   if (!badge) return;
   badges[user] = badges[user] || [];
-  if (!badges[user].some((b) => b.id === badgeId)) {
-    badges[user].push(badge);
-    saveToSupabase('badges', badges);
-    renderScoreboard();
-  }
+  const newBadge = {
+    badgeId,
+    name: badge.name,
+    icon: badge.icon,
+    dateGiven: new Date().toISOString(),
+    note,
+    id: generateId()
+  };
+  badges[user].unshift(newBadge);
+  saveToSupabase('badges', badges);
+  renderScoreboard();
+}
+
+function revokeBadge(user, badgeId) {
+  if (!badges[user]) return;
+  badges[user] = badges[user].filter((b) => b.id !== badgeId);
+  saveToSupabase('badges', badges);
+  renderScoreboard();
 }
 
 function incrementPoints(user, amount = 1) {
@@ -198,7 +211,9 @@ export function renderSingleProfile(name) {
   profileContainer.appendChild(summaryDiv);
 
   // Badges
-  const userBadges = badges[name] || [];
+  const userBadges = (badges[name] || []).slice().sort((a, b) => {
+    return new Date(b.dateGiven) - new Date(a.dateGiven);
+  });
   const badgeContainer = document.createElement('div');
   badgeContainer.className = 'badge-container';
   badgeContainer.innerHTML = `<h3>Badges</h3>`;
@@ -208,7 +223,18 @@ export function renderSingleProfile(name) {
     userBadges.forEach((b) => {
       const li = document.createElement('li');
       li.className = 'badge-item';
+      li.title = b.note ? b.note : '';
       li.textContent = `${b.icon} ${b.name}`;
+      if (adminUsers.includes(currentUser)) {
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '✖';
+        removeBtn.className = 'badge-remove';
+        removeBtn.addEventListener('click', () => {
+          revokeBadge(name, b.id);
+          renderSingleProfile(name);
+        });
+        li.appendChild(removeBtn);
+      }
       badgeList.appendChild(li);
     });
   } else {
@@ -228,13 +254,17 @@ export function renderSingleProfile(name) {
       option.textContent = `${b.icon} ${b.name}`;
       select.appendChild(option);
     });
+    const noteInput = document.createElement('input');
+    noteInput.type = 'text';
+    noteInput.placeholder = 'Note (optional)';
     const btn = document.createElement('button');
     btn.textContent = 'Give Badge';
     btn.addEventListener('click', () => {
-      grantBadge(name, select.value);
+      grantBadge(name, select.value, noteInput.value.trim());
       renderSingleProfile(name);
     });
     awardDiv.appendChild(select);
+    awardDiv.appendChild(noteInput);
     awardDiv.appendChild(btn);
     badgeContainer.appendChild(awardDiv);
   }
