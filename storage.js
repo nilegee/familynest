@@ -14,6 +14,8 @@ import {
 
 import { generateId, showAlert } from './util.js';
 
+const QA_DEFAULTS_FLAG = 'fn_qa_defaults_injected';
+
 export function resolveTable(name) {
   return tableAliases[name] || name;
 }
@@ -193,14 +195,16 @@ export function injectDefaultQA(qaList, saveQA) {
     { q: 'Will Papa die? If Papa dies how will I see him?', a: 'Everyone, even prophets, passes away. Islam teaches that the soul continues; if we live righteously, we hope to reunite in Paradise. Good deeds and prayers for loved ones keep us connected.' },
     { q: 'Are we going to meet in Jannah?', a: 'That’s the goal! Paradise is for those who believe and do good. Families who love and help each other for Allah’s sake can be reunited there, so keep praying and doing good.' }
   ];
-  let changed = false;
+
+  if (!Array.isArray(qaList)) return;
+  const alreadyInjected = localStorage.getItem(QA_DEFAULTS_FLAG) === 'true';
+  if (qaList.length > 0 || alreadyInjected) return;
+
   defaults.forEach(item => {
-    if (!qaList.some(q => q.q === item.q)) {
-      qaList.push({ id: generateId(), q: item.q, a: item.a });
-      changed = true;
-    }
+    qaList.push({ id: generateId(), q: item.q, a: item.a });
   });
-  if (changed) saveQA('qa_table', qaList);
+  saveQA('qa_table', qaList);
+  try { localStorage.setItem(QA_DEFAULTS_FLAG, 'true'); } catch (e) { /* ignore */ }
 }
 
 export async function loadAllData() {
