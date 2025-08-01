@@ -87,13 +87,16 @@ export function setupWallListeners() {
       const postIndex = wallPosts.findIndex(p => p.id === postId);
       if (postIndex === -1) return;
 
-      if (e.target.classList.contains('reaction-btn')) {
-        handleReaction(postIndex, e.target.getAttribute('data-reaction'), contentSearch ? contentSearch.value : '');
-      } else if (e.target.classList.contains('reply-btn')) {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      if (btn.classList.contains('reaction-btn')) {
+        handleReaction(postIndex, btn.getAttribute('data-reaction'), contentSearch ? contentSearch.value : '');
+      } else if (btn.classList.contains('reply-btn')) {
         handleReply(postIndex, contentSearch ? contentSearch.value : '');
-      } else if (e.target.classList.contains('edit-btn')) {
+      } else if (btn.classList.contains('edit-btn')) {
         enterWallPostEditMode(postId, contentSearch ? contentSearch.value : '');
-      } else if (e.target.classList.contains('delete-btn')) {
+      } else if (btn.classList.contains('delete-btn')) {
         if (confirm('Delete this post?')) {
           wallPosts.splice(postIndex, 1);
           saveToSupabase('wall_posts', wallPosts);
