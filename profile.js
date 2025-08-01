@@ -3,7 +3,7 @@
 import { escapeHtml, calculateAge } from './util.js';
 import { saveToSupabase } from './storage.js';
 
-// Internal state - set ONLY via setProfileData
+// These will be set via setProfileData etc.
 let profilesData = {};
 let badgeTypes = [];
 let badges = {};
@@ -12,37 +12,37 @@ let completedChores = {};
 export let currentEditingProfile = null;
 export let profileSimilarities = {};
 
-// Main.js should call this to inject all required state objects
-export function setProfileData({
-  profiles = {},
-  badgesData = {},
-  badgeTypesData = [],
-  userPointsData = {},
-  completedChoresData = {}
-} = {}) {
-  profilesData = profiles;
-  badges = badgesData;
-  badgeTypes = badgeTypesData;
-  userPoints = userPointsData;
-  completedChores = completedChoresData;
+// Optionally let main.js call this to inject/replace shared state.
+export function setProfileData(
+  data,
+  badgeData = {},
+  badgeTypeData = [],
+  userPts = {},
+  completed = {}
+) {
+  profilesData = data;
+  badges = badgeData;
+  badgeTypes = badgeTypeData;
+  userPoints = userPts;
+  completedChores = completed;
 }
 
-// --- Local badge and points helpers ---
+// Grant badge and increment points should ideally be imported, but can be local here for now:
 function grantBadge(user, badgeId) {
-  const badge = badgeTypes.find(b => b.id === badgeId);
+  const badge = badgeTypes.find((b) => b.id === badgeId);
   if (!badge) return;
   badges[user] = badges[user] || [];
-  if (!badges[user].some(b => b.id === badgeId)) {
+  if (!badges[user].some((b) => b.id === badgeId)) {
     badges[user].push(badge);
     saveToSupabase('badges', badges);
-    // Optionally: re-render scoreboard elsewhere
+    // You may want to refresh scoreboard here!
   }
 }
 
 function incrementPoints(user, amount = 1) {
   userPoints[user] = (userPoints[user] || 0) + amount;
   saveToSupabase('user_points', userPoints);
-  // Optionally: re-render scoreboard elsewhere
+  // You may want to refresh scoreboard here!
 }
 
 const adminUsers = ['Ghassan', 'Mariem'];
@@ -134,7 +134,7 @@ export function renderSingleProfile(name) {
     document.getElementById('editFavoriteHero').value = profile.favoriteHero || '';
     document.getElementById('editProfessionTitle').value = profile.profession.title || '';
     document.getElementById('editFunFact').value = profile.funFact || '';
-    profileEditForm.querySelectorAll('label').forEach(label => {
+    profileEditForm.querySelectorAll('label').forEach((label) => {
       let icon = label.querySelector('.edit-icon');
       if (!icon) {
         icon = document.createElement('span');
@@ -151,7 +151,7 @@ export function renderSingleProfile(name) {
   editProfileBtn.hidden = !canEdit;
   profileContainer.style.display = '';
   profileContainer.innerHTML = '';
-  profileEditForm.querySelectorAll('.edit-icon').forEach(i => i.hidden = true);
+  profileEditForm.querySelectorAll('.edit-icon').forEach((i) => (i.hidden = true));
 
   const age = calculateAge(profile.birthdate);
   const entries = [
@@ -166,7 +166,7 @@ export function renderSingleProfile(name) {
     { label: 'Profession', value: profile.profession.title },
     { label: 'Fun Fact', value: profile.funFact }
   ];
-  entries.forEach(item => {
+  entries.forEach((item) => {
     const div = document.createElement('div');
     div.className = 'profile-row';
     const safe = escapeHtml(item.value);
@@ -179,12 +179,14 @@ export function renderSingleProfile(name) {
   const now = new Date();
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - now.getDay());
-  startOfWeek.setHours(0,0,0,0);
+  startOfWeek.setHours(0, 0, 0, 0);
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 7);
-  const assigned = chores.filter(c => c.assignedTo === name || c.assignedTo === 'All');
-  const dueThisWeek = assigned.filter(c => !c.daily && c.due && new Date(c.due) >= startOfWeek && new Date(c.due) < endOfWeek).length;
-  const dailyCount = assigned.filter(c => c.daily).length;
+  const assigned = chores.filter((c) => c.assignedTo === name || c.assignedTo === 'All');
+  const dueThisWeek = assigned.filter(
+    (c) => !c.daily && c.due && new Date(c.due) >= startOfWeek && new Date(c.due) < endOfWeek
+  ).length;
+  const dailyCount = assigned.filter((c) => c.daily).length;
   const summaryDiv = document.createElement('div');
   summaryDiv.className = 'profile-summary';
   summaryDiv.textContent = `Chores assigned: ${assigned.length} (Daily: ${dailyCount}, Due this week: ${dueThisWeek})`;
@@ -198,7 +200,7 @@ export function renderSingleProfile(name) {
   const badgeList = document.createElement('ul');
   badgeList.className = 'badge-list';
   if (userBadges.length) {
-    userBadges.forEach(b => {
+    userBadges.forEach((b) => {
       const li = document.createElement('li');
       li.className = 'badge-item';
       li.textContent = `${b.icon} ${b.name}`;
@@ -215,7 +217,7 @@ export function renderSingleProfile(name) {
     const awardDiv = document.createElement('div');
     awardDiv.className = 'badge-award';
     const select = document.createElement('select');
-    badgeTypes.forEach(b => {
+    badgeTypes.forEach((b) => {
       const option = document.createElement('option');
       option.value = b.id;
       option.textContent = `${b.icon} ${b.name}`;
@@ -278,9 +280,16 @@ export function renderSingleProfile(name) {
       const label = profileFieldLabels[key] || key;
       items.push(`${label} matches ${sim[key].join(', ')}`);
     }
-    similarityInfoEl.innerHTML = `<h3>Things in Common</h3><ul>${items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul>`;
+    similarityInfoEl.innerHTML = `<h3>Things in Common</h3><ul>${items
+      .map((i) => `<li>${escapeHtml(i)}</li>`)
+      .join('')}</ul>`;
     similarityInfoEl.hidden = false;
   } else {
     similarityInfoEl.hidden = true;
   }
+}
+
+// 👇👇👇 ADD THIS AT THE END TO ALLOW SAFE ACCESS TO profilesData
+export function getProfilesData() {
+  return profilesData;
 }
