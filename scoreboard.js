@@ -5,6 +5,7 @@ import { saveToSupabase } from './storage.js';
 let _userPoints = {};
 let _badges = {};
 let _completedChores = {};
+let _sortBy = 'points';
 
 export function setScoreboardData({ userPoints, badges, completedChores }) {
   _userPoints = userPoints;
@@ -17,12 +18,24 @@ export function renderScoreboard() {
   if (!scoreboardList) return;
 
   scoreboardList.innerHTML = '';
-  Object.keys(_userPoints).forEach(name => {
+
+  const names = Object.keys(_userPoints);
+  names.sort((a, b) => {
+    if (_sortBy === 'name') return a.localeCompare(b);
+    if (_sortBy === 'chores') {
+      return (_completedChores[b] || 0) - (_completedChores[a] || 0);
+    }
+    return (_userPoints[b] || 0) - (_userPoints[a] || 0);
+  });
+
+  const medals = ['🥇', '🥈', '🥉'];
+  names.forEach((name, idx) => {
     const badgeHtml = (_badges[name] || [])
       .map(b => `<span title="${b.name}">${b.icon}</span>`)
       .join('');
     const li = document.createElement('li');
-    li.innerHTML = `<span>${name}</span>
+    if (idx < 3) li.classList.add(`top-${idx + 1}`);
+    li.innerHTML = `<span>${idx < 3 ? medals[idx] : ''} ${name}</span>
       <span>${_userPoints[name] || 0} pts | ${_completedChores[name] || 0} chores</span>
       <span class="scoreboard-badges">${badgeHtml}</span>`;
     scoreboardList.appendChild(li);
@@ -46,6 +59,14 @@ export function setupScoreboardListeners() {
       if (confirm('Reset all scores and badges?')) {
         resetScoreboard();
       }
+    });
+  }
+
+  const sortSelect = document.getElementById('scoreSortBy');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', () => {
+      _sortBy = sortSelect.value;
+      renderScoreboard();
     });
   }
 }
