@@ -1,8 +1,10 @@
 // chores.js
 
-import { showAlert, normalizeBadgeArray } from "./util.js";
+import { showAlert, normalizeBadgeArray, generateId } from "./util.js";
 import { renderScoreboard } from './scoreboard.js';
 import { adminUsers } from './data.js';
+import { saveToSupabase } from './storage.js';
+import { renderPointLogs } from './pointLogs.js';
 
 let _chores = [];
 let _badges = {};
@@ -10,6 +12,7 @@ let _userPoints = {};
 let _completedChores = {};
 let _badgeTypes = [];
 let _onSave = () => {};
+let _pointLogs = [];
 let showDailyOnlyCheckbox;
 let addChoreBtn;
 let choreDescInput;
@@ -23,6 +26,7 @@ export function setChoresData({
   userPoints,
   completedChores,
   badgeTypes,
+  pointLogs = [],
   onSave // callback: (updatedChores, updatedCompletedChores, updatedBadges, updatedUserPoints) => void
 }) {
   _chores = chores;
@@ -30,6 +34,7 @@ export function setChoresData({
   _userPoints = userPoints;
   _completedChores = completedChores;
   _badgeTypes = badgeTypes || [];
+  _pointLogs = pointLogs;
   _onSave = typeof onSave === "function" ? onSave : () => {};
 }
 
@@ -112,7 +117,18 @@ function handleChoreCheck(item, checkbox, li) {
     if (_completedChores[item.assignedTo] < 0) _completedChores[item.assignedTo] = 0;
 
     // Give point & badge if every 5 chores
-    _userPoints[item.assignedTo] = (_userPoints[item.assignedTo] || 0) + (checkbox.checked ? 1 : -1);
+    _userPoints[item.assignedTo] = (_userPoints[item.assignedTo] || 0) + delta;
+    const admin = localStorage.getItem('familyCurrentUser');
+    _pointLogs.push({
+      id: generateId(),
+      user_id: item.assignedTo,
+      admin_id: admin,
+      points_changed: delta,
+      reason: `Chore: ${item.desc}`,
+      timestamp: new Date().toISOString()
+    });
+    saveToSupabase('point_logs', _pointLogs);
+    renderPointLogs();
     if (_userPoints[item.assignedTo] % 5 === 0 && checkbox.checked) {
       grantBadge(item.assignedTo, 'star-helper', 'Completed 5 chores');
     }
