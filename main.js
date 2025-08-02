@@ -73,6 +73,7 @@ export async function main() {
     askBtnRef: document.getElementById('askBtn'),
     newQuestionInputRef: document.getElementById('newQuestion'),
     adminUsersRef: ['Ghassan', 'Mariem'],
+    questionOnlyUsersRef: ['Yahya', 'Yazid'],
     currentUserKeyRef: 'familyCurrentUser',
     questionSelectRef: document.getElementById('questionSelect'),
     adminAnswerSectionRef: document.getElementById('adminAnswerSection'),

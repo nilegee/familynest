@@ -11,6 +11,7 @@ let contentSearch = null;
 let askBtn = null;
 let newQuestionInput = null;
 let adminUsers = [];
+let questionOnlyUsers = [];
 let currentUserKey = 'familyCurrentUser';
 let questionSelect = null;
 let adminAnswerSection = null;
@@ -24,6 +25,7 @@ export function setupQA({
   askBtnRef,
   newQuestionInputRef,
   adminUsersRef,
+  questionOnlyUsersRef,
   currentUserKeyRef,
   questionSelectRef,
   adminAnswerSectionRef,
@@ -36,6 +38,7 @@ export function setupQA({
   askBtn = askBtnRef || document.getElementById('askBtn');
   newQuestionInput = newQuestionInputRef || document.getElementById('newQuestion');
   adminUsers = adminUsersRef || [];
+  questionOnlyUsers = questionOnlyUsersRef || [];
   currentUserKey = currentUserKeyRef || 'familyCurrentUser';
   questionSelect = questionSelectRef || document.getElementById('questionSelect');
   adminAnswerSection = adminAnswerSectionRef || document.getElementById('adminAnswerSection');
@@ -65,13 +68,16 @@ export function renderQA(filterText = '') {
     const li = document.createElement('li');
     li.setAttribute('data-id', item.id);
     li.setAttribute('tabindex', '0');
+    const currentUser = localStorage.getItem(currentUserKey);
+    const canModify = adminUsers.includes(currentUser) && !questionOnlyUsers.includes(currentUser);
     li.innerHTML = `
       <div class="qa-question">Q: ${escapeHtml(item.q)}</div>
       <div class="qa-answer">${item.a ? `A: ${escapeHtml(item.a)}` : '<i>Waiting for answer...</i>'}</div>
+      ${canModify ? `
       <div class="qa-actions">
         <button class="edit-q-btn" aria-label="Edit question"><i class="fa-solid fa-pen-to-square"></i></button>
         <button class="delete-q-btn" aria-label="Delete question"><i class="fa-solid fa-trash"></i></button>
-      </div>
+      </div>` : ''}
     `;
     qaListEl.appendChild(li);
   });
@@ -98,6 +104,8 @@ function setupQAListeners() {
 
   if (qaListEl) {
     qaListEl.addEventListener('click', async (e) => {
+      const currentUser = localStorage.getItem(currentUserKey);
+      if (!adminUsers.includes(currentUser) || questionOnlyUsers.includes(currentUser)) return;
       const li = e.target.closest('li');
       if (!li) return;
       const id = li.getAttribute('data-id');
@@ -121,6 +129,8 @@ function setupQAListeners() {
 
   if (saveAnswerBtn) {
     saveAnswerBtn.addEventListener('click', () => {
+      const currentUser = localStorage.getItem(currentUserKey);
+      if (!adminUsers.includes(currentUser) || questionOnlyUsers.includes(currentUser)) return;
       const selected = questionSelect?.value;
       const answer = answerInput?.value.trim();
       if (!selected || !answer) {
@@ -140,6 +150,8 @@ function setupQAListeners() {
 }
 
 function enterQAEditMode(id) {
+  const currentUser = localStorage.getItem(currentUserKey);
+  if (!adminUsers.includes(currentUser) || questionOnlyUsers.includes(currentUser)) return;
   const li = qaListEl.querySelector(`li[data-id="${id}"]`);
   if (!li) return;
   const qaItem = qaList.find(item => item.id === id);
