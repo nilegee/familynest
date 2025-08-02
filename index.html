@@ -77,11 +77,14 @@
     <!-- Wall Section -->
     <section id="wall" aria-label="Wall Section">
       <h1>Wall</h1>
-      <select id="postTypeSelect" aria-label="Select post type">
-        <option value="text">Post</option>
-        <option value="poll">Poll</option>
-      </select>
-      <textarea id="newWallPost" placeholder="Write something..." rows="3" aria-label="New wall post"></textarea>
+      <div class="post-input-row">
+        <textarea id="newWallPost" placeholder="Share your thoughts or create a poll…" rows="1" aria-label="New wall post"></textarea>
+        <button type="button" id="photoUploadBtn" aria-label="Attach photo"><i class="fa-solid fa-image"></i></button>
+        <button type="button" id="togglePollBtn">Create Poll</button>
+        <button class="add-btn" id="addWallPostBtn" disabled>Post</button>
+        <input type="file" id="wallPhoto" accept="image/*" hidden>
+      </div>
+      <img id="wallPhotoPreview" class="wall-photo-preview" alt="Selected photo preview" hidden>
       <div id="pollFields" class="poll-fields" hidden>
         <div id="pollOptions" class="poll-options-edit">
           <input type="text" class="poll-option-input" placeholder="Option 1">
@@ -90,8 +93,6 @@
         <button type="button" id="addPollOptionBtn">Add Option</button>
         <label class="poll-multiple-label"><input type="checkbox" id="pollMultiple"> Allow multiple selections</label>
       </div>
-      <br>
-      <button class="add-btn" id="addWallPostBtn">Post</button>
       <ul class="wall-posts" aria-live="polite" aria-atomic="true" aria-relevant="additions" id="wallPostsList"></ul>
     </section>
 

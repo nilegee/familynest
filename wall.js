@@ -9,6 +9,7 @@ let wallPosts = [];
 let currentUserKey = 'familyCurrentUser';
 // prevent attaching listeners multiple times when main() runs again
 let wallListenersInitialized = false;
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 
 export function setWallData({ wallPostsRef = [], userKey = 'familyCurrentUser' }) {
   wallPosts = wallPostsRef;
@@ -28,8 +29,8 @@ function getNewWallPostInput() {
 function getAddWallPostBtn() {
   return document.getElementById('addWallPostBtn');
 }
-function getPostTypeSelect() {
-  return document.getElementById('postTypeSelect');
+function getCreatePollBtn() {
+  return document.getElementById('togglePollBtn');
 }
 function getPollFields() {
   return document.getElementById('pollFields');
@@ -42,6 +43,30 @@ function getAddPollOptionBtn() {
 }
 function getPollMultipleCheckbox() {
   return document.getElementById('pollMultiple');
+}
+function getPhotoUploadBtn() {
+  return document.getElementById('photoUploadBtn');
+}
+function getPhotoInput() {
+  return document.getElementById('wallPhoto');
+}
+function getPhotoPreview() {
+  return document.getElementById('wallPhotoPreview');
+}
+
+function autoResizeTextarea(el) {
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 // Main render
@@ -74,7 +99,7 @@ export function renderWallPosts(filterText = '') {
         <div class="wall-post-text">${escapeHtml(r.text)}</div>
       </li>`).join('');
 
-    let mainHtml = `<div class="wall-post-text">${safeText}</div>`;
+    let mainHtml;
     if (post.poll) {
       const currentUser = localStorage.getItem(currentUserKey);
       const totalVotes = post.poll.options.reduce((s,o)=>s+((o.votes||[]).length),0);
@@ -88,6 +113,11 @@ export function renderWallPosts(filterText = '') {
         return `<li><button class="poll-vote-btn" data-idx="${idx}">${escapeHtml(o.text)}</button></li>`;
       }).join('');
       mainHtml = `<div class="poll-question">${safeText}</div><ul class="poll-options">${optionsHtml}</ul>`;
+    } else {
+      mainHtml = `<div class="wall-post-text">${safeText}</div>`;
+    }
+    if (post.photo) {
+      mainHtml += `<img src="${post.photo}" alt="Attached photo" class="wall-post-image">`;
     }
 
     li.innerHTML = `
@@ -117,17 +147,38 @@ export function setupWallListeners() {
   const wallPostsList = getWallPostsList();
   const addWallPostBtn = getAddWallPostBtn();
   const newWallPostInput = getNewWallPostInput();
-  const postTypeSelect = getPostTypeSelect();
   const pollFields = getPollFields();
   const addPollOptionBtn = getAddPollOptionBtn();
   const pollOptionsContainer = getPollOptionsContainer();
   const contentSearch = getContentSearch();
+  const createPollBtn = getCreatePollBtn();
+  const photoUploadBtn = getPhotoUploadBtn();
+  const photoInput = getPhotoInput();
+  const photoPreview = getPhotoPreview();
 
-  if (postTypeSelect && pollFields) {
-    postTypeSelect.addEventListener('change', () => {
-      const isPoll = postTypeSelect.value === 'poll';
-      pollFields.hidden = !isPoll;
-      newWallPostInput.placeholder = isPoll ? 'Poll question...' : 'Write something...';
+  function updatePostBtnState() {
+    const text = newWallPostInput ? newWallPostInput.value.trim() : '';
+    let valid = !!text;
+    const isPoll = pollFields && !pollFields.hidden;
+    if (isPoll) {
+      const optionInputs = pollOptionsContainer ? Array.from(pollOptionsContainer.querySelectorAll('input')) : [];
+      const options = optionInputs.map(i => i.value.trim()).filter(v => v);
+      if (options.length < 2) valid = false;
+    }
+    if (photoInput && photoInput.files[0]) {
+      const file = photoInput.files[0];
+      if (!file.type.startsWith('image/') || file.size > MAX_IMAGE_SIZE) valid = false;
+    }
+    if (addWallPostBtn) addWallPostBtn.disabled = !valid;
+  }
+
+  if (createPollBtn && pollFields) {
+    createPollBtn.addEventListener('click', () => {
+      const active = !pollFields.hidden;
+      pollFields.hidden = active;
+      createPollBtn.textContent = active ? 'Create Poll' : 'Cancel Poll';
+      newWallPostInput.placeholder = active ? 'Share your thoughts or create a poll…' : 'Poll question...';
+      updatePostBtnState();
     });
   }
 
@@ -137,7 +188,53 @@ export function setupWallListeners() {
       input.type = 'text';
       input.className = 'poll-option-input';
       input.placeholder = `Option ${pollOptionsContainer.children.length + 1}`;
+      input.addEventListener('input', updatePostBtnState);
       pollOptionsContainer.appendChild(input);
+    });
+    Array.from(pollOptionsContainer.querySelectorAll('input')).forEach(inp => inp.addEventListener('input', updatePostBtnState));
+  }
+
+  if (newWallPostInput) {
+    newWallPostInput.addEventListener('input', () => {
+      autoResizeTextarea(newWallPostInput);
+      updatePostBtnState();
+    });
+    autoResizeTextarea(newWallPostInput);
+  }
+
+  if (photoUploadBtn && photoInput) {
+    photoUploadBtn.addEventListener('click', () => photoInput.click());
+  }
+
+  if (photoInput && photoPreview) {
+    photoInput.addEventListener('change', () => {
+      const file = photoInput.files[0];
+      if (!file) {
+        photoPreview.hidden = true;
+        updatePostBtnState();
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        showAlert('Only image files are allowed.');
+        photoInput.value = '';
+        photoPreview.hidden = true;
+        updatePostBtnState();
+        return;
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        showAlert('Image must be smaller than 2 MB.');
+        photoInput.value = '';
+        photoPreview.hidden = true;
+        updatePostBtnState();
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        photoPreview.src = e.target.result;
+        photoPreview.hidden = false;
+      };
+      reader.readAsDataURL(file);
+      updatePostBtnState();
     });
   }
 
@@ -174,12 +271,11 @@ export function setupWallListeners() {
   }
 
   if (addWallPostBtn) {
-    addWallPostBtn.addEventListener('click', () => {
+    addWallPostBtn.addEventListener('click', async () => {
       const text = getNewWallPostInput().value.trim();
-      const postTypeSel = getPostTypeSelect();
-      const type = postTypeSel ? postTypeSel.value : 'text';
+      const isPoll = pollFields && !pollFields.hidden;
       if (!text) {
-        showAlert(type === 'poll' ? 'Please enter a poll question.' : 'Please enter something to post.');
+        showAlert(isPoll ? 'Please enter a poll question.' : 'Please enter something to post.');
         return;
       }
       const currentUser = localStorage.getItem(currentUserKey);
@@ -197,7 +293,7 @@ export function setupWallListeners() {
         userReactions: {},
         replies: []
       };
-      if (type === 'poll') {
+      if (isPoll) {
         const optsContainer = getPollOptionsContainer();
         const optionInputs = optsContainer ? Array.from(optsContainer.querySelectorAll('input')) : [];
         const options = optionInputs.map(i => i.value.trim()).filter(v => v);
@@ -211,12 +307,27 @@ export function setupWallListeners() {
         };
         optionInputs.forEach((inp, idx) => { if (idx > 1) inp.remove(); else inp.value = ''; });
       }
+      if (photoInput && photoInput.files[0]) {
+        base.photo = await readFileAsDataURL(photoInput.files[0]);
+      }
       wallPosts.unshift(base);
-      saveToSupabase('wall_posts', base);
+      addWallPostBtn.disabled = true;
+      const original = addWallPostBtn.innerHTML;
+      addWallPostBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+      await saveToSupabase('wall_posts', base);
       saveToLocal('wall_posts', wallPosts);
+      addWallPostBtn.innerHTML = original;
+      addWallPostBtn.disabled = false;
       getNewWallPostInput().value = '';
+      autoResizeTextarea(getNewWallPostInput());
+      if (photoInput) photoInput.value = '';
+      if (photoPreview) photoPreview.hidden = true;
+      pollFields.hidden = true;
+      if (createPollBtn) createPollBtn.textContent = 'Create Poll';
+      newWallPostInput.placeholder = 'Share your thoughts or create a poll…';
       renderWallPosts(getContentSearch() ? getContentSearch().value : '');
       notify('wall', 'New wall post', `${currentUser}: ${text}`);
+      updatePostBtnState();
     });
   }
 
@@ -227,6 +338,7 @@ export function setupWallListeners() {
     });
   }
 
+  updatePostBtnState();
   wallListenersInitialized = true;
 }
 
