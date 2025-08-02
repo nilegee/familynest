@@ -7,8 +7,8 @@ const URLS_TO_CACHE = [
   './main.js',
   './style.css',
   './icons/default-avatar.svg',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
+  './icons/house-192.png',
+  './icons/house-512.png',
   // Add more static assets if needed
 ];
 
