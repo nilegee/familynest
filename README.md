@@ -19,7 +19,7 @@ FamilyNest expects the following tables to exist in your Supabase project:
 
 | Table            | Description                        | Example Columns                       |
 |------------------|------------------------------------|---------------------------------------|
-| `wall_posts`     | Posts on the family wall           | `id` (text), `member` (text), `text` (text), `date` (timestamp), `reactions` (json) |
+| `wall_posts`     | Posts on the family wall           | `id` (text), `member` (text), `text` (text), `date` (timestamp), `reactions` (json), `edited` (boolean), `userReactions` (json), `replies` (json), `photo` (text) |
 | `qa_table`       | Questions and answers              | `id` (text), `q` (text), `a` (text)   |
 | `calendar_events`| Events for the family calendar     | `id` (text), `start` (date), `end` (date), `desc` (text) |
 | `profiles`       | Profile information for each user  | `name` (text), `value` (json)         |

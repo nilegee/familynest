@@ -99,7 +99,7 @@ export async function saveToSupabase(table, data, opts = {}) {
       if (!skipLocal) saveToLocal(table, data);
       return;
     }
-    if (error.code === '23502') {
+    if (error.code === '23502' || error.code === '42703') {
       console.info(`Supabase schema mismatch for '${table}' - using localStorage.`);
       supabaseEnabled = false;
       if (!skipLocal) saveToLocal(table, data);
