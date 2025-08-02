@@ -8,7 +8,6 @@ let _userPoints = {};
 let _badges = {};
 let _completedChores = {};
 let _sortBy = 'points';
-let listenersInitialized = false;
 
 export function setScoreboardData({ userPoints, badges, completedChores }) {
   _userPoints = userPoints;
@@ -89,24 +88,27 @@ export async function resetScoreboard() {
   return { success: true };
 }
 
-export function setupScoreboardListeners() {
-  if (listenersInitialized) return;
-  listenersInitialized = true;
+function handleResetClick() {
+  if (confirm('Are you sure you want to reset the scoreboard?')) {
+    resetScoreboard();
+  }
+}
 
+function handleSortChange(e) {
+  _sortBy = e.target.value;
+  renderScoreboard();
+}
+
+export function setupScoreboardListeners() {
   const resetBtn = document.getElementById('resetScoreboardBtn');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to reset the scoreboard?')) {
-        resetScoreboard();
-      }
-    });
+  if (resetBtn && !resetBtn.dataset.bound) {
+    resetBtn.addEventListener('click', handleResetClick);
+    resetBtn.dataset.bound = 'true';
   }
 
   const sortSelect = document.getElementById('scoreSortBy');
-  if (sortSelect) {
-    sortSelect.addEventListener('change', () => {
-      _sortBy = sortSelect.value;
-      renderScoreboard();
-    });
+  if (sortSelect && !sortSelect.dataset.bound) {
+    sortSelect.addEventListener('change', handleSortChange);
+    sortSelect.dataset.bound = 'true';
   }
 }

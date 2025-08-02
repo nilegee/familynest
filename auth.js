@@ -1,5 +1,6 @@
 import { main } from "./main.js";
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { showAlert } from './util.js';
 
 const supabaseUrl = window.SUPABASE_URL;
 const supabaseKey = window.SUPABASE_KEY;
@@ -39,7 +40,7 @@ export function initAuth(onSignedIn) {
       if (typeof onSignedIn === 'function') onSignedIn();
     } else {
       if (user && !allowed[user.email]) {
-        alert('This email is not allowed.');
+        showAlert('This email is not allowed.');
         await supabase.auth.signOut();
       }
       localStorage.removeItem('familyCurrentUser');

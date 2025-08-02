@@ -173,7 +173,7 @@ function calendarTableClickHandler(e) {
   const filtered = calendarEvents.filter(ev => ev.start <= date && ev.end >= date);
   if (filtered.length) {
     const msg = filtered.map(ev => `${ev.desc} (${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''})`).join('\n');
-    alert(msg);
+    showAlert(msg);
   }
 }
 
