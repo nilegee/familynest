@@ -102,7 +102,7 @@ export function renderWallPosts(filterText = '') {
       return `
       <li data-id="${r.id}">
         <div class="wall-post-header">
-          <img src="${rAvatar}" alt="${escapeHtml(r.member)} avatar" class="avatar-post">
+          <img src="${rAvatar}" alt="${escapeHtml(r.member)} avatar" class="reply-avatar">
           <strong class="wall-post-user">${escapeHtml(r.member)}</strong>
           <span class="wall-post-date" title="${formatDateLocal(r.date)}">${timeAgo(r.date)}</span>
         </div>
@@ -139,7 +139,7 @@ export function renderWallPosts(filterText = '') {
     const avatar = (window.profilesData && window.profilesData[post.member] && window.profilesData[post.member].avatar) || 'icons/default-avatar.svg';
     const headerHtml = `
       <div class="wall-post-header">
-        <img src="${avatar}" alt="${escapeHtml(post.member)} avatar" class="avatar-post">
+        <img src="${avatar}" alt="${escapeHtml(post.member)} avatar" class="wall-post-avatar">
         <strong class="wall-post-user">${escapeHtml(post.member)}</strong>
         <span class="wall-post-date" title="${formatDateLocal(post.date)}">${timeAgo(post.date)}${post.edited ? ' (edited)' : ''}</span>
       </div>`;
@@ -479,7 +479,7 @@ function enterWallPostEditMode(postId, filterText) {
   const avatar = (window.profilesData && window.profilesData[post.member] && window.profilesData[post.member].avatar) || 'icons/default-avatar.svg';
   li.innerHTML = `
     <div class="wall-post-header">
-      <img src="${avatar}" alt="${escapeHtml(post.member)} avatar" class="avatar-post">
+      <img src="${avatar}" alt="${escapeHtml(post.member)} avatar" class="wall-post-avatar">
       <strong class="wall-post-user">${escapeHtml(post.member)}</strong>
       <span class="wall-post-date" title="${formatDateLocal(post.date)}">Editing</span>
     </div>
