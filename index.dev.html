@@ -19,12 +19,12 @@
   <script>window.DISABLE_SUPABASE_ALERT = true;</script>
 </head>
 <body data-user="">
-  <div id="authContainer"><button id="signInBtn" aria-label="Sign in with Google">Sign in with Google</button></div>
+  <div id="authContainer"><button id="signInBtn" class="btn btn-accent" aria-label="Sign in with Google">Sign in with Google</button></div>
 
 
 
   <nav class="sidebar" aria-label="Main navigation">
-    <div class="logo">Family<span>Nest</span></div>
+    <div class="logo"><i class="fa-solid fa-people-group"></i><span>Family</span></div>
     <input type="search" id="sidebarSearch" placeholder="Search menu" aria-label="Search navigation menu" autocomplete="off">
     <ul role="menubar" aria-orientation="vertical" id="sidebarMenu">
       <li data-tab="wall" role="menuitem" tabindex="0" class="active" aria-current="page"><i class="fa-solid fa-house"></i><span>Wall</span><span class="tab-notify-dot"></span></li>
@@ -44,7 +44,7 @@
 
   <main class="content" role="main" tabindex="0">
     <header class="topbar" role="region" aria-label="User greeting and controls">
-      <div class="logo">Family<span>Nest</span></div>
+      <div class="logo"><i class="fa-solid fa-people-group"></i><span>Family</span></div>
       <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
       <div>
         <div class="greeting">Welcome, <span id="currentUserDisplay">Guest</span></div>
