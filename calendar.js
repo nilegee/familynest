@@ -3,6 +3,7 @@
 import { saveToSupabase, deleteFromSupabase } from './storage.js';
 import { generateId, showAlert } from './util.js';
 import { notify } from './notifications.js';
+import { adminUsers } from './data.js';
 
 let calendarEvents = [];
 let calendarBody;
@@ -32,7 +33,14 @@ export function setupCalendar({
   eventDesc = eventDescRef;
   addEventBtn = addEventBtnRef;
 
-  if (addEventBtn) addEventBtn.addEventListener('click', addCalendarEvent);
+  const currentUser = localStorage.getItem('familyCurrentUser');
+  if (addEventBtn) {
+    if (adminUsers.includes(currentUser)) {
+      addEventBtn.addEventListener('click', addCalendarEvent);
+    } else {
+      addEventBtn.disabled = true;
+    }
+  }
   if (calendarBody) calendarBody.addEventListener('click', calendarTableClickHandler);
   if (eventListEl) eventListEl.addEventListener('click', eventListClickHandler);
 
@@ -109,18 +117,26 @@ export function renderCalendarEventsList(filterDesc = '') {
     const f = filterDesc.toLowerCase();
     filtered = events.filter(ev => ev.desc.toLowerCase().includes(f));
   }
+  const currentUser = localStorage.getItem('familyCurrentUser');
+  const canModify = adminUsers.includes(currentUser);
   filtered.forEach(ev => {
     const li = document.createElement('li');
     li.setAttribute('data-id', ev.id);
     li.setAttribute('tabindex', '0');
-    li.innerHTML = `<span>${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''}: ${ev.desc}</span>
-      <button class="edit-event-btn">✏️</button>
-      <button class="delete-event-btn">🗑️</button>`;
+    li.innerHTML = `<span>${ev.start}${ev.end && ev.end !== ev.start ? '–' + ev.end : ''}: ${ev.desc}</span>` +
+      (canModify ?
+        ` <button class="edit-event-btn">✏️</button>
+      <button class="delete-event-btn">🗑️</button>` : '');
     eventListEl.appendChild(li);
   });
 }
 
 function addCalendarEvent() {
+  const currentUser = localStorage.getItem('familyCurrentUser');
+  if (!adminUsers.includes(currentUser)) {
+    showAlert('You do not have permission to add events.');
+    return;
+  }
   const start = eventStartDate.value;
   const end = eventEndDate.value;
   const desc = eventDesc.value.trim();
@@ -162,6 +178,9 @@ function calendarTableClickHandler(e) {
 }
 
 async function eventListClickHandler(e) {
+  const currentUser = localStorage.getItem('familyCurrentUser');
+  if (!adminUsers.includes(currentUser)) return;
+
   const li = e.target.closest('li[data-id]');
   if (!li) return;
   const id = li.getAttribute('data-id');
