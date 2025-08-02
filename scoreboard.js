@@ -2,6 +2,7 @@
 
 import { saveToSupabase, logAdminAction } from './storage.js';
 import { adminUsers } from './data.js';
+import { showAlert } from './util.js';
 
 let _userPoints = {};
 let _badges = {};
@@ -63,15 +64,28 @@ export function renderScoreboard() {
 
 export async function resetScoreboard() {
   const user = localStorage.getItem('familyCurrentUser');
-  if (!adminUsers.includes(user)) return;
-  _userPoints = {};
-  _badges = {};
-  _completedChores = {};
-  await saveToSupabase('user_points', _userPoints);
-  await saveToSupabase('badges', _badges);
-  await saveToSupabase('completed_chores', _completedChores);
+  if (!adminUsers.includes(user)) {
+    showAlert('Only admins can reset the scoreboard.');
+    return { success: false };
+  }
+
+  const names = Object.keys(_userPoints);
+  names.forEach(name => {
+    _userPoints[name] = 0;
+    _badges[name] = [];
+    _completedChores[name] = 0;
+  });
+
+  await Promise.all([
+    saveToSupabase('user_points', _userPoints),
+    saveToSupabase('badges', _badges),
+    saveToSupabase('completed_chores', _completedChores)
+  ]);
+
   renderScoreboard();
   await logAdminAction('reset scoreboard');
+  showAlert('Scoreboard reset.');
+  return { success: true };
 }
 
 export function setupScoreboardListeners() {
