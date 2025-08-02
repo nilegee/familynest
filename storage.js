@@ -208,7 +208,15 @@ export function injectDefaultQA(qaList, saveQA) {
   if (qaList.length > 0 || alreadyInjected) return;
 
   defaults.forEach(item => {
-    qaList.push({ id: generateId(), q: item.q, a: item.a });
+    qaList.push({
+      id: generateId(),
+      q: item.q,
+      a: item.a,
+      qBy: 'System',
+      qDate: new Date().toISOString(),
+      aBy: 'System',
+      aDate: new Date().toISOString()
+    });
   });
   saveQA('qa_table', qaList);
   try { localStorage.setItem(QA_DEFAULTS_FLAG, 'true'); } catch (e) { /* ignore */ }

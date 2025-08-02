@@ -516,18 +516,24 @@ ul.wall-posts li {
   margin-top: 0.5rem;
 }
 .poll-options li {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+.poll-options button {
+  width: 100%;
+  background: var(--color-card);
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
+  text-align: left;
 }
-.poll-options button {
+.poll-options button:hover {
   background: var(--accent-color);
   color: #fff;
-  border: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  cursor: pointer;
 }
 .poll-bar {
   flex-grow: 1;
@@ -540,9 +546,25 @@ ul.wall-posts li {
   background: var(--accent-color);
   height: 100%;
   display: block;
+  width: 0;
+  transition: width 0.3s ease;
 }
 .poll-count {
   font-size: 0.8rem;
+}
+.poll-type {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  margin-top: 0.3rem;
+}
+.poll-total {
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  text-align: right;
+}
+.poll-hide-label {
+  display: block;
+  margin-top: 0.3rem;
 }
 
 ul.qa-list {
@@ -589,6 +611,27 @@ ul.qa-list li {
 }
 .qa-actions button:hover {
   transform: scale(1.2);
+}
+
+.qa-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.3rem;
+}
+.avatar-qa {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.qa-user {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+.qa-date {
+  font-size: 0.8rem;
+  color: #555;
 }
 
 #adminAnswerSection {

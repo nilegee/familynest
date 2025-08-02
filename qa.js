@@ -1,7 +1,7 @@
 // qa.js
 
 import { saveToSupabase, deleteFromSupabase } from './storage.js';
-import { escapeHtml, generateId, showAlert } from './util.js';
+import { escapeHtml, generateId, showAlert, formatDateLocal, timeAgo } from './util.js';
 import { notify } from './notifications.js';
 
 // These should be injected by main.js/init
@@ -70,9 +70,24 @@ export function renderQA(filterText = '') {
     li.setAttribute('tabindex', '0');
     const currentUser = localStorage.getItem(currentUserKey);
     const canModify = adminUsers.includes(currentUser) && !questionOnlyUsers.includes(currentUser);
+    const qUser = item.qBy || 'Unknown';
+    const qAvatar = (window.profilesData && window.profilesData[qUser] && window.profilesData[qUser].avatar) || 'icons/default-avatar.svg';
+    const qDate = item.qDate ? `<span class="qa-date" title="${formatDateLocal(item.qDate)}">${timeAgo(item.qDate)}</span>` : '';
+    const qMeta = `<div class="qa-meta"><img src="${qAvatar}" alt="${escapeHtml(qUser)} avatar" class="avatar-qa"><span class="qa-user">${escapeHtml(qUser)}</span>${qDate}</div>`;
+    let answerHtml;
+    if (item.a) {
+      const aUser = item.aBy || 'Unknown';
+      const aAvatar = (window.profilesData && window.profilesData[aUser] && window.profilesData[aUser].avatar) || 'icons/default-avatar.svg';
+      const aDate = item.aDate ? `<span class="qa-date" title="${formatDateLocal(item.aDate)}">${timeAgo(item.aDate)}</span>` : '';
+      const aMeta = `<div class="qa-meta"><img src="${aAvatar}" alt="${escapeHtml(aUser)} avatar" class="avatar-qa"><span class="qa-user">${escapeHtml(aUser)}</span>${aDate}</div>`;
+      answerHtml = `${aMeta}<div class="qa-answer">A: ${escapeHtml(item.a)}</div>`;
+    } else {
+      answerHtml = `<div class="qa-answer"><i>Waiting for answer...</i></div>`;
+    }
     li.innerHTML = `
+      ${qMeta}
       <div class="qa-question">Q: ${escapeHtml(item.q)}</div>
-      <div class="qa-answer">${item.a ? `A: ${escapeHtml(item.a)}` : '<i>Waiting for answer...</i>'}</div>
+      ${answerHtml}
       ${canModify ? `
       <div class="qa-actions">
         <button class="edit-q-btn" aria-label="Edit question"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -92,8 +107,13 @@ function setupQAListeners() {
         showAlert('Please enter your question.');
         return;
       }
+      const currentUser = localStorage.getItem(currentUserKey);
+      if (!currentUser) {
+        showAlert('Please select your user first.');
+        return;
+      }
       const id = generateId();
-      const item = { id, q, a: '' };
+      const item = { id, q, a: '', qBy: currentUser, qDate: new Date().toISOString() };
       qaList.unshift(item);
       saveToSupabase('qa_table', item);
       if (newQuestionInput) newQuestionInput.value = '';
@@ -140,6 +160,8 @@ function setupQAListeners() {
       const qaItem = qaList.find(item => item.id === selected);
       if (qaItem) {
         qaItem.a = answer;
+        qaItem.aBy = currentUser;
+        qaItem.aDate = new Date().toISOString();
         saveToSupabase('qa_table', qaItem);
         if (answerInput) answerInput.value = '';
         renderQA(contentSearch?.value || '');
@@ -177,6 +199,10 @@ function enterQAEditMode(id) {
     }
     qaItem.q = newQ;
     qaItem.a = newA;
+    if (newA) {
+      qaItem.aBy = currentUser;
+      qaItem.aDate = new Date().toISOString();
+    }
     saveToSupabase('qa_table', qaItem);
     renderQA(contentSearch?.value || '');
   });

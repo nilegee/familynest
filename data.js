@@ -76,8 +76,24 @@ export const defaultWallPosts = [
 ];
 
 export const defaultQAList = [
-  { id: generateId(), q: "What's for dinner?", a: "We’re having Koshari!" },
-  { id: generateId(), q: "When is the next family trip?", a: "Next month, inshallah." }
+  {
+    id: generateId(),
+    q: "What's for dinner?",
+    a: "We’re having Koshari!",
+    qBy: 'Yahya',
+    qDate: new Date().toISOString(),
+    aBy: 'Mariem',
+    aDate: new Date().toISOString()
+  },
+  {
+    id: generateId(),
+    q: "When is the next family trip?",
+    a: "Next month, inshallah.",
+    qBy: 'Yazid',
+    qDate: new Date().toISOString(),
+    aBy: 'Ghassan',
+    aDate: new Date().toISOString()
+  }
 ];
 
 export const defaultCalendarEvents = [
