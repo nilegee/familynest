@@ -86,6 +86,7 @@ export function renderWallPosts(filterText = '') {
       p.text.toLowerCase().includes(f) || p.member.toLowerCase().includes(f)
     );
   }
+  const currentUser = localStorage.getItem(currentUserKey);
   filteredPosts.forEach(post => {
     const li = document.createElement('li');
     li.setAttribute('data-id', post.id);
@@ -93,12 +94,18 @@ export function renderWallPosts(filterText = '') {
     const safeText = escapeHtml(post.text);
 
     const repliesArr = Array.isArray(post.replies) ? post.replies : [];
-    const replies = repliesArr.map(r => `
+    const replies = repliesArr.map(r => {
+      const rAvatar = (window.profilesData && window.profilesData[r.member] && window.profilesData[r.member].avatar) || 'icons/default-avatar.svg';
+      return `
       <li data-id="${r.id}">
-        <strong>${escapeHtml(r.member)}</strong>
-        <span class="wall-post-date" title="${formatDateLocal(r.date)}">(${timeAgo(r.date)})</span>
+        <div class="wall-post-header">
+          <img src="${rAvatar}" alt="${escapeHtml(r.member)} avatar" class="avatar-post">
+          <strong class="wall-post-user">${escapeHtml(r.member)}</strong>
+          <span class="wall-post-date" title="${formatDateLocal(r.date)}">${timeAgo(r.date)}</span>
+        </div>
         <div class="wall-post-text">${escapeHtml(r.text)}</div>
-      </li>`).join('');
+      </li>`;
+    }).join('');
 
     let mainHtml;
     if (post.poll) {
@@ -120,18 +127,41 @@ export function renderWallPosts(filterText = '') {
     if (post.photo) {
       mainHtml += `<img src="${post.photo}" alt="Attached photo" class="wall-post-image">`;
     }
+    const avatar = (window.profilesData && window.profilesData[post.member] && window.profilesData[post.member].avatar) || 'icons/default-avatar.svg';
+    const headerHtml = `
+      <div class="wall-post-header">
+        <img src="${avatar}" alt="${escapeHtml(post.member)} avatar" class="avatar-post">
+        <strong class="wall-post-user">${escapeHtml(post.member)}</strong>
+        <span class="wall-post-date" title="${formatDateLocal(post.date)}">${timeAgo(post.date)}${post.edited ? ' (edited)' : ''}</span>
+      </div>`;
+
+    const reactionTypes = [
+      { emoji: '👍', label: 'Thumbs up' },
+      { emoji: '❤️', label: 'Heart' },
+      { emoji: '😂', label: 'Laugh' }
+    ];
+    const reactionBtns = reactionTypes.map(r => {
+      const count = post.reactions && post.reactions[r.emoji] ? post.reactions[r.emoji] : 0;
+      const reactedUsers = Object.entries(post.userReactions || {})
+        .filter(([, arr]) => Array.isArray(arr) && arr.includes(r.emoji))
+        .map(([u]) => u);
+      const title = reactedUsers.length ? reactedUsers.join(', ') : 'No reactions yet';
+      const active = currentUser && reactedUsers.includes(currentUser);
+      return `<button class="reaction-btn${active ? ' active' : ''}" aria-label="${r.label}" data-reaction="${r.emoji}" title="${escapeHtml(title)}">${r.emoji} ${count}</button>`;
+    }).join('');
+
+    const canModify = currentUser === post.member || adminUsers.includes(currentUser);
+    const actionBtns = `
+      <button class="reply-btn" aria-label="Reply to post" title="Reply"><i class="fa-solid fa-reply"></i></button>
+      ${canModify ? `<button class="edit-btn" aria-label="Edit post" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+      <button class="delete-btn" aria-label="Delete post" title="Delete"><i class="fa-solid fa-trash"></i></button>` : ''}`;
 
     li.innerHTML = `
-      <strong>${escapeHtml(post.member)}</strong>
-      <span class="wall-post-date" title="${formatDateLocal(post.date)}">(${timeAgo(post.date)})${post.edited ? ' (edited)' : ''}</span>
+      ${headerHtml}
       ${mainHtml}
       <div class="wall-post-actions" aria-label="Post actions">
-        <button class="reaction-btn" aria-label="Thumbs up" data-reaction="👍">👍 ${post.reactions && post.reactions['👍'] ? post.reactions['👍'] : 0}</button>
-        <button class="reaction-btn" aria-label="Heart" data-reaction="❤️">❤️ ${post.reactions && post.reactions['❤️'] ? post.reactions['❤️'] : 0}</button>
-        <button class="reaction-btn" aria-label="Laugh" data-reaction="😂">😂 ${post.reactions && post.reactions['😂'] ? post.reactions['😂'] : 0}</button>
-        <button class="reply-btn" aria-label="Reply to post">Reply</button>
-        <button class="edit-btn" aria-label="Edit post"><i class="fa-solid fa-pen-to-square"></i></button>
-        <button class="delete-btn" aria-label="Delete post"><i class="fa-solid fa-trash"></i></button>
+        <div class="reaction-group">${reactionBtns}</div>
+        <div class="action-group">${actionBtns}</div>
       </div>
       ${replies ? `<ul class="reply-list">${replies}</ul>` : ''}
     `;
@@ -255,11 +285,15 @@ export function setupWallListeners() {
       } else if (btn.classList.contains('reply-btn')) {
         handleReply(postIndex, contentSearch ? contentSearch.value : '');
       } else if (btn.classList.contains('edit-btn')) {
+        const currentUser = localStorage.getItem(currentUserKey);
+        if (post.member !== currentUser && !adminUsers.includes(currentUser)) return;
         enterWallPostEditMode(postId, contentSearch ? contentSearch.value : '');
       } else if (btn.classList.contains('poll-vote-btn')) {
         const idx = parseInt(btn.getAttribute('data-idx'), 10);
         handlePollVote(postIndex, idx, contentSearch ? contentSearch.value : '');
       } else if (btn.classList.contains('delete-btn')) {
+        const currentUser = localStorage.getItem(currentUserKey);
+        if (post.member !== currentUser && !adminUsers.includes(currentUser)) return;
         if (confirm('Delete this post?')) {
           wallPosts.splice(postIndex, 1);
           const ok = await deleteFromSupabase('wall_posts', postId);
@@ -423,10 +457,13 @@ function enterWallPostEditMode(postId, filterText) {
   if (!li) return;
   const post = wallPosts.find(p => p.id === postId);
   if (!post) return;
-
+  const avatar = (window.profilesData && window.profilesData[post.member] && window.profilesData[post.member].avatar) || 'icons/default-avatar.svg';
   li.innerHTML = `
-    <strong>${escapeHtml(post.member)}</strong>
-    <span class="wall-post-date" title="${formatDateLocal(post.date)}">(Editing)</span>
+    <div class="wall-post-header">
+      <img src="${avatar}" alt="${escapeHtml(post.member)} avatar" class="avatar-post">
+      <strong class="wall-post-user">${escapeHtml(post.member)}</strong>
+      <span class="wall-post-date" title="${formatDateLocal(post.date)}">Editing</span>
+    </div>
     <textarea class="wall-post-edit-text" aria-label="Edit post text">${escapeHtml(post.text)}</textarea>
     <div class="wall-post-edit-area">
       <button class="save-edit-btn">Save</button>
