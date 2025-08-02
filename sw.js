@@ -2,7 +2,6 @@
 
 const CACHE_NAME = 'family-hub-v1';
 const URLS_TO_CACHE = [
-  './',
   './index.html',
   './main.js',
   './style.css',
@@ -15,7 +14,15 @@ const URLS_TO_CACHE = [
 // INSTALL: cache app shell
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
+    caches.open(CACHE_NAME).then(cache => {
+      return Promise.all(
+        URLS_TO_CACHE.map(url =>
+          cache.add(url).catch(err => {
+            console.warn('SW: Failed to cache', url, err);
+          })
+        )
+      );
+    })
   );
   self.skipWaiting();
 });
