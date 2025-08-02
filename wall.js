@@ -296,11 +296,18 @@ export function setupWallListeners() {
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'poll-option-input';
-      input.placeholder = `Option ${pollOptionsContainer.children.length + 1}`;
+      const idx = pollOptionsContainer.children.length + 1;
+      input.placeholder = `Option ${idx}`;
+      input.setAttribute('aria-label', `Poll option ${idx}`);
       input.addEventListener('input', updatePostBtnState);
       pollOptionsContainer.appendChild(input);
     });
-    Array.from(pollOptionsContainer.querySelectorAll('input')).forEach(inp => inp.addEventListener('input', updatePostBtnState));
+    Array.from(pollOptionsContainer.querySelectorAll('input')).forEach((inp, i) => {
+      inp.addEventListener('input', updatePostBtnState);
+      if (!inp.hasAttribute('aria-label')) {
+        inp.setAttribute('aria-label', `Poll option ${i + 1}`);
+      }
+    });
   }
 
   if (newWallPostInput) {
