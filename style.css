@@ -314,6 +314,53 @@ h1 { font-size: 2rem; }
 h2 { font-size: 1.75rem; }
 h3 { font-size: 1.5rem; }
 
+.post-input-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin-bottom: 0.5rem;
+}
+.post-input-row textarea {
+  flex: 1 1 auto;
+  resize: none;
+  overflow: hidden;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+}
+.post-input-row button {
+  margin-top: 0;
+}
+#photoUploadBtn,
+#togglePollBtn {
+  background: var(--color-border);
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+#photoUploadBtn:hover,
+#togglePollBtn:hover {
+  background: var(--accent-color);
+  color: #fff;
+}
+.post-input-row button.add-btn {
+  padding: 0.5rem 1.5rem;
+  margin-top: 0 !important;
+}
+.wall-photo-preview,
+.wall-post-image {
+  max-width: 150px;
+  max-height: 150px;
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  display: block;
+}
+
 ul.wall-posts {
   list-style: none;
   padding: 0;
