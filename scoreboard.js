@@ -8,6 +8,7 @@ let _userPoints = {};
 let _badges = {};
 let _completedChores = {};
 let _sortBy = 'points';
+let listenersInitialized = false;
 
 export function setScoreboardData({ userPoints, badges, completedChores }) {
   _userPoints = userPoints;
@@ -89,6 +90,9 @@ export async function resetScoreboard() {
 }
 
 export function setupScoreboardListeners() {
+  if (listenersInitialized) return;
+  listenersInitialized = true;
+
   const resetBtn = document.getElementById('resetScoreboardBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {

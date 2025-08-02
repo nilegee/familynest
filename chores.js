@@ -90,8 +90,15 @@ export function renderChores(filterText = '', dailyOnly = false) {
       li.appendChild(dueSpan);
     }
 
-    // Admin delete button (if you want)
-    if (window.localStorage.getItem('familyCurrentUser') === 'Ghassan' /*or admin logic*/) {
+    // Admin-only controls
+    if (isAdmin) {
+      const editBtn = document.createElement('button');
+      editBtn.textContent = '✏️';
+      editBtn.title = 'Edit chore';
+      editBtn.className = 'chore-edit-btn';
+      editBtn.onclick = () => editChore(item.id);
+      li.appendChild(editBtn);
+
       const delBtn = document.createElement('button');
       delBtn.textContent = '🗑️';
       delBtn.title = 'Delete chore';
@@ -171,6 +178,26 @@ export function deleteChore(id) {
     _onSave(_chores, _completedChores, _badges, _userPoints);
     renderChores();
   }
+}
+
+export function editChore(id) {
+  const chore = _chores.find(ch => ch.id === id);
+  if (!chore) return;
+  const newDesc = prompt('Edit description', chore.desc);
+  if (newDesc === null) return;
+  const newAssignee = prompt('Assign to', chore.assignedTo);
+  if (newAssignee === null) return;
+  let newDue = chore.due;
+  if (!chore.daily) {
+    const duePrompt = prompt('Due date', chore.due || '');
+    if (duePrompt === null) return;
+    newDue = duePrompt;
+  }
+  chore.desc = newDesc.trim() || chore.desc;
+  chore.assignedTo = newAssignee.trim() || chore.assignedTo;
+  if (!chore.daily) chore.due = newDue.trim();
+  _onSave(_chores, _completedChores, _badges, _userPoints);
+  renderChores();
 }
 
 export function setupChoresUI({
