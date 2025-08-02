@@ -56,11 +56,11 @@ export function setupTabListeners() {
       tab.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
           e.preventDefault();
-          const next = (i + 1) % sidebarTabs.length;
+          const next = (i + 1) % list.length;
           list[next].focus();
         } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
           e.preventDefault();
-          const prev = (i - 1 + sidebarTabs.length) % sidebarTabs.length;
+          const prev = (i - 1 + list.length) % list.length;
           list[prev].focus();
         } else if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
