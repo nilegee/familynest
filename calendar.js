@@ -52,6 +52,20 @@ export function renderCalendarTable() {
   const startDay = firstDay.getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   calendarBody.innerHTML = '';
+  const events = Array.isArray(calendarEvents) ? calendarEvents : [];
+
+  // Precompute which dates in this month have events
+  const eventMap = {};
+  events.forEach(ev => {
+    const start = new Date(ev.start);
+    const end = new Date(ev.end);
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (!eventMap[ds]) eventMap[ds] = [];
+      eventMap[ds].push(ev);
+    }
+  });
+
   let day = 1;
   for (let r = 0; r < 6; r++) {
     const row = document.createElement('tr');
@@ -68,6 +82,15 @@ export function renderCalendarTable() {
         cell.textContent = day;
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         cell.setAttribute('data-date', dateStr);
+        const evs = eventMap[dateStr];
+        if (evs && evs.length) {
+          cell.classList.add('has-event');
+          cell.title = evs.map(e => e.desc).join('\n');
+          const indicator = document.createElement('span');
+          indicator.className = 'event-count';
+          indicator.textContent = evs.length;
+          cell.appendChild(indicator);
+        }
         day++;
       }
       row.appendChild(cell);
