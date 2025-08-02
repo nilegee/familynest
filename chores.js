@@ -4,7 +4,6 @@ import { showAlert, normalizeBadgeArray, generateId } from "./util.js";
 import { renderScoreboard } from './scoreboard.js';
 import { adminUsers } from './data.js';
 import { saveToSupabase } from './storage.js';
-import { renderPointLogs } from './pointLogs.js';
 
 let _chores = [];
 let _badges = {};
@@ -135,7 +134,6 @@ function handleChoreCheck(item, checkbox, li) {
       timestamp: new Date().toISOString()
     });
     saveToSupabase('point_logs', _pointLogs);
-    renderPointLogs();
     if (_userPoints[item.assignedTo] % 5 === 0 && checkbox.checked) {
       grantBadge(item.assignedTo, 'star-helper', 'Completed 5 chores');
     }

@@ -4,7 +4,6 @@ import { escapeHtml, calculateAge, generateId, normalizeBadgeArray } from './uti
 import { saveToSupabase, saveToLocal } from './storage.js';
 import { renderScoreboard } from './scoreboard.js';
 import { adminUsers } from './data.js';
-import { renderPointLogs as renderAdminPointLogs } from './pointLogs.js';
 
 // These will be set via setProfileData etc.
 let profilesData = {};
@@ -79,7 +78,6 @@ function incrementPoints(user, amount = 1) {
   });
   saveToSupabase('point_logs', pointLogs);
   renderScoreboard();
-  renderAdminPointLogs();
 }
 
 const profileFieldLabels = {
