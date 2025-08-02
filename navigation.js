@@ -38,9 +38,6 @@ export function setActiveTab(index) {
     case 'Scoreboard':
       document.getElementById('scoreboard').hidden = false;
       break;
-    case 'Logs':
-      document.getElementById('pointLogs').hidden = false;
-      break;
     case 'Settings':
       document.getElementById('settings').hidden = false;
       break;
