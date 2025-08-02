@@ -102,7 +102,7 @@ export function renderQA(filterText = '') {
 function setupQAListeners() {
   if (askBtn) {
     askBtn.addEventListener('click', () => {
-      const q = newQuestionInput?.value.trim();
+      const q = (newQuestionInput?.value || '').trim();
       if (!q) {
         showAlert('Please enter your question.');
         return;
