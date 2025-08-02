@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 /*
   Define a soft pastel colour palette for the family dashboard. These CSS variables
@@ -15,23 +14,17 @@
   --color-card: #ffffff;
   --color-text: #333333;
   --color-border: #e0e0e0;
-  --accent-ghassan: #6b42f5;
-  --accent-mariem: #009688;
-  --accent-yazid: #2196f3;
-  --accent-yahya: #4caf50;
-  --accent-color: var(--accent-ghassan);
+  --radius: 12px;
 }
 
-body[data-user="Ghassan"] { --accent-color: var(--accent-ghassan); }
-body[data-user="Mariem"]  { --accent-color: var(--accent-mariem); }
-body[data-user="Yazid"]   { --accent-color: var(--accent-yazid); }
-body[data-user="Yahya"]   { --accent-color: var(--accent-yahya); }
-
 [data-theme="dark"] {
-  --color-background: #1e1e20;
-  --color-card: #2a2a2d;
-  --color-text: #e0e0e0;
-  --color-border: #444;
+  --color-background: #0d0f18;
+  --color-card: #121521;
+  --color-text: #e6e8f0;
+  --color-text-secondary: #8a94a6;
+  --color-border: #1f2230;
+  --color-accent: #00f0ff;
+  --accent-color: var(--color-accent);
 }
 
 * {
@@ -50,9 +43,41 @@ button:focus-visible,
 [hidden] {
   display: none !important;
 }
+
+button {
+  background: var(--color-accent);
+  color: var(--color-background);
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 0 8px var(--color-accent);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+button:hover {
+  box-shadow: 0 0 12px var(--color-accent);
+  transform: translateY(-1px);
+}
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: 'Poppins', sans-serif;
+  padding: 0.5rem;
+}
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 6px var(--color-accent);
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-accent);
+}
 body, html {
   margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 16px;
   background: var(--color-background);
   color: var(--color-text);
@@ -68,7 +93,7 @@ nav.sidebar {
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1rem;
-  box-shadow: 1px 0 6px rgb(0 0 0 / 0.05);
+  box-shadow: 0 0 10px var(--color-accent);
   user-select: none;
   position: relative;
 }
@@ -85,17 +110,12 @@ nav.sidebar .logo {
 }
 nav.sidebar input[type="search"] {
   padding: 0.6rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #ddd;
   width: 100%;
   font-size: 0.95rem;
   margin-bottom: 1rem;
-  outline: none;
-  transition: border-color 0.3s ease;
 }
 nav.sidebar input[type="search"]:focus {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 6px rgba(144,202,249,0.6);
+  box-shadow: 0 0 6px var(--color-accent);
 }
 nav.sidebar ul {
   list-style: none;
@@ -110,7 +130,7 @@ nav.sidebar li {
   align-items: center;
   gap: 12px;
   padding: 0.9rem 1rem;
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 600;
   color: var(--color-text);
   cursor: pointer;
@@ -134,22 +154,14 @@ nav.sidebar li.active {
   background: var(--accent-color);
   color: white;
   font-weight: 700;
-  box-shadow: 0 0 12px rgba(0,0,0,0.2);
+  box-shadow: 0 0 12px var(--color-accent);
 }
 nav.sidebar button#changeUserBtn {
   margin-top: 1rem;
-  border: none;
-  background: #f0f0f0;
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  user-select: none;
 }
 nav.sidebar button#changeUserBtn:hover {
-  background: var(--accent-color);
-  color: white;
+  box-shadow: 0 0 12px var(--color-accent);
 }
 
 /* Responsive adjustments: shrink sidebar on narrow screens and allow content to fill the remaining width */
@@ -168,7 +180,7 @@ nav.sidebar button#changeUserBtn:hover {
 
 main.content {
   flex-grow: 1;
-  background: white;
+  background: var(--color-background);
   padding: 2rem 3rem;
   overflow-y: auto;
   overflow-x: hidden;
@@ -195,7 +207,7 @@ main.content {
 }
 .topbar .date {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--color-text-secondary);
 }
 .topbar .right-controls {
   display: flex;
@@ -208,8 +220,6 @@ main.content {
   position: relative;
 }
 .profile-dropdown button {
-  background: none;
-  border: none;
   cursor: pointer;
   font-size: 1.2rem;
 }
@@ -217,10 +227,10 @@ main.content {
   position: absolute;
   right: 0;
   top: 100%;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  border-radius: var(--radius);
+  box-shadow: 0 0 10px var(--color-accent);
   padding: 0.5rem;
   display: flex;
   flex-direction: column;
@@ -248,22 +258,13 @@ main.content {
 }
 .topbar .search-input {
   padding: 0.5rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 0.9rem;
-  outline: none;
   width: 100%;
   max-width: 220px;
-  transition: border-color 0.3s ease;
 }
 .topbar .search-input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 6px var(--accent-color);
+  box-shadow: 0 0 6px var(--color-accent);
 }
 .topbar button.bell-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
   position: relative;
   padding: 0;
   color: var(--color-text);
@@ -271,7 +272,7 @@ main.content {
   flex-shrink: 0;
 }
 .topbar button.bell-btn:hover {
-  color: var(--accent-color);
+  color: var(--color-accent);
 }
 .topbar button.bell-btn svg {
   width: 22px;
@@ -293,7 +294,7 @@ main.content {
   position: absolute;
   top: -4px;
   right: -4px;
-  background: #f44336;
+  background: var(--color-accent);
   color: white;
   font-size: 0.7rem;
   font-weight: 700;
@@ -308,16 +309,16 @@ main.content {
   right: 4px;
   width: 8px;
   height: 8px;
-  background: #f44336;
+  background: var(--color-accent);
   border-radius: 50%;
   display: none;
 }
 
 h1, h2, h3 {
   margin: 0 0 1rem 0;
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 700;
-  color: #222;
+  color: var(--color-text);
   user-select: none;
 }
 h1 { font-size: 2rem; }
@@ -336,27 +337,20 @@ h3 { font-size: 1.5rem; }
   flex: 1 1 auto;
   resize: none;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.5rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-text);
 }
 .post-input-row button {
   margin-top: 0;
 }
 #photoUploadBtn,
 #togglePollBtn {
-  background: var(--color-border);
-  border: none;
-  border-radius: 8px;
   padding: 0.5rem 0.75rem;
-  cursor: pointer;
-}
-#photoUploadBtn:hover,
-#togglePollBtn:hover {
-  background: var(--accent-color);
-  color: #fff;
 }
 .post-input-row button.add-btn {
   padding: 0.5rem 1.5rem;
@@ -366,7 +360,7 @@ h3 { font-size: 1.5rem; }
   max-width: 150px;
   max-height: 150px;
   margin-top: 0.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
   display: block;
 }
 
@@ -383,7 +377,7 @@ h3 { font-size: 1.5rem; }
   max-height: 60vh;
   object-fit: contain;
   margin-top: 0.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 
 @media (max-width: 600px) {
@@ -401,14 +395,13 @@ ul.wall-posts {
   user-select: none;
 }
 ul.wall-posts li {
-  /* Use a card background colour and subtle shadow for posts. The border adds
-     gentle separation from the background. */
+  /* Card styling for posts with neon accent */
   background: var(--color-card);
-  border-radius: 15px;
+  border-radius: var(--radius);
   border: 1px solid var(--color-border);
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 0 10px var(--color-accent);
   position: relative;
   word-wrap: break-word;
 }
@@ -433,7 +426,7 @@ ul.wall-posts li {
 }
 .wall-post-date {
   font-size: 0.8rem;
-  color: #555;
+  color: var(--color-text-secondary);
   margin-left: 4px;
   font-weight: 400;
   user-select: none;
@@ -465,8 +458,6 @@ ul.wall-posts li {
   align-items: center;
 }
 .wall-post-actions button {
-  background: transparent;
-  border: none;
   cursor: pointer;
   font-size: 1rem;
   user-select: none;
@@ -481,7 +472,7 @@ ul.wall-posts li {
 }
 .reaction-btn.active {
   background: var(--color-accent);
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 .wall-post-actions button i {
   pointer-events: none;
@@ -507,9 +498,9 @@ ul.wall-posts li {
 .reply-form textarea {
   flex-grow: 1;
   resize: vertical;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.5rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
 }
 .wall-post-edit-area {
@@ -521,9 +512,9 @@ ul.wall-posts li {
 .wall-post-edit-area textarea {
   flex-grow: 1;
   resize: vertical;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.5rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
 }
 
@@ -534,9 +525,9 @@ ul.wall-posts li {
 .poll-fields input {
   display: block;
   margin: 0.25rem 0;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0.4rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
 }
 .poll-fields button {
@@ -562,7 +553,7 @@ ul.wall-posts li {
   border: 1px solid var(--accent-color);
   color: var(--accent-color);
   padding: 0.4rem 0.6rem;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -577,7 +568,7 @@ ul.wall-posts li {
   flex-grow: 1;
   height: 8px;
   background: var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius);
   overflow: hidden;
 }
 .poll-bar-fill {
@@ -615,11 +606,11 @@ ul.qa-list {
 ul.qa-list li {
   /* Match Q&A items with card style and shadow */
   background: var(--color-card);
-  border-radius: 12px;
+  border-radius: var(--radius);
   border: 1px solid var(--color-border);
   padding: 1rem 1.3rem;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 0 10px var(--color-accent);
   font-weight: 600;
   position: relative;
 }
@@ -669,29 +660,30 @@ ul.qa-list li {
 }
 .qa-date {
   font-size: 0.8rem;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 #adminAnswerSection {
   max-width: 900px;
   margin-top: 1rem;
-  /* Light pastel panel for admin answer area */
-  background: rgba(179, 157, 219, 0.2);
+  background: var(--color-card);
   padding: 1rem;
-  border-left: 5px solid var(--accent-color);
-  border-radius: 8px;
+  border-left: 5px solid var(--color-accent);
+  border-radius: var(--radius);
 }
 
 #adminAnswerSection select,
 #adminAnswerSection textarea {
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
   margin-bottom: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-accent);
   padding: 0.5rem;
   resize: vertical;
+  background: transparent;
+  color: var(--color-text);
 }
 
 #adminAnswerSection button {
@@ -700,7 +692,7 @@ ul.qa-list li {
   background-color: var(--accent-color);
   color: white;
   border: none;
-  border-radius: 30px;
+  border-radius: var(--radius);
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -752,11 +744,11 @@ ul.events-list {
 ul.events-list li {
   /* Apply card styling to events */
   background: var(--color-card);
-  border-radius: 12px;
+  border-radius: var(--radius);
   border: 1px solid var(--color-border);
   padding: 1rem 1.3rem;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 0 10px var(--color-accent);
   font-weight: 600;
   display: flex;
   justify-content: space-between;
@@ -765,10 +757,6 @@ ul.events-list li {
 }
 
 ul.events-list li button {
-  background: none;
-  border: none;
-  color: #f44336;
-  cursor: pointer;
   font-weight: bold;
   font-size: 1.2rem;
 }
@@ -781,11 +769,11 @@ ul.chores-list {
   max-width: 900px;
 }
 ul.chores-list li {
-  background: #faf8ff;
-  border-radius: 12px;
+  background: var(--color-card);
+  border-radius: var(--radius);
   padding: 1rem 1.3rem;
   margin-bottom: 1rem;
-  box-shadow: 0 4px 15px rgb(160 126 255 / 0.3);
+  box-shadow: 0 0 10px var(--color-accent);
   font-weight: 600;
   display: flex;
   justify-content: space-between;
@@ -796,13 +784,8 @@ ul.chores-list li.completed {
   text-decoration: line-through;
 }
 ul.chores-list li button {
-  background: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 0.3rem 0.8rem;
-  cursor: pointer;
   font-size: 0.8rem;
+  padding: 0.3rem 0.8rem;
 }
 
 /* Additional chore styling */
@@ -817,17 +800,17 @@ ul.chores-list li button {
 }
 .chore-item small {
   margin-left: 0.4rem;
-  color: #777;
+  color: var(--color-text-secondary);
   font-size: 0.85rem;
 }
 .chore-assigned {
-  color: #888;
+  color: var(--color-text-secondary);
   font-size: 0.85rem;
 }
 
 .daily-label {
   background: #ffecb3;
-  border-radius: 4px;
+  border-radius: var(--radius);
   padding: 0 0.4rem;
   margin-left: 0.4rem;
   color: #c27600;
@@ -844,7 +827,7 @@ ul.chores-list li button {
 .profile-summary {
   margin: 0.5rem 0 1rem;
   font-size: 0.95rem;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .edit-icon {
@@ -857,9 +840,9 @@ ul.chores-list li button {
 .badge-container {
   margin-top: 1rem;
   padding: 1rem;
-  background: #f9f5ff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: 0 0 10px var(--color-accent);
 }
 .badge-container h3 {
   margin-bottom: 0.5rem;
@@ -877,7 +860,7 @@ ul.chores-list li button {
 .badge-list .badge-item {
   background: var(--accent-color);
   color: white;
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 0.2rem 0.6rem;
   font-size: 0.9rem;
   display: flex;
@@ -892,31 +875,25 @@ ul.chores-list li button {
 }
 .badge-award select {
   padding: 0.4rem 0.6rem;
-  border-radius: 12px;
-  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-accent);
   font-size: 0.9rem;
 }
 .badge-award button {
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 20px;
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
   cursor: pointer;
 }
 .badge-award input {
   padding: 0.4rem 0.6rem;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
   font-size: 0.9rem;
 }
 .badge-remove {
   margin-left: 0.3rem;
-  background: transparent;
-  border: none;
   cursor: pointer;
-  color: #333;
+  color: var(--color-background);
 }
 
 /* Similarity info styling */
@@ -924,7 +901,7 @@ ul.chores-list li button {
   margin-top: 1rem;
   background: #fffbec;
   border: 1px solid #fff4c2;
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 1rem;
 }
 .similarity-info h3 {
@@ -954,44 +931,23 @@ ul.chores-list li button {
   width: 16px;
   height: 16px;
   vertical-align: middle;
-  border-radius: 4px;
+  border-radius: var(--radius);
   margin-right: 0.3rem;
 }
 
 input[type="text"], input[type="date"], textarea {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  margin-top: 0.5rem;
-  width: 100%;
   max-width: 350px;
-  outline: none;
-  transition: border-color 0.3s ease;
-  user-select: text;
-  font-family: 'Inter', sans-serif;
-}
-
-input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 6px var(--accent-color);
+  margin-top: 0.5rem;
 }
 
 button.add-btn {
   margin-top: 1rem;
-  background: var(--accent-color);
-  border: none;
-  border-radius: 40px;
   padding: 0.6rem 2rem;
-  color: white;
   font-weight: 700;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.3s ease;
 }
 
 button.add-btn:hover {
-  background: var(--accent-color);
+  box-shadow: 0 0 12px var(--color-accent);
 }
 
 button.btn-primary {
@@ -999,7 +955,7 @@ button.btn-primary {
   color: white;
   font-weight: 700;
   border: none;
-  border-radius: 30px;
+  border-radius: var(--radius);
   padding: 0.5rem 1.5rem;
   cursor: pointer;
   user-select: none;
@@ -1016,7 +972,7 @@ button.btn-secondary {
   color: var(--color-text);
   font-weight: 600;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 0.4rem 1rem;
   cursor: pointer;
   user-select: none;
@@ -1041,15 +997,15 @@ button.btn-secondary:hover {
 .profile-row {
   background: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 0.6rem 1rem;
   margin-bottom: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 0 10px var(--color-accent);
   font-size: 0.95rem;
 }
 
 .age-text {
-  color: #777;
+  color: var(--color-text-secondary);
   font-size: 0.85rem;
   margin-left: 4px;
 }
@@ -1075,12 +1031,14 @@ button.btn-secondary:hover {
   width: 100%;
   max-width: 400px;
   padding: 0.4rem 0.6rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-accent);
   font-size: 1rem;
   resize: vertical;
   user-select: text;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
+  background: transparent;
+  color: var(--color-text);
 }
 
 .profile-avatar {
@@ -1158,13 +1116,13 @@ button.btn-secondary:hover {
   height: 48px;
   border-radius: 50%;
   border: none;
-  background: var(--color-primary);
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-background);
   display: none;
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px var(--color-accent);
   z-index: 1000;
 }
 
@@ -1197,7 +1155,7 @@ button.btn-secondary:hover {
   }
   nav.sidebar.open {
     transform: translateX(0);
-    box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+    box-shadow: 0 0 10px var(--color-accent);
   }
   .sidebar-overlay.visible {
     display: block;
@@ -1229,12 +1187,12 @@ button.btn-secondary:hover {
   transition: opacity 0.3s ease;
 }
 #userSelectModal .modal-content {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-card);
+  border-radius: var(--radius);
   padding: 2rem;
   width: 320px;
   text-align: center;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px var(--color-accent);
   user-select: none;
 }
 
@@ -1252,28 +1210,28 @@ button.btn-secondary:hover {
 .score-sort-select {
   margin-bottom: 0.8rem;
   padding: 0.4rem 0.6rem;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-accent);
 }
 .scoreboard-list li {
   background: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 0.8rem 1rem;
   margin-bottom: 0.8rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 0 10px var(--color-accent);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .scoreboard-list li.top-1 {
-  background: #fff4e5;
+  background: var(--color-card);
 }
 .scoreboard-list li.top-2 {
-  background: #f1f1f1;
+  background: var(--color-card);
 }
 .scoreboard-list li.top-3 {
-  background: #e8e8e8;
+  background: var(--color-card);
 }
 .scoreboard-badges {
   display: flex;
@@ -1301,7 +1259,7 @@ nav.bottom-nav {
   right: 0;
   background: var(--color-card);
   border-top: 1px solid var(--color-border);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px var(--color-accent);
   z-index: 997;
   justify-content: flex-start;
   overflow-x: auto;
@@ -1311,8 +1269,6 @@ nav.bottom-nav {
 nav.bottom-nav button {
   flex: 0 0 72px;
   padding: 0.6rem 0.4rem;
-  background: none;
-  border: none;
   font-weight: 600;
   cursor: pointer;
   display: flex;
