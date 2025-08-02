@@ -70,12 +70,23 @@ if (profileMenuBtn && profileMenu) {
   });
 
   const profileBtn = document.getElementById('profileMenuProfile');
+  const settingsBtn = document.getElementById('profileMenuSettings');
   const signOutBtn = document.getElementById('signOutBtn');
   if (profileBtn) {
     profileBtn.addEventListener('click', () => {
       const user = localStorage.getItem(currentUserKey);
       const tabs = Array.from(document.querySelectorAll('nav.sidebar li'));
       const idx = tabs.findIndex(t => t.textContent.trim() === user);
+      if (idx >= 0) {
+        import('./navigation.js').then(m => m.setActiveTab(idx));
+      }
+      profileMenu.hidden = true;
+    });
+  }
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      const tabs = Array.from(document.querySelectorAll('nav.sidebar li'));
+      const idx = tabs.findIndex(t => t.textContent.trim() === 'Settings');
       if (idx >= 0) {
         import('./navigation.js').then(m => m.setActiveTab(idx));
       }

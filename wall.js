@@ -1,7 +1,8 @@
 // wall.js
 
-import { saveToSupabase, deleteFromSupabase, saveToLocal } from './storage.js';
+import { saveToSupabase, deleteFromSupabase, saveToLocal, supabase, logAdminAction } from './storage.js';
 import { escapeHtml, formatDateLocal, timeAgo, generateId, showAlert } from './util.js';
+import { adminUsers } from './data.js';
 import { notify } from './notifications.js';
 
 // These should be injected by main.js/init, but we always lookup live DOM
@@ -455,4 +456,45 @@ function enterWallPostEditMode(postId, filterText) {
   });
 
   textarea.focus();
+}
+
+// Remove photo file from Supabase storage if stored there
+async function removePhotoFile(url) {
+  if (!url || url.startsWith('data:')) return;
+  try {
+    const parts = url.split('/storage/v1/object/public/')[1];
+    if (!parts) return;
+    const slash = parts.indexOf('/');
+    if (slash === -1) return;
+    const bucket = parts.slice(0, slash);
+    const path = parts.slice(slash + 1);
+    if (supabase) {
+      await supabase.storage.from(bucket).remove([path]);
+    }
+  } catch (e) {
+    console.warn('Failed to remove photo file', e);
+  }
+}
+
+// Cleanup photos older than given days (0 = all)
+export async function cleanupPhotos(days) {
+  const admin = localStorage.getItem(currentUserKey);
+  if (!adminUsers.includes(admin)) return 0;
+  const cutoff = days > 0 ? Date.now() - days * 86400000 : 0;
+  let removed = 0;
+  for (const post of wallPosts) {
+    if (post.photo) {
+      const postTime = new Date(post.date).getTime();
+      if (!cutoff || postTime < cutoff) {
+        await removePhotoFile(post.photo);
+        delete post.photo;
+        removed++;
+      }
+    }
+  }
+  await saveToSupabase('wall_posts', wallPosts, { replace: true });
+  saveToLocal('wall_posts', wallPosts);
+  renderWallPosts();
+  await logAdminAction(`cleanup photos ${days ? `older than ${days} days` : 'all'}`);
+  return removed;
 }

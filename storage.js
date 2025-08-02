@@ -26,7 +26,7 @@ const supabaseUrl = window.SUPABASE_URL || '';
 const supabaseKey = window.SUPABASE_KEY || '';
 
 let supabaseEnabled = true;
-let supabase;
+export let supabase;
 
 if (!supabaseUrl || !supabaseKey) {
   alert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
@@ -228,4 +228,14 @@ export async function loadAllData() {
   let completedChores = await loadFromSupabase('completed_chores', defaultCompletedChores);
   let pointLogs = await loadFromSupabase('point_logs', defaultPointLogs);
   return { wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores, pointLogs };
+}
+
+// Log admin actions with timestamp
+export async function logAdminAction(action) {
+  const admin = localStorage.getItem('familyCurrentUser') || 'unknown';
+  const entry = { id: generateId(), admin_id: admin, action, timestamp: new Date().toISOString() };
+  const logs = loadFromLocal('admin_logs', []);
+  logs.push(entry);
+  saveToLocal('admin_logs', logs);
+  await saveToSupabase('admin_logs', entry, { skipLocal: true });
 }
