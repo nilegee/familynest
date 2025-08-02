@@ -3,6 +3,8 @@
 import { escapeHtml, calculateAge, generateId, normalizeBadgeArray } from './util.js';
 import { saveToSupabase, saveToLocal } from './storage.js';
 import { renderScoreboard } from './scoreboard.js';
+import { adminUsers } from './data.js';
+import { renderPointLogs as renderAdminPointLogs } from './pointLogs.js';
 
 // These will be set via setProfileData etc.
 let profilesData = {};
@@ -63,20 +65,23 @@ function revokeBadge(user, badgeId) {
 function incrementPoints(user, amount = 1) {
   const admin = localStorage.getItem('familyCurrentUser');
   if (!adminUsers.includes(admin)) return;
+  const reason = prompt('Reason for points change:');
+  if (reason === null) return;
   userPoints[user] = (userPoints[user] || 0) + amount;
   saveToSupabase('user_points', userPoints);
   pointLogs.push({
     id: generateId(),
-    user,
-    admin,
-    amount,
+    user_id: user,
+    admin_id: admin,
+    points_changed: amount,
+    reason,
     timestamp: new Date().toISOString()
   });
   saveToSupabase('point_logs', pointLogs);
   renderScoreboard();
+  renderAdminPointLogs();
 }
 
-const adminUsers = ['Ghassan', 'Mariem'];
 const profileFieldLabels = {
   favoriteColor: 'Favourite Colour',
   favoriteFood: 'Favourite Food',
@@ -324,6 +329,32 @@ export function renderSingleProfile(name) {
     pointsDiv.appendChild(subBtn);
   }
   profileContainer.appendChild(pointsDiv);
+
+  // Point logs for this user
+  if (currentUser === name || adminUsers.includes(currentUser)) {
+    const logSection = document.createElement('div');
+    logSection.className = 'point-log-user';
+    logSection.innerHTML = '<h3>Scoreboard Log</h3>';
+    const ul = document.createElement('ul');
+    const logs = pointLogs
+      .filter(l => l.user_id === name)
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    if (logs.length) {
+      logs.forEach(l => {
+        const li = document.createElement('li');
+        const pts = l.points_changed > 0 ? `+${l.points_changed}` : l.points_changed;
+        const date = new Date(l.timestamp).toLocaleString();
+        li.textContent = `${date}: ${pts} by ${l.admin_id} - ${l.reason}`;
+        ul.appendChild(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      li.textContent = 'No point changes yet.';
+      ul.appendChild(li);
+    }
+    logSection.appendChild(ul);
+    profileContainer.appendChild(logSection);
+  }
 
   // Avatar upload
   if (canEdit) {

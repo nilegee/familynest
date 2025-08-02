@@ -1222,3 +1222,25 @@ nav.bottom-nav::after {
   color: #b00020;
   margin: 1rem 0;
 }
+
+.point-log-user ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.point-log-user li {
+  margin-bottom: 0.25rem;
+}
+
+.point-log-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.point-log-filters label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+}

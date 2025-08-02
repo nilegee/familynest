@@ -12,6 +12,7 @@ import { setupTabListeners, setActiveTab, setupSidebarToggle } from './navigatio
 import { setupProfileEditListeners } from './profileEditListeners.js';
 import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
 import { initNotifications, clearTabDot } from './notifications.js';
+import { setPointLogsData, renderPointLogs, setupPointLogFilters } from './pointLogs.js';
 
 let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores, pointLogs;
 
@@ -56,6 +57,7 @@ export async function main() {
     userPoints,
     completedChores,
     badgeTypes,
+    pointLogs,
     onSave: (chores, completedChores, badges, userPoints) => {
       saveToSupabase('chores', chores, { replace: true });
       saveToSupabase('completed_chores', completedChores);
@@ -64,6 +66,7 @@ export async function main() {
     }
   });
   setProfileData(profilesData, badges, badgeTypes, userPoints, completedChores, pointLogs);
+  setPointLogsData(pointLogs, Object.keys(userPoints));
 
   // Q&A robust setup (NO undefined errors!)
   setupQA({
@@ -123,6 +126,8 @@ export async function main() {
   renderChores('', false);
   renderScoreboard();
   setupScoreboardListeners();
+  renderPointLogs();
+  setupPointLogFilters();
 
   // Profile editing
   setupProfileEditListeners();

@@ -35,6 +35,7 @@
       <li data-tab="calendar" role="menuitem" tabindex="-1"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></li>
       <li data-tab="chores" role="menuitem" tabindex="-1"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></li>
       <li data-tab="scoreboard" role="menuitem" tabindex="-1"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="logs" role="menuitem" tabindex="-1" class="admin-only"><i class="fa-solid fa-list"></i><span>Logs</span></li>
       <li data-tab="settings" role="menuitem" tabindex="-1" class="admin-only"><i class="fa-solid fa-gear"></i><span>Settings</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Ghassan</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Mariem</span></li>
@@ -197,6 +198,18 @@
       <ul id="scoreboardList" class="scoreboard-list"></ul>
     </section>
 
+    <!-- Point Logs Section (admin only) -->
+    <section id="pointLogs" aria-label="Point Logs Section" hidden class="admin-only">
+      <h1>Point Logs</h1>
+      <div id="pointLogFilters" class="point-log-filters">
+        <label>User: <select id="pointLogFilterUser"></select></label>
+        <label>From: <input type="date" id="pointLogFilterFrom"></label>
+        <label>To: <input type="date" id="pointLogFilterTo"></label>
+        <label>Min change: <input type="number" id="pointLogFilterPoints" placeholder="pts"></label>
+      </div>
+      <div id="pointLogsContainer"></div>
+    </section>
+
     <!-- Settings Section (admin only) -->
     <section id="settings" aria-label="Settings Section" hidden>
       <h1>Settings</h1>
@@ -276,6 +289,7 @@
     <button data-tab="calendar" aria-label="Calendar"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></button>
     <button data-tab="chores" aria-label="Chores"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></button>
     <button data-tab="scoreboard" aria-label="Scoreboard"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="logs" aria-label="Logs" class="admin-only"><i class="fa-solid fa-list"></i><span>Logs</span></button>
     <button data-tab="settings" aria-label="Settings" class="admin-only"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
     <button aria-label="Ghassan profile"><i class="fa-solid fa-user"></i><span>Ghassan</span></button>
     <button aria-label="Mariem profile"><i class="fa-solid fa-user"></i><span>Mariem</span></button>
