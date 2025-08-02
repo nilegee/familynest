@@ -66,6 +66,7 @@
           </button>
           <div id="profileMenu" class="profile-menu" hidden>
             <button id="profileMenuProfile">Profile</button>
+            <button id="profileMenuSettings" class="admin-only">Settings</button>
             <hr>
             <button id="signOutBtn" class="sign-out">Sign Out</button>
           </div>
@@ -214,6 +215,13 @@
     <section id="settings" aria-label="Settings Section" hidden>
       <h1>Settings</h1>
       <button id="resetScoreboardBtn" class="btn-secondary">Reset Scoreboard</button>
+      <div id="photoCleanup" class="admin-only">
+        <h2>Photo Cleanup</h2>
+        <button id="cleanupPhotosWeekBtn" class="btn-secondary">Remove photos older than 1 week</button>
+        <button id="cleanupPhotosMonthBtn" class="btn-secondary">Remove photos older than 1 month</button>
+        <button id="cleanupPhotosAllBtn" class="btn-secondary">Remove all photos</button>
+        <div id="photoCleanupStatus" aria-live="polite"></div>
+      </div>
     </section>
 
     <!-- Profile Detail Section -->

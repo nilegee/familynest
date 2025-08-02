@@ -13,6 +13,7 @@ import { setupProfileEditListeners } from './profileEditListeners.js';
 import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
 import { initNotifications, clearTabDot } from './notifications.js';
 import { setPointLogsData, renderPointLogs, setupPointLogFilters } from './pointLogs.js';
+import { setupSettings } from './settings.js';
 
 let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores, pointLogs;
 
@@ -128,6 +129,7 @@ export async function main() {
   setupScoreboardListeners();
   renderPointLogs();
   setupPointLogFilters();
+  setupSettings();
 
   // Profile editing
   setupProfileEditListeners();
