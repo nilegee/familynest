@@ -25,6 +25,9 @@ export function updateAdminVisibility() {
   const isAdmin = adminUsers.includes(user);
   const choreAdminPanel = document.getElementById('choreAdminPanel');
   if (choreAdminPanel) choreAdminPanel.hidden = !isAdmin;
+  document.querySelectorAll('.admin-only').forEach(el => el.hidden = !isAdmin);
+  const settingsSection = document.getElementById('settings');
+  if (settingsSection) settingsSection.hidden = !isAdmin;
   if (adminAnswerSection) {
     // If qaList not loaded yet, hide
     if (!Array.isArray(window.qaList)) {

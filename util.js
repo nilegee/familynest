@@ -75,7 +75,17 @@ export function generateId() {
 }
 
 export function showAlert(message) {
-  alert(message);
+  const box = document.getElementById('appAlert');
+  if (box) {
+    box.textContent = message;
+    box.hidden = false;
+    setTimeout(() => {
+      box.hidden = true;
+      box.textContent = '';
+    }, 3000);
+  } else {
+    console.warn(message);
+  }
 }
 
 export function normalizeBadgeArray(raw) {
