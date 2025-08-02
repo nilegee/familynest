@@ -375,15 +375,21 @@ h3 { font-size: 1.5rem; }
   max-width: 100%;
 }
 
-.wall-post > img {
+.wall-post-image {
+  display: block;
   max-width: 100%;
-  width: 100%;
+  width: auto;
   height: auto;
-  max-height: 300px;
-  object-fit: cover;
+  max-height: 60vh;
+  object-fit: contain;
   margin-top: 0.5rem;
   border-radius: 8px;
-  display: block;
+}
+
+@media (max-width: 600px) {
+  .wall-post-image {
+    max-height: 40vh;
+  }
 }
 
 ul.wall-posts {
