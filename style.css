@@ -375,12 +375,12 @@ h3 { font-size: 1.5rem; }
   max-width: 100%;
 }
 
-.wall-post-image {
-  width: 100%;
+.wall-post > img {
   max-width: 100%;
+  width: 100%;
   height: auto;
   max-height: 300px;
-  object-fit: contain;
+  object-fit: cover;
   margin-top: 0.5rem;
   border-radius: 8px;
   display: block;
@@ -390,6 +390,7 @@ ul.wall-posts {
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%;
   max-width: 900px;
   user-select: none;
 }
