@@ -686,6 +686,25 @@ section#calendar {
   max-width: 900px;
 }
 
+section#calendar table td.has-event {
+  background: var(--color-accent);
+  position: relative;
+  cursor: pointer;
+}
+
+section#calendar table td.has-event .event-count {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: var(--accent-color);
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  line-height: 18px;
+}
+
 ul.events-list {
   list-style: none;
   padding: 0;
