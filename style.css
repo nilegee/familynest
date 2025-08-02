@@ -498,6 +498,20 @@ ul.wall-posts li {
 .reply-list li {
   margin-top: 0.5rem;
 }
+.reply-form {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.reply-form textarea {
+  flex-grow: 1;
+  resize: vertical;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+}
 .wall-post-edit-area {
   margin-top: 0.5rem;
   display: flex;
