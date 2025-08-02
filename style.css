@@ -2,13 +2,12 @@
 
 /*
   Global design system variables for a consistent theme across the app.
-  The palette centres on a deep blue primary and a warm yellow secondary
+  The palette centres on a deep blue primary and a warm yellow accent
   with neutral grays and whites.
 */
 :root {
   --color-primary: #1D4E89;   /* brand blue */
-  --color-secondary: #F3B44C; /* accent yellow */
-  --color-accent: var(--color-secondary);
+  --color-accent: #F3B44C; /* accent yellow */
   --color-background: #fefefe;
   --color-card: #ffffff;
   --color-text: #333333;
@@ -39,7 +38,7 @@
 }
 button:focus-visible,
 [role="menuitem"]:focus-visible {
-  outline: 2px solid var(--accent-color);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 [hidden] {
@@ -90,7 +89,7 @@ button:hover,
 
 /* Accent button (e.g., login) */
 .btn-accent {
-  background-color: var(--color-secondary);
+  background-color: var(--color-accent);
   color: var(--color-primary);
 }
 
@@ -146,7 +145,7 @@ nav.sidebar .logo {
   gap: var(--space-sm);
 }
 nav.sidebar .logo i {
-  color: var(--color-secondary);
+  color: var(--color-accent);
 }
 nav.sidebar input[type="search"] {
   padding: 0.6rem 1rem;
@@ -192,11 +191,11 @@ nav.sidebar li span {
   flex: 1;
 }
 nav.sidebar li:hover {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: white;
 }
 nav.sidebar li.active {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: white;
   font-weight: 700;
   box-shadow: 0 0 12px rgba(0,0,0,0.2);
@@ -213,7 +212,7 @@ nav.sidebar button#changeUserBtn {
   user-select: none;
 }
 nav.sidebar button#changeUserBtn:hover {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: white;
 }
 
@@ -263,7 +262,7 @@ main.content {
   gap: var(--space-sm);
 }
 .topbar .logo i {
-  color: var(--color-secondary);
+  color: var(--color-accent);
 }
 .topbar .greeting {
   font-weight: 700;
@@ -341,8 +340,8 @@ main.content {
   color: var(--color-text);
 }
 .topbar .search-input:focus {
-  border-color: var(--color-secondary);
-  box-shadow: 0 0 6px var(--color-secondary);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
 }
 .topbar button.bell-btn {
   background: transparent;
@@ -355,7 +354,7 @@ main.content {
   flex-shrink: 0;
 }
 .topbar button.bell-btn:hover {
-  color: var(--color-secondary);
+  color: var(--color-accent);
 }
 .topbar button.bell-btn svg {
   width: 22px;
@@ -371,7 +370,7 @@ main.content {
   color: #fff;
 }
 .theme-toggle:hover {
-  color: var(--color-secondary);
+  color: var(--color-accent);
 }
 .notification-badge {
   position: absolute;
@@ -439,7 +438,7 @@ h3 { font-size: 1.5rem; }
 }
 #photoUploadBtn:hover,
 #togglePollBtn:hover {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: #fff;
 }
 .post-input-row button.add-btn {
@@ -510,7 +509,7 @@ ul.wall-posts li {
   flex-shrink: 0;
 }
 .wall-post-user {
-  color: var(--accent-color);
+  color: var(--color-accent);
   font-weight: 700;
   font-size: 1.1rem;
   user-select: text;
@@ -528,11 +527,11 @@ ul.wall-posts li {
   white-space: pre-wrap;
 }
 .wall-post-text .mention {
-  color: var(--accent-color);
+  color: var(--color-accent);
   font-weight: 600;
 }
 .wall-post-text .hashtag {
-  color: var(--color-secondary);
+  color: var(--color-accent);
   font-weight: 600;
 }
 .wall-post-actions {
@@ -643,8 +642,8 @@ ul.wall-posts li {
 .poll-options button {
   width: 100%;
   background: var(--color-card);
-  border: 1px solid var(--accent-color);
-  color: var(--accent-color);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
   cursor: pointer;
@@ -654,7 +653,7 @@ ul.wall-posts li {
   text-align: left;
 }
 .poll-options button:hover {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: #fff;
 }
 .poll-bar {
@@ -665,7 +664,7 @@ ul.wall-posts li {
   overflow: hidden;
 }
 .poll-bar-fill {
-  background: var(--accent-color);
+  background: var(--color-accent);
   height: 100%;
   display: block;
   width: 0;
@@ -676,7 +675,7 @@ ul.wall-posts li {
 }
 .poll-type {
   font-size: 0.85rem;
-  color: var(--accent-color);
+  color: var(--color-accent);
   margin-top: 0.3rem;
 }
 .poll-total {
@@ -709,7 +708,7 @@ ul.qa-list li {
 }
 .qa-question {
   font-weight: 700;
-  color: var(--accent-color);
+  color: var(--color-accent);
   user-select: text;
 }
 .qa-answer {
@@ -748,7 +747,7 @@ ul.qa-list li {
   object-fit: cover;
 }
 .qa-user {
-  color: var(--accent-color);
+  color: var(--color-accent);
   font-weight: 700;
 }
 .qa-date {
@@ -762,7 +761,7 @@ ul.qa-list li {
   /* Light pastel panel for admin answer area */
   background: rgba(179, 157, 219, 0.2);
   padding: 1rem;
-  border-left: 5px solid var(--accent-color);
+  border-left: 5px solid var(--color-accent);
   border-radius: 8px;
 }
 
@@ -781,7 +780,7 @@ ul.qa-list li {
 #adminAnswerSection button {
   padding: 0.5rem 1.5rem;
   font-weight: 700;
-  background-color: var(--accent-color);
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: var(--radius-md);
@@ -790,14 +789,14 @@ ul.qa-list li {
 }
 
 #adminAnswerSection button:hover {
-  background-color: var(--accent-color);
+  background-color: var(--color-accent);
 }
 
 .pinned-message {
   margin-top: 1rem;
   padding: 1rem;
   background: rgba(179, 157, 219, 0.2);
-  border-left: 5px solid var(--accent-color);
+  border-left: 5px solid var(--color-accent);
   font-style: italic;
   max-width: 900px;
   user-select: none;
@@ -817,7 +816,7 @@ section#calendar table td.has-event .event-count {
   position: absolute;
   bottom: 2px;
   right: 2px;
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: #fff;
   border-radius: 50%;
   width: 18px;
@@ -948,7 +947,7 @@ ul.chores-list li button {
 .badge-container h3 {
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
-  color: var(--accent-color);
+  color: var(--color-accent);
 }
 .badge-list {
   list-style: none;
@@ -959,7 +958,7 @@ ul.chores-list li button {
   gap: 0.5rem;
 }
 .badge-list .badge-item {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: white;
   border-radius: var(--radius-md);
   padding: 0.2rem 0.6rem;
@@ -981,7 +980,7 @@ ul.chores-list li button {
   font-size: 0.9rem;
 }
 .badge-award button {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: white;
   border: none;
   border-radius: var(--radius-md);
@@ -1057,13 +1056,13 @@ input[type="text"], input[type="date"], textarea {
 }
 
 input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 6px var(--accent-color);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
 }
 
 button.add-btn {
   margin-top: 1rem;
-  background: var(--accent-color);
+  background: var(--color-accent);
   border: none;
   border-radius: var(--radius-md);
   padding: 0.6rem 2rem;
@@ -1075,11 +1074,11 @@ button.add-btn {
 }
 
 button.add-btn:hover {
-  background: var(--accent-color);
+  background: var(--color-accent);
 }
 
 button.btn-primary {
-  background-color: var(--accent-color);
+  background-color: var(--color-accent);
   color: white;
   font-weight: 700;
   border: none;
@@ -1092,7 +1091,7 @@ button.btn-primary {
 }
 
 button.btn-primary:hover {
-  background-color: var(--accent-color);
+  background-color: var(--color-accent);
 }
 
 button.btn-secondary {
@@ -1109,7 +1108,7 @@ button.btn-secondary {
 }
 
 button.btn-secondary:hover {
-  background-color: var(--accent-color);
+  background-color: var(--color-accent);
   color: white;
 }
 
@@ -1230,7 +1229,7 @@ button.btn-secondary:hover {
   padding: 0.4rem;
 }
 .hamburger-btn:hover {
-  color: var(--color-secondary);
+  color: var(--color-accent);
 }
 
 /* Floating menu button for small screens */
@@ -1365,7 +1364,7 @@ button.btn-secondary:hover {
   flex-wrap: wrap;
 }
 .scoreboard-badges span {
-  background: var(--accent-color);
+  background: var(--color-accent);
   color: white;
   border-radius: 50%;
   width: 24px;
