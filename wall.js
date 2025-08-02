@@ -354,7 +354,30 @@ export function setupWallListeners() {
       if (btn.classList.contains('reaction-btn')) {
         handleReaction(postIndex, btn.getAttribute('data-reaction'), contentSearch ? contentSearch.value : '');
       } else if (btn.classList.contains('reply-btn')) {
-        handleReply(postIndex, contentSearch ? contentSearch.value : '');
+        let form = li.querySelector('.reply-form');
+        if (form) {
+          form.remove();
+        } else {
+          form = document.createElement('div');
+          form.className = 'reply-form';
+          form.innerHTML = `
+            <textarea class="reply-input" placeholder="Write a reply..."></textarea>
+            <button class="submit-reply-btn">Post</button>
+            <button class="cancel-reply-btn">Cancel</button>
+          `;
+          li.appendChild(form);
+          const textarea = form.querySelector('.reply-input');
+          textarea.focus();
+        }
+      } else if (btn.classList.contains('submit-reply-btn')) {
+        const form = li.querySelector('.reply-form');
+        const textarea = form ? form.querySelector('.reply-input') : null;
+        const text = textarea ? textarea.value.trim() : '';
+        if (form) form.remove();
+        handleReply(postIndex, text, contentSearch ? contentSearch.value : '');
+      } else if (btn.classList.contains('cancel-reply-btn')) {
+        const form = li.querySelector('.reply-form');
+        if (form) form.remove();
       } else if (btn.classList.contains('edit-btn')) {
         const currentUser = localStorage.getItem(currentUserKey);
         if (post.member !== currentUser && !adminUsers.includes(currentUser)) return;
@@ -484,13 +507,12 @@ function handleReaction(postIndex, reaction, filterText) {
   renderWallPosts(filterText);
 }
 
-function handleReply(postIndex, filterText) {
+function handleReply(postIndex, replyText, filterText) {
   const currentUser = localStorage.getItem(currentUserKey);
   if (!currentUser) {
     showAlert('Please select your user first.');
     return;
   }
-  const replyText = prompt('Enter your reply:');
   if (!replyText) return;
   const post = wallPosts[postIndex];
   post.replies = post.replies || [];
