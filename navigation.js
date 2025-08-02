@@ -18,44 +18,35 @@ export function setActiveTab(index) {
   bottomTabs.forEach((tab, i) => {
     tab.classList.toggle('active', i === index);
   });
-  const activeDataTab = sidebarTabs[index].dataset.tab;
-  if (activeDataTab) clearTabDot(activeDataTab);
+  const tabKey = sidebarTabs[index].dataset.tab || sidebarTabs[index].textContent.trim();
+  if (sidebarTabs[index].dataset.tab) clearTabDot(tabKey);
   sections.forEach(sec => sec.hidden = true);
-  const tabName = sidebarTabs[index].textContent.trim();
-  switch (tabName) {
-    case 'Wall':
+  document.getElementById('profileDetail').hidden = true;
+  switch (tabKey) {
+    case 'wall':
       document.getElementById('wall').hidden = false;
       break;
-    case 'Q&A':
+    case 'qa':
       document.getElementById('qa').hidden = false;
       break;
-    case 'Calendar':
+    case 'calendar':
       document.getElementById('calendar').hidden = false;
       break;
-    case 'Chores':
+    case 'chores':
       document.getElementById('chores').hidden = false;
       break;
-    case 'Scoreboard':
+    case 'scoreboard':
       document.getElementById('scoreboard').hidden = false;
       break;
-    case 'Settings':
+    case 'settings':
       document.getElementById('settings').hidden = false;
       break;
-    case 'Ghassan':
-    case 'Mariem':
-    case 'Yazid':
-    case 'Yahya':
+    default:
       document.getElementById('profileDetail').hidden = false;
-      renderSingleProfile(tabName);
+      renderSingleProfile(tabKey);
       break;
   }
   // updateSearchFilters(); // wire up in main if needed
-  if (['Ghassan', 'Mariem', 'Yazid', 'Yahya'].includes(tabName)) {
-    document.getElementById('profileDetail').hidden = false;
-    renderSingleProfile(tabName);
-  } else {
-    document.getElementById('profileDetail').hidden = true;
-  }
 }
 
 export function setupTabListeners() {
