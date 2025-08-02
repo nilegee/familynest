@@ -45,6 +45,9 @@ function getAddPollOptionBtn() {
 function getPollMultipleCheckbox() {
   return document.getElementById('pollMultiple');
 }
+function getPollHideResultsCheckbox() {
+  return document.getElementById('pollHideResults');
+}
 function getPhotoUploadBtn() {
   return document.getElementById('photoUploadBtn');
 }
@@ -112,15 +115,21 @@ export function renderWallPosts(filterText = '') {
       const currentUser = localStorage.getItem(currentUserKey);
       const totalVotes = post.poll.options.reduce((s,o)=>s+((o.votes||[]).length),0);
       const userVoted = post.poll.options.some(o=>(o.votes||[]).includes(currentUser));
+      const showResults = userVoted || !post.poll.hideResults;
       const optionsHtml = post.poll.options.map((o,idx)=>{
         const votes = (o.votes||[]).length;
         const percent = totalVotes ? Math.round(votes*100/totalVotes) : 0;
-        if (userVoted) {
-          return `<li>${escapeHtml(o.text)} <div class="poll-bar"><span class="poll-bar-fill" style="width:${percent}%"></span></div> <span class="poll-count">${votes}</span>${(o.votes||[]).includes(currentUser)?' ✅':''}</li>`;
+        const chosen = (o.votes||[]).includes(currentUser);
+        let inner = `<span class="poll-option-text">${escapeHtml(o.text)}</span>`;
+        if (showResults) {
+          inner += ` <div class="poll-bar"><span class="poll-bar-fill" data-percent="${percent}"></span></div> <span class="poll-count">${votes}</span>`;
         }
-        return `<li><button class="poll-vote-btn" data-idx="${idx}">${escapeHtml(o.text)}</button></li>`;
+        if (chosen) inner += ' ✅';
+        return `<li><button class="poll-vote-btn" data-idx="${idx}">${inner}</button></li>`;
       }).join('');
-      mainHtml = `<div class="poll-question">${safeText}</div><ul class="poll-options">${optionsHtml}</ul>`;
+      const typeText = post.poll.multiple ? 'Multiple choice' : 'Single choice';
+      const totalVotesHtml = showResults ? `<div class="poll-total">${totalVotes} vote${totalVotes===1?'':'s'}</div>` : '';
+      mainHtml = `<div class="poll-question">${safeText}</div><div class="poll-type">${typeText}</div><ul class="poll-options">${optionsHtml}</ul>${totalVotesHtml}`;
     } else {
       mainHtml = `<div class="wall-post-text">${safeText}</div>`;
     }
@@ -167,6 +176,12 @@ export function renderWallPosts(filterText = '') {
     `;
     wallPostsList.appendChild(li);
   });
+  requestAnimationFrame(() => {
+    wallPostsList.querySelectorAll('.poll-bar-fill').forEach(el => {
+      const pct = el.getAttribute('data-percent');
+      if (pct !== null) el.style.width = pct + '%';
+    });
+  });
 }
 
 // All events setup in one go, after DOMContentLoaded
@@ -183,6 +198,7 @@ export function setupWallListeners() {
   const pollOptionsContainer = getPollOptionsContainer();
   const contentSearch = getContentSearch();
   const createPollBtn = getCreatePollBtn();
+  const pollHideResults = getPollHideResultsCheckbox();
   const photoUploadBtn = getPhotoUploadBtn();
   const photoInput = getPhotoInput();
   const photoPreview = getPhotoPreview();
@@ -338,6 +354,7 @@ export function setupWallListeners() {
         }
         base.poll = {
           multiple: getPollMultipleCheckbox() ? getPollMultipleCheckbox().checked : false,
+          hideResults: pollHideResults ? pollHideResults.checked : false,
           options: options.map(t => ({ id: generateId(), text: t, votes: [] }))
         };
         optionInputs.forEach((inp, idx) => { if (idx > 1) inp.remove(); else inp.value = ''; });
@@ -359,6 +376,8 @@ export function setupWallListeners() {
       if (photoPreview) photoPreview.hidden = true;
       pollFields.hidden = true;
       if (createPollBtn) createPollBtn.textContent = 'Create Poll';
+      if (getPollMultipleCheckbox()) getPollMultipleCheckbox().checked = false;
+      if (pollHideResults) pollHideResults.checked = false;
       newWallPostInput.placeholder = 'Share your thoughts or create a poll…';
       renderWallPosts(getContentSearch() ? getContentSearch().value : '');
       notify('wall', 'New wall post', `${currentUser}: ${text}`);
