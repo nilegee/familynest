@@ -437,6 +437,14 @@ ul.wall-posts li {
   user-select: text;
   white-space: pre-wrap;
 }
+.wall-post-text .mention {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+.wall-post-text .hashtag {
+  color: var(--color-secondary);
+  font-weight: 600;
+}
 .wall-post-actions {
   margin-top: 8px;
   display: flex;
