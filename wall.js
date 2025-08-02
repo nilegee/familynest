@@ -293,6 +293,7 @@ export function setupWallListeners() {
       const postId = li.getAttribute('data-id');
       const postIndex = wallPosts.findIndex(p => p.id === postId);
       if (postIndex === -1) return;
+      const post = wallPosts[postIndex];
 
       const btn = e.target.closest('button');
       if (!btn) return;
