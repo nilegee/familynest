@@ -22,7 +22,7 @@
   <script src="./config.js"></script>
 </head>
 <body data-user="">
-  <div id="authContainer"><button id="signInBtn">Sign in with Google</button></div>
+  <div id="authContainer"><button id="signInBtn" aria-label="Sign in with Google">Sign in with Google</button></div>
 
 
 
@@ -65,10 +65,10 @@
             <img id="avatarMenuImg" class="avatar-small" src="icons/default-avatar.svg" alt="User avatar">
           </button>
           <div id="profileMenu" class="profile-menu" hidden>
-            <button id="profileMenuProfile">Profile</button>
-            <button id="profileMenuSettings" class="admin-only">Settings</button>
+            <button id="profileMenuProfile" aria-label="Profile">Profile</button>
+            <button id="profileMenuSettings" class="admin-only" aria-label="Settings">Settings</button>
             <hr>
-            <button id="signOutBtn" class="sign-out">Sign Out</button>
+            <button id="signOutBtn" class="sign-out" aria-label="Sign Out">Sign Out</button>
           </div>
         </div>
       </div>
@@ -82,8 +82,8 @@
       <div class="post-input-row">
         <textarea id="newWallPost" placeholder="Share your thoughts or create a poll…" rows="1" aria-label="New wall post"></textarea>
         <button type="button" id="photoUploadBtn" aria-label="Attach photo"><i class="fa-solid fa-image"></i></button>
-        <button type="button" id="togglePollBtn">Create Poll</button>
-        <button class="add-btn" id="addWallPostBtn" disabled>Post</button>
+        <button type="button" id="togglePollBtn" aria-label="Create Poll">Create Poll</button>
+        <button class="add-btn" id="addWallPostBtn" disabled aria-label="Post to wall">Post</button>
         <input type="file" id="wallPhoto" accept="image/*" hidden>
       </div>
       <img id="wallPhotoPreview" class="wall-photo-preview" alt="Selected photo preview" hidden>
@@ -92,7 +92,7 @@
           <input type="text" class="poll-option-input" placeholder="Option 1">
           <input type="text" class="poll-option-input" placeholder="Option 2">
         </div>
-        <button type="button" id="addPollOptionBtn">Add Option</button>
+        <button type="button" id="addPollOptionBtn" aria-label="Add poll option">Add Option</button>
         <label class="poll-multiple-label"><input type="checkbox" id="pollMultiple"> Allow multiple selections</label>
       </div>
       <ul class="wall-posts" aria-live="polite" aria-atomic="true" aria-relevant="additions" id="wallPostsList"></ul>
@@ -103,13 +103,13 @@
       <h1>Q&amp;A</h1>
       <ul class="qa-list" aria-live="polite" aria-atomic="true" id="qaList"></ul>
       <input type="text" id="newQuestion" placeholder="Ask a question..." aria-label="New question input" autocomplete="off">
-      <button class="add-btn" id="askBtn">Ask</button>
+      <button class="add-btn" id="askBtn" aria-label="Ask question">Ask</button>
 
       <div id="adminAnswerSection" hidden aria-live="polite" aria-atomic="true">
         <h2>Answer a Question</h2>
         <select id="questionSelect" aria-label="Select question to answer"></select>
         <textarea id="answerInput" rows="3" placeholder="Type answer here..." aria-label="Answer input"></textarea>
-        <button id="saveAnswerBtn" class="add-btn">Save Answer</button>
+        <button id="saveAnswerBtn" class="add-btn" aria-label="Save answer">Save Answer</button>
       </div>
 
       <div id="pinnedMessage" class="pinned-message" aria-live="polite" aria-atomic="true">
@@ -155,7 +155,7 @@
       <label for="eventDesc">Event Description:</label><br>
       <input type="text" id="eventDesc" placeholder="Description" aria-label="Event description" autocomplete="off" >
       <br>
-      <button class="add-btn" id="addEventBtn">Add Event</button>
+      <button class="add-btn" id="addEventBtn" aria-label="Add event">Add Event</button>
     </section>
 
     <!-- Chores Section -->
@@ -183,7 +183,7 @@
         <br>
         <label><input type="checkbox" id="choreDaily" > Daily chore</label>
         <br>
-        <button class="add-btn" id="addChoreBtn">Add Chore</button>
+        <button class="add-btn" id="addChoreBtn" aria-label="Add chore">Add Chore</button>
       </div>
     </section>
 
@@ -214,12 +214,12 @@
     <!-- Settings Section (admin only) -->
     <section id="settings" aria-label="Settings Section" hidden>
       <h1>Settings</h1>
-      <button id="resetScoreboardBtn" class="btn-secondary">Reset Scoreboard</button>
+      <button id="resetScoreboardBtn" class="btn-secondary" aria-label="Reset scoreboard">Reset Scoreboard</button>
       <div id="photoCleanup" class="admin-only">
         <h2>Photo Cleanup</h2>
-        <button id="cleanupPhotosWeekBtn" class="btn-secondary">Remove photos older than 1 week</button>
-        <button id="cleanupPhotosMonthBtn" class="btn-secondary">Remove photos older than 1 month</button>
-        <button id="cleanupPhotosAllBtn" class="btn-secondary">Remove all photos</button>
+        <button id="cleanupPhotosWeekBtn" class="btn-secondary" aria-label="Remove photos older than 1 week">Remove photos older than 1 week</button>
+        <button id="cleanupPhotosMonthBtn" class="btn-secondary" aria-label="Remove photos older than 1 month">Remove photos older than 1 month</button>
+        <button id="cleanupPhotosAllBtn" class="btn-secondary" aria-label="Remove all photos">Remove all photos</button>
         <div id="photoCleanupStatus" aria-live="polite"></div>
       </div>
     </section>
@@ -230,7 +230,7 @@
         Profile
         <img id="profileAvatar" alt="" class="profile-avatar" src="" >
       </h1>
-      <button id="editProfileBtn" class="btn-secondary">Edit Profile</button>
+      <button id="editProfileBtn" class="btn-secondary" aria-label="Edit profile">Edit Profile</button>
       <form id="profileEditForm" class="profile-edit-form" hidden>
         <div class="profile-field">
           <label for="editBirthdate">Birthdate</label>
@@ -279,8 +279,8 @@
           <label><input type="checkbox" id="notifyCalendar"> Calendar events</label><br>
           <label><input type="checkbox" id="notifyAnswer"> Answers</label>
         </fieldset>
-        <button type="button" id="saveProfileBtn" class="btn-primary">Save</button>
-        <button type="button" id="cancelProfileBtn" class="btn-secondary">Cancel</button>
+        <button type="button" id="saveProfileBtn" class="btn-primary" aria-label="Save profile">Save</button>
+        <button type="button" id="cancelProfileBtn" class="btn-secondary" aria-label="Cancel profile edit">Cancel</button>
       </form>
       <div id="profileContainer" class="profile-container"></div>
       <div id="similarityInfo" class="similarity-info" hidden></div>
