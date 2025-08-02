@@ -400,13 +400,14 @@ ul.wall-posts li {
 .wall-post-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 }
-.avatar-post {
-  width: 36px;
-  height: 36px;
+.wall-post-avatar,
+.reply-avatar {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   object-fit: cover;
+  margin-right: 8px;
   flex-shrink: 0;
 }
 .wall-post-user {
@@ -467,7 +468,7 @@ ul.wall-posts li {
 }
 .reply-list {
   list-style: none;
-  padding-left: 1rem;
+  padding-left: 0.5rem;
   margin-top: 0.5rem;
   border-left: 2px solid var(--color-border);
 }
