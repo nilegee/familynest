@@ -92,6 +92,7 @@ export function renderWallPosts(filterText = '') {
   const currentUser = localStorage.getItem(currentUserKey);
   filteredPosts.forEach(post => {
     const li = document.createElement('li');
+    li.classList.add('wall-post');
     li.setAttribute('data-id', post.id);
     li.setAttribute('tabindex', '0');
     const safeText = escapeHtml(post.text);

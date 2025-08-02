@@ -370,12 +370,17 @@ h3 { font-size: 1.5rem; }
   display: block;
 }
 
-.wall-post-image {
-  max-width: 100%;
+.wall-post {
   width: 100%;
+  max-width: 100%;
+}
+
+.wall-post-image {
+  width: 100%;
+  max-width: 100%;
   height: auto;
   max-height: 300px;
-  object-fit: cover;
+  object-fit: contain;
   margin-top: 0.5rem;
   border-radius: 8px;
   display: block;
