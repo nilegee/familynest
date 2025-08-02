@@ -11,6 +11,10 @@ let currentUserKey = 'familyCurrentUser';
 // prevent attaching listeners multiple times when main() runs again
 let wallListenersInitialized = false;
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+const POSTS_PER_PAGE = 10;
+let currentPage = 1;
+let currentFilterText = '';
+let hasMorePosts = false;
 
 export function setWallData({ wallPostsRef = [], userKey = 'familyCurrentUser' }) {
   wallPosts = wallPostsRef;
@@ -73,11 +77,25 @@ function readFileAsDataURL(file) {
   });
 }
 
+function formatPostText(text) {
+  if (!text) return '';
+  const escaped = escapeHtml(text);
+  return escaped
+    .replace(/(^|\s)@([a-zA-Z0-9_]+)/g, '$1<span class="mention">@$2</span>')
+    .replace(/(^|\s)#([a-zA-Z0-9_]+)/g, '$1<span class="hashtag">#$2</span>');
+}
+
 // Main render
-export function renderWallPosts(filterText = '') {
+export function renderWallPosts(filterText = '', reset = true) {
   const wallPostsList = getWallPostsList();
   if (!wallPostsList) return; // DOM not ready yet!
-  wallPostsList.innerHTML = '';
+  if (reset) {
+    wallPostsList.innerHTML = '';
+    currentPage = 1;
+    currentFilterText = filterText;
+  } else {
+    filterText = currentFilterText;
+  }
 
   const posts = Array.isArray(wallPosts)
     ? [...wallPosts].sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -89,13 +107,18 @@ export function renderWallPosts(filterText = '') {
       p.text.toLowerCase().includes(f) || p.member.toLowerCase().includes(f)
     );
   }
+
+  const start = (currentPage - 1) * POSTS_PER_PAGE;
+  const end = currentPage * POSTS_PER_PAGE;
+  const toRender = filteredPosts.slice(start, end);
+
   const currentUser = localStorage.getItem(currentUserKey);
-  filteredPosts.forEach(post => {
+  toRender.forEach(post => {
     const li = document.createElement('li');
     li.classList.add('wall-post');
     li.setAttribute('data-id', post.id);
     li.setAttribute('tabindex', '0');
-    const safeText = escapeHtml(post.text);
+    const safeText = formatPostText(post.text);
 
     const repliesArr = Array.isArray(post.replies) ? post.replies : [];
     const replies = repliesArr.map(r => {
@@ -107,7 +130,7 @@ export function renderWallPosts(filterText = '') {
           <strong class="wall-post-user">${escapeHtml(r.member)}</strong>
           <span class="wall-post-date" title="${formatDateLocal(r.date)}">${timeAgo(r.date)}</span>
         </div>
-        <div class="wall-post-text">${escapeHtml(r.text)}</div>
+        <div class="wall-post-text">${formatPostText(r.text)}</div>
       </li>`;
     }).join('');
 
@@ -177,6 +200,9 @@ export function renderWallPosts(filterText = '') {
     `;
     wallPostsList.appendChild(li);
   });
+
+  hasMorePosts = end < filteredPosts.length;
+
   requestAnimationFrame(() => {
     wallPostsList.querySelectorAll('.poll-bar-fill').forEach(el => {
       const pct = el.getAttribute('data-percent');
@@ -393,6 +419,14 @@ export function setupWallListeners() {
       renderWallPosts(contentSearch.value);
     });
   }
+
+  window.addEventListener('scroll', () => {
+    if (!hasMorePosts) return;
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+      currentPage++;
+      renderWallPosts(undefined, false);
+    }
+  });
 
   updatePostBtnState();
   wallListenersInitialized = true;
