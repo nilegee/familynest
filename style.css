@@ -1170,3 +1170,8 @@ nav.bottom-nav::after {
     max-width: 100vw;
   }
 }
+
+.app-alert {
+  color: #b00020;
+  margin: 1rem 0;
+}

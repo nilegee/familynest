@@ -35,6 +35,7 @@
       <li data-tab="calendar" role="menuitem" tabindex="-1"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></li>
       <li data-tab="chores" role="menuitem" tabindex="-1"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></li>
       <li data-tab="scoreboard" role="menuitem" tabindex="-1"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="settings" role="menuitem" tabindex="-1" class="admin-only"><i class="fa-solid fa-gear"></i><span>Settings</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Ghassan</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Mariem</span></li>
       <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Yazid</span></li>
@@ -70,6 +71,8 @@
         </div>
       </div>
     </header>
+
+    <div id="appAlert" class="app-alert" hidden></div>
 
     <!-- Wall Section -->
     <section id="wall" aria-label="Wall Section">
@@ -191,6 +194,11 @@
         <option value="chores">Completed Chores</option>
       </select>
       <ul id="scoreboardList" class="scoreboard-list"></ul>
+    </section>
+
+    <!-- Settings Section (admin only) -->
+    <section id="settings" aria-label="Settings Section" hidden>
+      <h1>Settings</h1>
       <button id="resetScoreboardBtn" class="btn-secondary">Reset Scoreboard</button>
     </section>
 
@@ -267,6 +275,7 @@
     <button data-tab="calendar" aria-label="Calendar"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></button>
     <button data-tab="chores" aria-label="Chores"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></button>
     <button data-tab="scoreboard" aria-label="Scoreboard"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="settings" aria-label="Settings" class="admin-only"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
     <button aria-label="Ghassan profile"><i class="fa-solid fa-user"></i><span>Ghassan</span></button>
     <button aria-label="Mariem profile"><i class="fa-solid fa-user"></i><span>Mariem</span></button>
     <button aria-label="Yazid profile"><i class="fa-solid fa-user"></i><span>Yazid</span></button>

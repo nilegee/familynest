@@ -2,6 +2,7 @@
 
 import { showAlert, normalizeBadgeArray } from "./util.js";
 import { renderScoreboard } from './scoreboard.js';
+import { adminUsers } from './data.js';
 
 let _chores = [];
 let _badges = {};
@@ -41,6 +42,11 @@ export function renderChores(filterText = '', dailyOnly = false) {
 
   let filtered = Array.isArray(_chores) ? [..._chores] : [];
   if (dailyOnly) filtered = filtered.filter(item => item.daily);
+  const currentUser = localStorage.getItem('familyCurrentUser');
+  const isAdmin = adminUsers.includes(currentUser);
+  if (!isAdmin) {
+    filtered = filtered.filter(item => item.assignedTo === currentUser || item.assignedTo === 'All');
+  }
   if (filterText) {
     const f = filterText.toLowerCase();
     filtered = filtered.filter(
@@ -169,7 +175,7 @@ export function setupChoresUI({
   addChoreBtn?.addEventListener('click', () => {
     const desc = choreDescInput?.value.trim();
     if (!desc) {
-      alert('Please enter a chore description.');
+      showAlert('Please enter a chore description.');
       return;
     }
     addChore({

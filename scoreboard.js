@@ -1,6 +1,7 @@
 // scoreboard.js
 
 import { saveToSupabase } from './storage.js';
+import { adminUsers } from './data.js';
 
 let _userPoints = {};
 let _badges = {};
@@ -61,6 +62,8 @@ export function renderScoreboard() {
 }
 
 export function resetScoreboard() {
+  const user = localStorage.getItem('familyCurrentUser');
+  if (!adminUsers.includes(user)) return;
   _userPoints = {};
   _badges = {};
   _completedChores = {};
@@ -74,9 +77,7 @@ export function setupScoreboardListeners() {
   const resetBtn = document.getElementById('resetScoreboardBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      if (confirm('Reset all scores and badges?')) {
-        resetScoreboard();
-      }
+      resetScoreboard();
     });
   }
 
