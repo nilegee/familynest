@@ -10,7 +10,7 @@ let wallPosts = [];
 let currentUserKey = 'familyCurrentUser';
 // prevent attaching listeners multiple times when main() runs again
 let wallListenersInitialized = false;
-const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB target after compression
 const POSTS_PER_PAGE = 10;
 let currentPage = 1;
 let currentFilterText = '';
@@ -68,12 +68,46 @@ function autoResizeTextarea(el) {
   el.style.height = el.scrollHeight + 'px';
 }
 
-function readFileAsDataURL(file) {
+// Resize an image to keep it within reasonable dimensions and under MAX_IMAGE_SIZE.
+// Returns a data URL of the processed image.
+function resizeImage(file, maxBytes = MAX_IMAGE_SIZE, maxWidth = 1024, maxHeight = 1024) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let { width, height } = img;
+      const scale = Math.min(maxWidth / width, maxHeight / height, 1);
+      width *= scale;
+      height *= scale;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      let quality = 0.92;
+      const attempt = () => {
+        canvas.toBlob(blob => {
+          if (!blob) {
+            reject(new Error('Image processing failed'));
+            return;
+          }
+          if (blob.size <= maxBytes || quality <= 0.5) {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          } else {
+            quality -= 0.07;
+            attempt();
+          }
+        }, 'image/jpeg', quality);
+      };
+      attempt();
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = reject;
+    img.src = url;
   });
 }
 
@@ -229,6 +263,7 @@ export function setupWallListeners() {
   const photoUploadBtn = getPhotoUploadBtn();
   const photoInput = getPhotoInput();
   const photoPreview = getPhotoPreview();
+  let processedPhotoData = null;
 
   function updatePostBtnState() {
     const text = newWallPostInput ? newWallPostInput.value.trim() : '';
@@ -241,7 +276,7 @@ export function setupWallListeners() {
     }
     if (photoInput && photoInput.files[0]) {
       const file = photoInput.files[0];
-      if (!file.type.startsWith('image/') || file.size > MAX_IMAGE_SIZE) valid = false;
+      if (!file.type.startsWith('image/')) valid = false;
     }
     if (addWallPostBtn) addWallPostBtn.disabled = !valid;
   }
@@ -281,10 +316,11 @@ export function setupWallListeners() {
   }
 
   if (photoInput && photoPreview) {
-    photoInput.addEventListener('change', () => {
+    photoInput.addEventListener('change', async () => {
       const file = photoInput.files[0];
       if (!file) {
         photoPreview.hidden = true;
+        processedPhotoData = null;
         updatePostBtnState();
         return;
       }
@@ -292,22 +328,13 @@ export function setupWallListeners() {
         showAlert('Only image files are allowed.');
         photoInput.value = '';
         photoPreview.hidden = true;
+        processedPhotoData = null;
         updatePostBtnState();
         return;
       }
-      if (file.size > MAX_IMAGE_SIZE) {
-        showAlert('Image must be smaller than 2 MB.');
-        photoInput.value = '';
-        photoPreview.hidden = true;
-        updatePostBtnState();
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = e => {
-        photoPreview.src = e.target.result;
-        photoPreview.hidden = false;
-      };
-      reader.readAsDataURL(file);
+      processedPhotoData = await resizeImage(file);
+      photoPreview.src = processedPhotoData;
+      photoPreview.hidden = false;
       updatePostBtnState();
     });
   }
@@ -387,8 +414,8 @@ export function setupWallListeners() {
         };
         optionInputs.forEach((inp, idx) => { if (idx > 1) inp.remove(); else inp.value = ''; });
       }
-      if (photoInput && photoInput.files[0]) {
-        base.photo = await readFileAsDataURL(photoInput.files[0]);
+      if (photoInput && photoInput.files[0] && processedPhotoData) {
+        base.photo = processedPhotoData;
       }
       wallPosts.unshift(base);
       addWallPostBtn.disabled = true;
@@ -402,6 +429,7 @@ export function setupWallListeners() {
       autoResizeTextarea(getNewWallPostInput());
       if (photoInput) photoInput.value = '';
       if (photoPreview) photoPreview.hidden = true;
+      processedPhotoData = null;
       pollFields.hidden = true;
       if (createPollBtn) createPollBtn.textContent = 'Create Poll';
       if (getPollMultipleCheckbox()) getPollMultipleCheckbox().checked = false;
