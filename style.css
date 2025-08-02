@@ -1382,7 +1382,7 @@ nav.bottom-nav {
   scrollbar-width: none;
 }
 nav.bottom-nav button {
-  flex: 0 0 72px;
+  flex: 1 0 60px;
   padding: 0.6rem 0.4rem;
   background: none;
   border: none;
