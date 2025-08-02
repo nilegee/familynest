@@ -7,7 +7,7 @@
 */
 :root {
   --color-primary: #1D4E89;   /* brand blue */
-  --color-secondary: #F3B44C; /* brand yellow */
+  --color-secondary: #B8860B; /* accessible yellow */
   --color-accent: var(--color-secondary);
   --color-background: #fefefe;
   --color-card: #ffffff;
@@ -102,7 +102,7 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-  color: #888;
+  color: #666;
 }
 
 /* Containers */

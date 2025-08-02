@@ -10,6 +10,7 @@ export async function initNotifications() {
       console.warn('SW registration failed', e);
     }
   }
+  requestPermission();
 }
 
 export function requestPermission() {

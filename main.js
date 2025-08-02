@@ -132,3 +132,6 @@ export async function main() {
 
 }
 
+
+// Initialize the application
+main();

@@ -84,10 +84,22 @@ export function setupSidebarToggle() {
     overlay.classList.toggle('visible', isOpen);
     if (floatBtn) floatBtn.setAttribute('aria-expanded', isOpen);
     if (hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', isOpen);
+    if (isOpen) {
+      const active = sidebar.querySelector('li.active');
+      if (active) active.focus();
+    } else {
+      const trigger = floatBtn || hamburgerBtn;
+      if (trigger) trigger.focus();
+    }
   }
 
   [floatBtn, hamburgerBtn].forEach(btn => {
     if (btn) btn.addEventListener('click', toggle);
   });
   overlay.addEventListener('click', toggle);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+      toggle();
+    }
+  });
 }
