@@ -29,7 +29,9 @@ let supabaseEnabled = true;
 export let supabase;
 
 if (!supabaseUrl || !supabaseKey) {
-  showAlert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
+  if (!window.DISABLE_SUPABASE_ALERT) {
+    showAlert('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_KEY in config.js');
+  }
   supabaseEnabled = false;
 } else {
   supabase = window.supabase

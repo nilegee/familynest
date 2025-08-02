@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" >
+  <meta name="viewport" content="width=device-width, initial-scale=1" >
+  <title>Family Dashboard - Ghassan's Style</title>
+  <!-- Import custom font for the logo. Using Pacifico adds a handwritten feel to the title -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;display=swap" rel="stylesheet">
+  <!-- Include Font Awesome icons for consistent iconography -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" >
+  <!-- Link to web app manifest so the PWA install prompt appears. Use a relative path so it works when hosted in a subfolder (e.g. GitHub Pages). -->
+  <link rel="manifest" href="./manifest.json">
+  <!-- Set a base URL so that all relative resources (CSS/JS/icons) are resolved relative to the app root, not the domain root. -->
+  <base href="./">
+  <link rel="icon" href="./icons/favicon.ico">
+  <link rel="stylesheet" href="./style.css" >
+  <script>window.DISABLE_SUPABASE_ALERT = true;</script>
+</head>
+<body data-user="">
+  <div id="authContainer"><button id="signInBtn" aria-label="Sign in with Google">Sign in with Google</button></div>
+
+
+
+  <nav class="sidebar" aria-label="Main navigation">
+    <div class="logo">Family Nest 🪺</div>
+    <input type="search" id="sidebarSearch" placeholder="Search menu" aria-label="Search navigation menu" autocomplete="off">
+    <ul role="menubar" aria-orientation="vertical" id="sidebarMenu">
+      <li data-tab="wall" role="menuitem" tabindex="0" class="active" aria-current="page"><i class="fa-solid fa-house"></i><span>Wall</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="qa" role="menuitem" tabindex="-1"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="calendar" role="menuitem" tabindex="-1"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="chores" role="menuitem" tabindex="-1"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="scoreboard" role="menuitem" tabindex="-1"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></li>
+      <li data-tab="logs" role="menuitem" tabindex="-1" class="admin-only"><i class="fa-solid fa-list"></i><span>Logs</span></li>
+      <li data-tab="settings" role="menuitem" tabindex="-1" class="admin-only"><i class="fa-solid fa-gear"></i><span>Settings</span></li>
+      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Ghassan</span></li>
+      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Mariem</span></li>
+      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Yazid</span></li>
+      <li role="menuitem" tabindex="-1"><i class="fa-solid fa-user"></i><span>Yahya</span></li>
+    </ul>
+  </nav>
+
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <main class="content" role="main" tabindex="0">
+    <header class="topbar" role="region" aria-label="User greeting and controls">
+      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
+      <div>
+        <div class="greeting">Welcome, <span id="currentUserDisplay">Guest</span></div>
+        <div class="date" id="currentDateDisplay" aria-live="polite" aria-atomic="true">Loading date...</div>
+      </div>
+      <div class="right-controls">
+        <input type="search" id="contentSearch" class="search-input" placeholder="Search content" aria-label="Search content" autocomplete="off">
+        <button class="bell-btn" aria-label="Notifications" id="notificationBtn" aria-live="polite" aria-atomic="true" aria-relevant="additions">
+          <i class="fa-solid fa-bell"></i>
+          <span id="notificationBadge" class="notification-badge" aria-hidden="true"></span>
+        </button>
+        <button id="themeToggleBtn" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        <div class="profile-dropdown">
+          <button id="profileMenuBtn" aria-label="Account menu" hidden>
+            <img id="avatarMenuImg" class="avatar-small" src="icons/default-avatar.svg" alt="User avatar">
+          </button>
+          <div id="profileMenu" class="profile-menu" hidden>
+            <button id="profileMenuProfile" aria-label="Profile">Profile</button>
+            <button id="profileMenuSettings" class="admin-only" aria-label="Settings">Settings</button>
+            <hr>
+            <button id="signOutBtn" class="sign-out" aria-label="Sign Out">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div id="appAlert" class="app-alert" hidden></div>
+
+    <!-- Wall Section -->
+    <section id="wall" aria-label="Wall Section">
+      <h1>Wall</h1>
+      <div class="post-input-row">
+        <textarea id="newWallPost" placeholder="Share your thoughts or create a poll…" rows="1" aria-label="New wall post"></textarea>
+        <button type="button" id="photoUploadBtn" aria-label="Attach photo"><i class="fa-solid fa-image"></i></button>
+        <button type="button" id="togglePollBtn" aria-label="Create Poll">Create Poll</button>
+        <button class="add-btn" id="addWallPostBtn" disabled aria-label="Post to wall">Post</button>
+        <input type="file" id="wallPhoto" accept="image/*" hidden>
+      </div>
+      <img id="wallPhotoPreview" class="wall-photo-preview" alt="Selected photo preview" hidden>
+      <div id="pollFields" class="poll-fields" hidden>
+        <div id="pollOptions" class="poll-options-edit">
+          <input type="text" class="poll-option-input" placeholder="Option 1">
+          <input type="text" class="poll-option-input" placeholder="Option 2">
+        </div>
+        <button type="button" id="addPollOptionBtn" aria-label="Add poll option">Add Option</button>
+        <label class="poll-multiple-label"><input type="checkbox" id="pollMultiple"> Allow multiple selections</label>
+        <label class="poll-hide-label"><input type="checkbox" id="pollHideResults"> Hide results until vote</label>
+      </div>
+      <ul class="wall-posts" aria-live="polite" aria-atomic="true" aria-relevant="additions" id="wallPostsList"></ul>
+    </section>
+
+    <!-- Q&amp;A Section -->
+    <section id="qa" aria-label="Q&amp;A Section" hidden>
+      <h1>Q&amp;A</h1>
+      <ul class="qa-list" aria-live="polite" aria-atomic="true" id="qaList"></ul>
+      <input type="text" id="newQuestion" placeholder="Ask a question..." aria-label="New question input" autocomplete="off">
+      <button class="add-btn" id="askBtn" aria-label="Ask question">Ask</button>
+
+      <div id="adminAnswerSection" hidden aria-live="polite" aria-atomic="true">
+        <h2>Answer a Question</h2>
+        <select id="questionSelect" aria-label="Select question to answer"></select>
+        <textarea id="answerInput" rows="3" placeholder="Type answer here..." aria-label="Answer input"></textarea>
+        <button id="saveAnswerBtn" class="add-btn" aria-label="Save answer">Save Answer</button>
+      </div>
+
+      <div id="pinnedMessage" class="pinned-message" aria-live="polite" aria-atomic="true">
+        Mariem is the love of my life and followed by Yazid and Yahya. You are my kids and you are my whole world, the best time I spend is with all of you.
+      </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section id="calendar" aria-label="Calendar Section" hidden>
+      <h1>Calendar</h1>
+
+      <table id="calendarTable" aria-label="August 2025 Calendar" role="grid" aria-readonly="true" aria-describedby="calendarLegend">
+        <thead>
+          <tr>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Sun</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Mon</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Tue</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Wed</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Thu</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Fri</th>
+            <th scope="col" style="padding: 6px; border: 1px solid #ddd;">Sat</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+
+      <div id="calendarLegend" class="calendar-legend">
+        <strong>Legend:</strong>
+        <span><span class="legend-color" style="background:#9c27b0;"></span>Birthday 🎂</span>
+        <span><span class="legend-color" style="background:#2196f3;"></span>Trip 🏨</span>
+        <span><span class="legend-color" style="background:#4caf50;"></span>Other 📅</span>
+      </div>
+
+      <h2>Upcoming Events</h2>
+      <ul class="events-list" aria-live="polite" aria-atomic="true" id="eventList"></ul>
+
+      <label for="eventStartDate">Start Date:</label><br>
+      <input type="date" id="eventStartDate" aria-label="Event start date" >
+      <br>
+      <label for="eventEndDate">End Date (optional):</label><br>
+      <input type="date" id="eventEndDate" aria-label="Event end date" >
+      <br>
+      <label for="eventDesc">Event Description:</label><br>
+      <input type="text" id="eventDesc" placeholder="Description" aria-label="Event description" autocomplete="off" >
+      <br>
+      <button class="add-btn" id="addEventBtn" aria-label="Add event">Add Event</button>
+    </section>
+
+    <!-- Chores Section -->
+    <section id="chores" aria-label="Chores Section" hidden>
+      <h1>Chores</h1>
+      <label><input type="checkbox" id="showDailyOnly" > Show daily chores only</label>
+      <ul id="choresList" class="chores-list" aria-live="polite" aria-atomic="true"></ul>
+      <!-- Admin-only chore creation form -->
+      <div id="choreAdminPanel" hidden>
+        <h2>Add Chore</h2>
+        <label for="choreDesc">Description:</label><br>
+        <input type="text" id="choreDesc" placeholder="e.g., Water the plants" aria-label="Chore description" autocomplete="off" >
+        <br>
+        <label for="choreAssignedTo">Assign To:</label><br>
+        <select id="choreAssignedTo" aria-label="Assign chore">
+          <option value="All">All</option>
+          <option value="Ghassan">Ghassan</option>
+          <option value="Mariem">Mariem</option>
+          <option value="Yazid">Yazid</option>
+          <option value="Yahya">Yahya</option>
+        </select>
+        <br>
+        <label for="choreDue">Due Date:</label><br>
+        <input type="date" id="choreDue" aria-label="Chore due date" >
+        <br>
+        <label><input type="checkbox" id="choreDaily" > Daily chore</label>
+        <br>
+        <button class="add-btn" id="addChoreBtn" aria-label="Add chore">Add Chore</button>
+      </div>
+    </section>
+
+    <!-- Scoreboard Section -->
+    <section id="scoreboard" aria-label="Scoreboard Section" hidden>
+      <h1>Scoreboard</h1>
+      <label for="scoreSortBy" class="score-sort-label">Sort by:</label>
+      <select id="scoreSortBy" class="score-sort-select">
+        <option value="points">Points</option>
+        <option value="name">Name</option>
+        <option value="chores">Completed Chores</option>
+      </select>
+      <ul id="scoreboardList" class="scoreboard-list"></ul>
+    </section>
+
+    <!-- Point Logs Section (admin only) -->
+    <section id="pointLogs" aria-label="Point Logs Section" hidden class="admin-only">
+      <h1>Point Logs</h1>
+      <div id="pointLogFilters" class="point-log-filters">
+        <label>User: <select id="pointLogFilterUser"></select></label>
+        <label>From: <input type="date" id="pointLogFilterFrom"></label>
+        <label>To: <input type="date" id="pointLogFilterTo"></label>
+        <label>Min change: <input type="number" id="pointLogFilterPoints" placeholder="pts"></label>
+      </div>
+      <div id="pointLogsContainer"></div>
+    </section>
+
+    <!-- Settings Section (admin only) -->
+    <section id="settings" aria-label="Settings Section" hidden>
+      <h1>Settings</h1>
+      <button id="resetScoreboardBtn" class="btn-secondary" aria-label="Reset scoreboard">Reset Scoreboard</button>
+      <div id="photoCleanup" class="admin-only">
+        <h2>Photo Cleanup</h2>
+        <button id="cleanupPhotosWeekBtn" class="btn-secondary" aria-label="Remove photos older than 1 week">Remove photos older than 1 week</button>
+        <button id="cleanupPhotosMonthBtn" class="btn-secondary" aria-label="Remove photos older than 1 month">Remove photos older than 1 month</button>
+        <button id="cleanupPhotosAllBtn" class="btn-secondary" aria-label="Remove all photos">Remove all photos</button>
+        <div id="photoCleanupStatus" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- Profile Detail Section -->
+    <section id="profileDetail" aria-label="Profile Detail Section" hidden>
+      <h1 id="profileName" style="display:flex; align-items:center; gap:10px;">
+        Profile
+        <img id="profileAvatar" alt="" class="profile-avatar" src="" >
+      </h1>
+      <button id="editProfileBtn" class="btn-secondary" aria-label="Edit profile">Edit Profile</button>
+      <form id="profileEditForm" class="profile-edit-form" hidden>
+        <div class="profile-field">
+          <label for="editBirthdate">Birthdate</label>
+          <input type="date" id="editBirthdate" >
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteColor">Favourite Colour</label>
+          <input type="text" id="editFavoriteColor" >
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteFood">Favourite Food</label>
+          <input type="text" id="editFavoriteFood" >
+        </div>
+        <div class="profile-field">
+          <label for="editDislikedFood">Disliked Food</label>
+          <input type="text" id="editDislikedFood" >
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteWeekendActivity">Favourite Weekend Activity</label>
+          <input type="text" id="editFavoriteWeekendActivity" >
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteGame">Favourite Game</label>
+          <input type="text" id="editFavoriteGame" >
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteMovie">Favourite Movie</label>
+          <input type="text" id="editFavoriteMovie" >
+        </div>
+        <div class="profile-field">
+          <label for="editFavoriteHero">Favourite Hero</label>
+          <input type="text" id="editFavoriteHero" >
+        </div>
+        <div class="profile-field">
+          <label for="editProfessionTitle">Profession</label>
+          <input type="text" id="editProfessionTitle" >
+        </div>
+        <div class="profile-field">
+          <label for="editFunFact">Fun Fact</label>
+          <textarea id="editFunFact" rows="3"></textarea>
+        </div>
+        <fieldset class="profile-field">
+          <legend>Notifications</legend>
+          <label><input type="checkbox" id="notifyWall"> Wall posts</label><br>
+          <label><input type="checkbox" id="notifyQa"> Questions</label><br>
+          <label><input type="checkbox" id="notifyCalendar"> Calendar events</label><br>
+          <label><input type="checkbox" id="notifyAnswer"> Answers</label>
+        </fieldset>
+        <button type="button" id="saveProfileBtn" class="btn-primary" aria-label="Save profile">Save</button>
+        <button type="button" id="cancelProfileBtn" class="btn-secondary" aria-label="Cancel profile edit">Cancel</button>
+      </form>
+      <div id="profileContainer" class="profile-container"></div>
+      <div id="similarityInfo" class="similarity-info" hidden></div>
+    </section>
+  </main>
+
+  <button id="floatingMenuBtn" class="floating-menu-btn" aria-label="Open menu" title="Menu">
+    <i class="fa-solid fa-ellipsis-vertical"></i>
+  </button>
+
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <button data-tab="wall" aria-label="Wall"><i class="fa-solid fa-house"></i><span>Wall</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="qa" aria-label="Q and A"><i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="calendar" aria-label="Calendar"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="chores" aria-label="Chores"><i class="fa-solid fa-broom"></i><span>Chores</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="scoreboard" aria-label="Scoreboard"><i class="fa-solid fa-trophy"></i><span>Scoreboard</span><span class="tab-notify-dot"></span></button>
+    <button data-tab="logs" aria-label="Logs" class="admin-only"><i class="fa-solid fa-list"></i><span>Logs</span></button>
+    <button data-tab="settings" aria-label="Settings" class="admin-only"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
+    <button aria-label="Ghassan profile"><i class="fa-solid fa-user"></i><span>Ghassan</span></button>
+    <button aria-label="Mariem profile"><i class="fa-solid fa-user"></i><span>Mariem</span></button>
+    <button aria-label="Yazid profile"><i class="fa-solid fa-user"></i><span>Yazid</span></button>
+    <button aria-label="Yahya profile"><i class="fa-solid fa-user"></i><span>Yahya</span></button>
+  </nav>
+
+  <script type="module" src="./auth.dev.js"></script>
+  <!-- Modular JS loader -->
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

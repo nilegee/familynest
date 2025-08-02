@@ -2,6 +2,10 @@
 
 FamilyNest now stores all data in [Supabase](https://supabase.com). The front end communicates directly with your Supabase project – no separate Node.js server is required.
 
+## Development Without Supabase
+
+To work on the interface without any database connection, open `index.dev.html` in your browser. This page loads default data from local storage so you can test UI/UX without Supabase.
+
 ## Configure Supabase
 
 1. Create a project at [app.supabase.com](https://app.supabase.com/).
