@@ -158,3 +158,4 @@ export const defaultChores = [
 export const defaultUserPoints = { Ghassan: 0, Mariem: 0, Yazid: 0, Yahya: 0 };
 export const defaultBadges = { Ghassan: [], Mariem: [], Yazid: [], Yahya: [] };
 export const defaultCompletedChores = { Ghassan: 0, Mariem: 0, Yazid: 0, Yahya: 0 };
+export const defaultPointLogs = [];

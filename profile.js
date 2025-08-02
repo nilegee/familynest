@@ -10,6 +10,7 @@ let badgeTypes = [];
 let badges = {};
 let userPoints = {};
 let completedChores = {};
+let pointLogs = [];
 export let currentEditingProfile = null;
 export let profileSimilarities = {};
 
@@ -23,13 +24,15 @@ export function setProfileData(
   badgeData = {},
   badgeTypeData = [],
   userPts = {},
-  completed = {}
+  completed = {},
+  pointLogsData = []
 ) {
   profilesData = data;
   badges = badgeData;
   badgeTypes = badgeTypeData;
   userPoints = userPts;
   completedChores = completed;
+  pointLogs = pointLogsData;
 }
 
 // Grant badge and increment points should ideally be imported, but can be local here for now:
@@ -58,8 +61,18 @@ function revokeBadge(user, badgeId) {
 }
 
 function incrementPoints(user, amount = 1) {
+  const admin = localStorage.getItem('familyCurrentUser');
+  if (!adminUsers.includes(admin)) return;
   userPoints[user] = (userPoints[user] || 0) + amount;
   saveToSupabase('user_points', userPoints);
+  pointLogs.push({
+    id: generateId(),
+    user,
+    admin,
+    amount,
+    timestamp: new Date().toISOString()
+  });
+  saveToSupabase('point_logs', pointLogs);
   renderScoreboard();
 }
 
@@ -300,7 +313,15 @@ export function renderSingleProfile(name) {
       incrementPoints(name);
       renderSingleProfile(name);
     });
+    const subBtn = document.createElement('button');
+    subBtn.className = 'btn-secondary';
+    subBtn.textContent = '-1 Point';
+    subBtn.addEventListener('click', () => {
+      incrementPoints(name, -1);
+      renderSingleProfile(name);
+    });
     pointsDiv.appendChild(addBtn);
+    pointsDiv.appendChild(subBtn);
   }
   profileContainer.appendChild(pointsDiv);
 

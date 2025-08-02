@@ -9,7 +9,8 @@ import {
   defaultChores,
   defaultUserPoints,
   defaultBadges,
-  defaultCompletedChores
+  defaultCompletedChores,
+  defaultPointLogs
 } from './data.js';
 
 import { generateId, showAlert } from './util.js';
@@ -225,5 +226,6 @@ export async function loadAllData() {
   let userPoints = await loadFromSupabase('user_points', defaultUserPoints);
   let badges = await loadFromSupabase('badges', defaultBadges);
   let completedChores = await loadFromSupabase('completed_chores', defaultCompletedChores);
-  return { wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores };
+  let pointLogs = await loadFromSupabase('point_logs', defaultPointLogs);
+  return { wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores, pointLogs };
 }

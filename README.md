@@ -26,6 +26,7 @@ FamilyNest expects the following tables to exist in your Supabase project:
 | `chores`         | Chores assigned to family members  | `id` (text), `desc` (text), `assignedTo` (text), `due` (date), `daily` (boolean), `completed` (boolean) |
 | `reminders`      | Reminders for family members       | `id` (text), `text` (text), `date` (timestamp) |
 | `user_points`    | Points for each family member       | `name` (text), `value` (integer)      |
+| `point_logs`     | Log of point changes                | `id` (text), `user` (text), `admin` (text), `amount` (integer), `timestamp` (timestamp) |
 | `badges`         | Earned badges for members           | `name` (text), `value` (json)         |
 | `completed_chores`| Total chores completed            | `name` (text), `value` (integer)      |
 

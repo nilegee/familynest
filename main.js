@@ -13,7 +13,7 @@ import { setupProfileEditListeners } from './profileEditListeners.js';
 import { badgeTypes } from './data.js'; // if you use badgeTypes from your data.js
 import { initNotifications, clearTabDot } from './notifications.js';
 
-let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores;
+let wallPosts, qaList, calendarEvents, profilesData, chores, userPoints, badges, completedChores, pointLogs;
 
 // Assign loaded state to locals, also inject into window if you want
 function assignData(allData) {
@@ -25,6 +25,7 @@ function assignData(allData) {
   userPoints = allData.userPoints;
   badges = allData.badges;
   completedChores = allData.completedChores;
+  pointLogs = allData.pointLogs;
 
   // If you want dev/legacy access
   window.wallPosts = wallPosts;
@@ -35,6 +36,7 @@ function assignData(allData) {
   window.userPoints = userPoints;
   window.badges = badges;
   window.completedChores = completedChores;
+  window.pointLogs = pointLogs;
 }
 
 export async function main() {
@@ -61,7 +63,7 @@ export async function main() {
       saveToSupabase('user_points', userPoints);
     }
   });
-  setProfileData(profilesData, badges, badgeTypes, userPoints, completedChores);
+  setProfileData(profilesData, badges, badgeTypes, userPoints, completedChores, pointLogs);
 
   // Q&A robust setup (NO undefined errors!)
   setupQA({
