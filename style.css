@@ -1,31 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 /*
-  Define a soft pastel colour palette for the family dashboard. These CSS variables
-  make it easy to tweak the look and feel consistently across the app. The
-  primary colour is a soft lavender, secondary is mint green and the accent
-  colour is a light blue. Backgrounds use a near‑white shade to reduce eye strain.
+  Global design system variables for a consistent theme across the app.
+  The palette centres on a deep blue primary and a warm yellow secondary
+  with neutral grays and whites.
 */
 :root {
-  --color-primary: #c5cae9;   /* lavender */
-  --color-secondary: #a8e6cf; /* mint */
-  --color-accent: #b3e5fc;    /* light blue */
-  --color-background: #fafcff; /* light background */
+  --color-primary: #1D4E89;   /* brand blue */
+  --color-secondary: #F3B44C; /* brand yellow */
+  --color-accent: var(--color-secondary);
+  --color-background: #fefefe;
   --color-card: #ffffff;
   --color-text: #333333;
   --color-border: #e0e0e0;
-  --accent-ghassan: #6b42f5;
-  --accent-mariem: #009688;
-  --accent-yazid: #2196f3;
-  --accent-yahya: #4caf50;
-  --accent-color: var(--accent-ghassan);
+  --radius-md: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-bold: 600;
 }
-
-body[data-user="Ghassan"] { --accent-color: var(--accent-ghassan); }
-body[data-user="Mariem"]  { --accent-color: var(--accent-mariem); }
-body[data-user="Yazid"]   { --accent-color: var(--accent-yazid); }
-body[data-user="Yahya"]   { --accent-color: var(--accent-yahya); }
 
 [data-theme="dark"] {
   --color-background: #1e1e20;
@@ -51,8 +46,9 @@ button:focus-visible,
   display: none !important;
 }
 body, html {
-  margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
   font-size: 16px;
   background: var(--color-background);
   color: var(--color-text);
@@ -60,6 +56,62 @@ body, html {
   min-height: 100vh;
   overflow-x: hidden;
   max-width: 100vw;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-top: 0;
+}
+
+p, label, span, li {
+  font-weight: var(--font-normal);
+  color: var(--color-text);
+}
+
+/* Buttons */
+button,
+.btn {
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover,
+.btn:hover {
+  background-color: #173d6b;
+}
+
+/* Input fields */
+input,
+select,
+textarea {
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 16px;
+  font-family: inherit;
+  background: #fff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #888;
+}
+
+/* Containers */
+.container,
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 nav.sidebar {
   width: 260px;
@@ -73,15 +125,17 @@ nav.sidebar {
   position: relative;
 }
 nav.sidebar .logo {
-  /* Use a playful handwritten font for the logo. The Pacifico font is defined in index.html */
-  font-family: 'Pacifico', cursive;
-  font-weight: 400;
-  font-size: 1.6rem;
-  color: var(--accent-color);
-  margin-bottom: 1.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  margin-bottom: var(--space-lg);
   user-select: none;
   display: flex;
   align-items: center;
+}
+nav.sidebar .logo span {
+  color: var(--color-secondary);
 }
 nav.sidebar input[type="search"] {
   padding: 0.6rem 1rem;
@@ -185,17 +239,31 @@ main.content {
   user-select: none;
   flex-wrap: wrap;
   gap: 1rem;
+  background: var(--color-primary);
+  color: #fff;
+  padding: var(--space-md);
+}
+.topbar .logo {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.topbar .logo span {
+  color: #fff;
 }
 .topbar .greeting {
   font-weight: 700;
   font-size: 1.3rem;
-  color: #222;
+  color: #fff;
   flex-grow: 1;
   min-width: 200px;
 }
 .topbar .date {
   font-size: 0.85rem;
-  color: #999;
+  color: rgba(255,255,255,0.8);
 }
 .topbar .right-controls {
   display: flex;
@@ -203,6 +271,7 @@ main.content {
   gap: 1rem;
   flex-wrap: nowrap;
   min-width: 220px;
+  color: #fff;
 }
 .profile-dropdown {
   position: relative;
@@ -226,6 +295,7 @@ main.content {
   flex-direction: column;
   backdrop-filter: blur(2px);
   z-index: 1000;
+  color: var(--color-text);
 }
 .profile-menu button {
   background: none;
@@ -234,6 +304,7 @@ main.content {
   text-align: left;
   cursor: pointer;
   font-size: 0.9rem;
+  color: var(--color-text);
 }
 .profile-menu button:hover {
   background: var(--color-border);
@@ -247,18 +318,20 @@ main.content {
   margin: 0.4rem 0;
 }
 .topbar .search-input {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 0.9rem;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-primary);
+  font-size: 16px;
   outline: none;
   width: 100%;
   max-width: 220px;
   transition: border-color 0.3s ease;
+  background: #fff;
+  color: var(--color-text);
 }
 .topbar .search-input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 6px var(--accent-color);
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 6px var(--color-secondary);
 }
 .topbar button.bell-btn {
   background: transparent;
@@ -266,12 +339,12 @@ main.content {
   cursor: pointer;
   position: relative;
   padding: 0;
-  color: var(--color-text);
+  color: #fff;
   transition: color 0.3s ease;
   flex-shrink: 0;
 }
 .topbar button.bell-btn:hover {
-  color: var(--accent-color);
+  color: var(--color-secondary);
 }
 .topbar button.bell-btn svg {
   width: 22px;
@@ -284,10 +357,10 @@ main.content {
   cursor: pointer;
   font-size: 1.2rem;
   padding: 0 0.4rem;
-  color: var(--color-text);
+  color: #fff;
 }
 .theme-toggle:hover {
-  color: var(--accent-color);
+  color: var(--color-secondary);
 }
 .notification-badge {
   position: absolute;
@@ -1140,13 +1213,13 @@ button.btn-secondary:hover {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--color-text);
+  color: #fff;
   cursor: pointer;
   display: none;
   padding: 0.4rem;
 }
 .hamburger-btn:hover {
-  color: var(--color-primary);
+  color: var(--color-secondary);
 }
 
 /* Floating menu button for small screens */
