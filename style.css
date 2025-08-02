@@ -37,6 +37,16 @@ body[data-user="Yahya"]   { --accent-color: var(--accent-yahya); }
 * {
   box-sizing: border-box;
 }
+[role="menuitem"], button {
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+button:focus-visible,
+[role="menuitem"]:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
 [hidden] {
   display: none !important;
 }
@@ -102,7 +112,7 @@ nav.sidebar li {
   padding: 0.9rem 1rem;
   border-radius: 12px;
   font-weight: 600;
-  color: #666;
+  color: var(--color-text);
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
   user-select: none;
@@ -256,7 +266,7 @@ main.content {
   cursor: pointer;
   position: relative;
   padding: 0;
-  color: #666;
+  color: var(--color-text);
   transition: color 0.3s ease;
   flex-shrink: 0;
 }
@@ -386,7 +396,7 @@ ul.wall-posts li strong {
 }
 .wall-post-date {
   font-size: 0.8rem;
-  color: #666;
+  color: #555;
   margin-left: 6px;
   font-weight: 400;
   user-select: none;
@@ -1204,10 +1214,10 @@ nav.bottom-nav::after {
 
 @media (max-width: 600px) {
   .hamburger-btn {
-    display: none;
+    display: inline-block;
   }
   .floating-menu-btn {
-    display: flex;
+    display: none;
   }
   nav.bottom-nav {
     display: flex;
